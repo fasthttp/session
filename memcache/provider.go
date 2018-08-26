@@ -21,7 +21,6 @@ var (
 // Provider provider struct
 type Provider struct {
 	config         *Config
-	values         *session.CCMap
 	memCacheClient *memcache.Client
 	maxLifeTime    int64
 }
@@ -30,7 +29,6 @@ type Provider struct {
 func NewProvider() *Provider {
 	return &Provider{
 		config:         &Config{},
-		values:         session.NewDefaultCCMap(),
 		memCacheClient: &memcache.Client{},
 	}
 }
