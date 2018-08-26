@@ -1,10 +1,9 @@
 session
 =======
 
-[![build](https://img.shields.io/shippable/5444c5ecb904a4b21567b0ff.svg)](https://travis-ci.org/fasthttp/session)
+[![Build Status](https://img.shields.io/shippable/5444c5ecb904a4b21567b0ff.svg)](https://travis-ci.org/fasthttp/session)
+[![Go Report Card](https://goreportcard.com/badge/github.com/fasthttp/session)](https://goreportcard.com/report/github.com/fasthttp/session)
 [![GoDoc](https://godoc.org/github.com/fasthttp/session?status.svg)](https://godoc.org/github.com/fasthttp/session)
-[![go_Report](https://goreportcard.com/badge/github.com/fasthttp/session)](https://goreportcard.com/report/github.com/fasthttp/session)
-
 
 ## Providers
 
