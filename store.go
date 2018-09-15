@@ -1,6 +1,7 @@
 package session
 
 import (
+	"github.com/savsgio/dictpool"
 	"github.com/valyala/fasthttp"
 )
 
@@ -8,7 +9,7 @@ import (
 type SessionStore interface {
 	Save(*fasthttp.RequestCtx) error
 	Get(key string) interface{}
-	GetAll() map[string]interface{}
+	GetAll() *dictpool.Dict
 	Set(key string, value interface{})
 	Delete(key string)
 	Flush()
@@ -18,14 +19,29 @@ type SessionStore interface {
 // Store store
 type Store struct {
 	sessionID string
-	data      *CCMap
+	data      *dictpool.Dict
+}
+
+func fnvHash(key string) uint32 {
+	hash := uint32(2166136261)
+	const prime32 = uint32(16777619)
+	for i := 0; i < len(key); i++ {
+		hash *= prime32
+		hash ^= uint32(key[i])
+	}
+	return hash
 }
 
 // Init init store data and sessionID
-func (s *Store) Init(sessionID string, data map[string]interface{}) {
+func (s *Store) Init(sessionID string, data *dictpool.Dict) {
 	s.sessionID = sessionID
-	s.data = NewDefaultCCMap()
-	s.data.MSet(data)
+	s.data = dictpool.AcquireDict()
+
+	if data != nil {
+		for _, kv := range data.D {
+			s.data.SetBytes(kv.Key, kv.Value)
+		}
+	}
 }
 
 // Get get data by key
@@ -34,8 +50,8 @@ func (s *Store) Get(key string) interface{} {
 }
 
 // GetAll get all data
-func (s *Store) GetAll() map[string]interface{} {
-	return s.data.GetAll()
+func (s *Store) GetAll() *dictpool.Dict {
+	return s.data
 }
 
 // Set set data
@@ -45,12 +61,12 @@ func (s *Store) Set(key string, value interface{}) {
 
 // Delete delete data by key
 func (s *Store) Delete(key string) {
-	s.data.Delete(key)
+	s.data.Del(key)
 }
 
 // Flush flush all data
 func (s *Store) Flush() {
-	s.data.Clear()
+	s.data.Reset()
 }
 
 // GetSessionID get session id

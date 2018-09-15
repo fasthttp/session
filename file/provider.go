@@ -122,7 +122,7 @@ func (fp *Provider) ReadStore(sessionID string) (session.SessionStore, error) {
 	if err != nil {
 		return store, err
 	}
-	store.Init(sessionID, map[string]interface{}{})
+	store.Init(sessionID, nil)
 
 	return store, nil
 }
@@ -170,7 +170,7 @@ func (fp *Provider) Regenerate(oldSessionID string, sessionID string) (session.S
 		return store, nil
 	}
 
-	store.Init(sessionID, map[string]interface{}{})
+	store.Init(sessionID, nil)
 
 	return store, nil
 }

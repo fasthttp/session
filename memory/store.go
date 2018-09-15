@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/fasthttp/session"
+	"github.com/savsgio/dictpool"
 	"github.com/valyala/fasthttp"
 )
 
@@ -13,12 +14,12 @@ import (
 // NewMemoryStore new default memory store
 func NewMemoryStore(sessionID string) *Store {
 	memStore := &Store{}
-	memStore.Init(sessionID, make(map[string]interface{}))
+	memStore.Init(sessionID, nil)
 	return memStore
 }
 
 // NewMemoryStoreData new memory store data
-func NewMemoryStoreData(sessionID string, data map[string]interface{}) *Store {
+func NewMemoryStoreData(sessionID string, data *dictpool.Dict) *Store {
 	memStore := &Store{}
 	memStore.Init(sessionID, data)
 	return memStore

@@ -5,6 +5,8 @@ import (
 	"encoding/base64"
 	"encoding/gob"
 	"encoding/json"
+
+	"github.com/savsgio/dictpool"
 )
 
 // session Encrypt tool
@@ -41,12 +43,12 @@ func (s *Encrypt) JSONDecode(data []byte) (map[string]interface{}, error) {
 }
 
 // GOBEncode gob encode
-func (s *Encrypt) GOBEncode(data map[string]interface{}) ([]byte, error) {
-	if len(data) == 0 {
+func (s *Encrypt) GOBEncode(data *dictpool.Dict) ([]byte, error) {
+	if len(data.D) == 0 {
 		return []byte(""), nil
 	}
-	for _, v := range data {
-		gob.Register(v)
+	for _, kv := range data.D {
+		gob.Register(kv)
 	}
 	buf := bytes.NewBuffer(nil)
 	enc := gob.NewEncoder(buf)
@@ -58,23 +60,24 @@ func (s *Encrypt) GOBEncode(data map[string]interface{}) ([]byte, error) {
 }
 
 // GOBDecode gob decode data to map
-func (s *Encrypt) GOBDecode(data []byte) (map[string]interface{}, error) {
+func (s *Encrypt) GOBDecode(data []byte) (*dictpool.Dict, error) {
 
 	if len(data) == 0 {
-		return make(map[string]interface{}), nil
+		return dictpool.AcquireDict(), nil
 	}
 	buf := bytes.NewBuffer(data)
 	dec := gob.NewDecoder(buf)
-	var out map[string]interface{}
+
+	var out dictpool.Dict
 	err := dec.Decode(&out)
 	if err != nil {
-		return make(map[string]interface{}), err
+		return dictpool.AcquireDict(), err
 	}
-	return out, nil
+	return &out, nil
 }
 
 // Base64Encode base64 encode
-func (s *Encrypt) Base64Encode(data map[string]interface{}) ([]byte, error) {
+func (s *Encrypt) Base64Encode(data *dictpool.Dict) ([]byte, error) {
 	var coder = base64.NewEncoding(BASE64TABLE)
 	b, err := s.GOBEncode(data)
 	if err != nil {
@@ -84,7 +87,7 @@ func (s *Encrypt) Base64Encode(data map[string]interface{}) ([]byte, error) {
 }
 
 // Base64Decode base64 decode
-func (s *Encrypt) Base64Decode(data []byte) (map[string]interface{}, error) {
+func (s *Encrypt) Base64Decode(data []byte) (*dictpool.Dict, error) {
 	var coder = base64.NewEncoding(BASE64TABLE)
 	b, err := coder.DecodeString(string(data))
 	if err != nil {

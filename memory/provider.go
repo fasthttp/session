@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/fasthttp/session"
+	"github.com/savsgio/dictpool"
 )
 
 // session memory provider
@@ -16,7 +17,7 @@ const ProviderName = "memory"
 // Provider provider struct
 type Provider struct {
 	config      *Config
-	values      *session.CCMap
+	values      *dictpool.Dict
 	maxLifeTime int64
 }
 
@@ -24,7 +25,7 @@ type Provider struct {
 func NewProvider() *Provider {
 	return &Provider{
 		config:      &Config{},
-		values:      session.NewDefaultCCMap(),
+		values:      dictpool.AcquireDict(),
 		maxLifeTime: 0,
 	}
 }
@@ -49,10 +50,10 @@ func (mp *Provider) NeedGC() bool {
 
 // GC session garbage collection
 func (mp *Provider) GC() {
-	for sessionID, value := range mp.values.GetAll() {
-		if time.Now().Unix() >= value.(*Store).lastActiveTime+mp.maxLifeTime {
+	for _, kv := range mp.values.D {
+		if time.Now().Unix() >= kv.Value.(*Store).lastActiveTime+mp.maxLifeTime {
 			// destroy session sessionID
-			mp.Destroy(sessionID)
+			mp.Destroy(string(kv.Key))
 			return
 		}
 	}
@@ -72,15 +73,16 @@ func (mp *Provider) ReadStore(sessionID string) (session.SessionStore, error) {
 }
 
 // Regenerate regenerate session
-func (mp *Provider) Regenerate(oldSessionId string, sessionID string) (session.SessionStore, error) {
-	memStoreInter := mp.values.Get(oldSessionId)
+func (mp *Provider) Regenerate(oldSessionID string, sessionID string) (session.SessionStore, error) {
+	memStoreInter := mp.values.Get(oldSessionID)
 	if memStoreInter != nil {
 		memStore := memStoreInter.(*Store)
 		// insert new session store
 		newMemStore := NewMemoryStoreData(sessionID, memStore.GetAll())
 		mp.values.Set(sessionID, newMemStore)
 		// delete old session store
-		mp.values.Delete(oldSessionId)
+		mp.values.Del(oldSessionID)
+
 		return newMemStore, nil
 	}
 
@@ -92,13 +94,13 @@ func (mp *Provider) Regenerate(oldSessionId string, sessionID string) (session.S
 
 // Destroy destroy session by sessionID
 func (mp *Provider) Destroy(sessionID string) error {
-	mp.values.Delete(sessionID)
+	mp.values.Del(sessionID)
 	return nil
 }
 
 // Count session values count
 func (mp *Provider) Count() int {
-	return mp.values.Count()
+	return len(mp.values.D)
 }
 
 // register session provider
