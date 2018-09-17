@@ -3,6 +3,7 @@ package memcache
 import (
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/fasthttp/session"
+	"github.com/savsgio/dictpool"
 	"github.com/valyala/fasthttp"
 )
 
@@ -11,12 +12,12 @@ import (
 // NewMemCacheStore new default memCache store
 func NewMemCacheStore(sessionID string) *Store {
 	memCacheStore := &Store{}
-	memCacheStore.Init(sessionID, make(map[string]interface{}))
+	memCacheStore.Init(sessionID, nil)
 	return memCacheStore
 }
 
 // NewMemCacheStoreData new memCache store data
-func NewMemCacheStoreData(sessionID string, data map[string]interface{}) *Store {
+func NewMemCacheStoreData(sessionID string, data *dictpool.Dict) *Store {
 	memCacheStore := &Store{}
 	memCacheStore.Init(sessionID, data)
 	return memCacheStore

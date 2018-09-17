@@ -22,7 +22,6 @@ session
 - Provide full session storage.
 - Convenient switching of session storage.
 - Customizable data serialization.
-- Implement concurrent map(ccmap.go) to improve performance.
 
 
 ## Others

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/fasthttp/session"
+	"github.com/savsgio/dictpool"
 	"github.com/valyala/fasthttp"
 )
 
@@ -12,12 +13,12 @@ import (
 // NewMysqlStore new default mysql store
 func NewMysqlStore(sessionID string) *Store {
 	mysqlStore := &Store{}
-	mysqlStore.Init(sessionID, make(map[string]interface{}))
+	mysqlStore.Init(sessionID, nil)
 	return mysqlStore
 }
 
 // NewMysqlStoreData new mysql store data
-func NewMysqlStoreData(sessionID string, data map[string]interface{}) *Store {
+func NewMysqlStoreData(sessionID string, data *dictpool.Dict) *Store {
 	mysqlStore := &Store{}
 	mysqlStore.Init(sessionID, data)
 	return mysqlStore

@@ -19,23 +19,13 @@ type SessionStore interface {
 // Store store
 type Store struct {
 	sessionID string
-	data      *dictpool.Dict
-}
-
-func fnvHash(key string) uint32 {
-	hash := uint32(2166136261)
-	const prime32 = uint32(16777619)
-	for i := 0; i < len(key); i++ {
-		hash *= prime32
-		hash ^= uint32(key[i])
-	}
-	return hash
+	data      dictpool.Dict
 }
 
 // Init init store data and sessionID
 func (s *Store) Init(sessionID string, data *dictpool.Dict) {
 	s.sessionID = sessionID
-	s.data = dictpool.AcquireDict()
+	s.data = dictpool.Dict{}
 
 	if data != nil {
 		for _, kv := range data.D {
@@ -51,7 +41,7 @@ func (s *Store) Get(key string) interface{} {
 
 // GetAll get all data
 func (s *Store) GetAll() *dictpool.Dict {
-	return s.data
+	return &s.data
 }
 
 // Set set data

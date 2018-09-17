@@ -1,5 +1,7 @@
 package sqlite3
 
+import "github.com/savsgio/dictpool"
+
 // Config session sqlite3 config
 type Config struct {
 
@@ -16,10 +18,10 @@ type Config struct {
 	SetMaxOpenConn int
 
 	// session value serialize func
-	SerializeFunc func(data map[string]interface{}) ([]byte, error)
+	SerializeFunc func(data *dictpool.Dict) ([]byte, error)
 
 	// session value unSerialize func
-	UnSerializeFunc func(data []byte) (map[string]interface{}, error)
+	UnSerializeFunc func(data []byte) (*dictpool.Dict, error)
 }
 
 // NewConfigWith instance new config with especific paremters

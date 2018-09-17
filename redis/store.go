@@ -2,6 +2,7 @@ package redis
 
 import (
 	"github.com/fasthttp/session"
+	"github.com/savsgio/dictpool"
 	"github.com/valyala/fasthttp"
 )
 
@@ -10,12 +11,12 @@ import (
 // NewRedisStore new default redis store
 func NewRedisStore(sessionID string) *Store {
 	redisStore := &Store{}
-	redisStore.Init(sessionID, make(map[string]interface{}))
+	redisStore.Init(sessionID, nil)
 	return redisStore
 }
 
 // NewRedisStoreData new redis store data
-func NewRedisStoreData(sessionID string, data map[string]interface{}) *Store {
+func NewRedisStoreData(sessionID string, data *dictpool.Dict) *Store {
 	redisStore := &Store{}
 	redisStore.Init(sessionID, data)
 	return redisStore

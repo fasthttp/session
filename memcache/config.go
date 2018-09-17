@@ -1,5 +1,7 @@
 package memcache
 
+import "github.com/savsgio/dictpool"
+
 // Config session memcache config
 type Config struct {
 
@@ -18,10 +20,10 @@ type Config struct {
 	KeyPrefix string
 
 	// session value serialize func
-	SerializeFunc func(data map[string]interface{}) ([]byte, error)
+	SerializeFunc func(data *dictpool.Dict) ([]byte, error)
 
 	// session value unSerialize func
-	UnSerializeFunc func(data []byte) (map[string]interface{}, error)
+	UnSerializeFunc func(data []byte) (*dictpool.Dict, error)
 }
 
 // Name return provider name

@@ -178,10 +178,10 @@ func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) (sessionStore SessionStor
 	// encode cookie value
 	encodeCookieValue := s.config.Encode(sessionID)
 
-	oldSessionId := s.GetSessionID(ctx)
+	oldSessionID := s.GetSessionID(ctx)
 	// regenerate provider session store
-	if oldSessionId != "" {
-		sessionStore, err = s.provider.Regenerate(oldSessionId, sessionID)
+	if oldSessionID != "" {
+		sessionStore, err = s.provider.Regenerate(oldSessionID, sessionID)
 	} else {
 		sessionStore, err = s.provider.ReadStore(sessionID)
 	}

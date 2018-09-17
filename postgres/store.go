@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/fasthttp/session"
+	"github.com/savsgio/dictpool"
 	"github.com/valyala/fasthttp"
 )
 
@@ -12,12 +13,12 @@ import (
 // NewPostgresStore new default postgres store
 func NewPostgresStore(sessionID string) *Store {
 	postgresStore := &Store{}
-	postgresStore.Init(sessionID, make(map[string]interface{}))
+	postgresStore.Init(sessionID, nil)
 	return postgresStore
 }
 
 // NewPostgresStoreData new postgres store data
-func NewPostgresStoreData(sessionID string, data map[string]interface{}) *Store {
+func NewPostgresStoreData(sessionID string, data *dictpool.Dict) *Store {
 	postgresStore := &Store{}
 	postgresStore.Init(sessionID, data)
 	return postgresStore

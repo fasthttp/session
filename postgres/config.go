@@ -3,6 +3,8 @@ package postgres
 import (
 	"fmt"
 	"net/url"
+
+	"github.com/savsgio/dictpool"
 )
 
 // Config session postgres config
@@ -37,10 +39,10 @@ type Config struct {
 	SetMaxOpenConn int
 
 	// session value serialize func
-	SerializeFunc func(data map[string]interface{}) ([]byte, error)
+	SerializeFunc func(data *dictpool.Dict) ([]byte, error)
 
 	// session value unSerialize func
-	UnSerializeFunc func(data []byte) (map[string]interface{}, error)
+	UnSerializeFunc func(data []byte) (*dictpool.Dict, error)
 }
 
 // NewConfigWith instance new config with especific paremters
