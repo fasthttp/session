@@ -11,7 +11,7 @@ type Cookie struct{}
 
 // NewCookie return new cookie instance
 func NewCookie() *Cookie {
-	return &Cookie{}
+	return new(Cookie)
 }
 
 // Get get cookie by name

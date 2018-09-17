@@ -8,7 +8,7 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-var version = "v0.0.1"
+var version = "v1.0.0"
 
 // Session session struct
 type Session struct {

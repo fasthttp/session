@@ -47,33 +47,34 @@ func (s *Encrypt) GOBEncode(data *dictpool.Dict) ([]byte, error) {
 	if len(data.D) == 0 {
 		return []byte(""), nil
 	}
+
 	for _, kv := range data.D {
 		gob.Register(kv)
 	}
 	buf := bytes.NewBuffer(nil)
-	enc := gob.NewEncoder(buf)
-	err := enc.Encode(data)
+	err := gob.NewEncoder(buf).Encode(data)
 	if err != nil {
 		return []byte(""), err
 	}
+
 	return buf.Bytes(), nil
 }
 
 // GOBDecode gob decode data to map
 func (s *Encrypt) GOBDecode(data []byte) (*dictpool.Dict, error) {
+	d := dictpool.AcquireDict()
 
 	if len(data) == 0 {
-		return dictpool.AcquireDict(), nil
+		return d, nil
 	}
+
 	buf := bytes.NewBuffer(data)
 	dec := gob.NewDecoder(buf)
-
-	var out dictpool.Dict
-	err := dec.Decode(&out)
+	err := dec.Decode(d)
 	if err != nil {
-		return dictpool.AcquireDict(), err
+		return d, err
 	}
-	return &out, nil
+	return d, nil
 }
 
 // Base64Encode base64 encode

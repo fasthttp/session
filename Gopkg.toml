@@ -26,10 +26,10 @@
   name = "github.com/valyala/fasthttp"
   branch = "master"
 
-[prune]
-  go-tests = true
-  unused-packages = true
-
 [[constraint]]
   branch = "master"
   name = "github.com/savsgio/dictpool"
+
+[prune]
+  go-tests = true
+  unused-packages = true
