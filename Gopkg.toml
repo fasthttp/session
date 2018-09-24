@@ -1,0 +1,39 @@
+[[constraint]]
+  branch = "master"
+  name = "github.com/bradfitz/gomemcache"
+
+[[constraint]]
+  name = "github.com/go-sql-driver/mysql"
+  version = "1.4.0"
+
+[[constraint]]
+  name = "github.com/lib/pq"
+  version = "1.0.0"
+
+[[constraint]]
+  name = "github.com/gomodule/redigo"
+  version = "2.0.0"
+
+[[constraint]]
+  name = "github.com/mattn/go-sqlite3"
+  version = "1.9.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/savsgio/dictpool"
+
+[[constraint]]
+  name = "github.com/valyala/bytebufferpool"
+  version = "1.0.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/valyala/fasthttp"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/valyala/fastrand"
+
+[prune]
+  go-tests = true
+  unused-packages = true

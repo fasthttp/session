@@ -1,0 +1,152 @@
+package postgres
+
+import (
+	"time"
+
+	"github.com/fasthttp/session"
+	"github.com/valyala/bytebufferpool"
+)
+
+var (
+	provider = NewProvider()
+	encrypt  = session.NewEncrypt()
+)
+
+// NewProvider new mysql provider
+func NewProvider() *Provider {
+	return &Provider{
+		config: new(Config),
+		db:     new(Dao),
+	}
+}
+
+// Init init provider config
+func (pp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
+	if cfg.Name() != ProviderName {
+		return errInvalidProviderConfig
+	}
+
+	pp.config = cfg.(*Config)
+	pp.maxLifeTime = lifeTime
+
+	if pp.config.Host == "" {
+		return errConfigHostEmpty
+	}
+	if pp.config.Port == 0 {
+		return errConfigPortZero
+	}
+
+	if pp.config.SerializeFunc == nil {
+		pp.config.SerializeFunc = encrypt.Base64Encode
+	}
+	if pp.config.UnSerializeFunc == nil {
+		pp.config.UnSerializeFunc = encrypt.Base64Decode
+	}
+
+	var err error
+	pp.db, err = NewDao("postgres", pp.config.getPostgresDSN(), pp.config.TableName)
+	if err != nil {
+		return err
+	}
+	pp.db.Connection.SetMaxOpenConns(pp.config.SetMaxIdleConn)
+	pp.db.Connection.SetMaxIdleConns(pp.config.SetMaxIdleConn)
+
+	return pp.db.Connection.Ping()
+}
+
+// ReadStore read session store by session id
+func (pp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
+	var store *Store
+
+	row, err := pp.db.getSessionBySessionID(sessionID)
+
+	if row.sessionID != "" { // Exist
+		buff := bytebufferpool.Get()
+		buff.SetString(row.contents)
+		data, err := pp.config.UnSerializeFunc(buff.Bytes())
+		bytebufferpool.Put(buff)
+
+		if err != nil {
+			return nil, err
+		}
+
+		store = NewStore(sessionID, data)
+
+	} else { // Not exist
+		_, err := pp.db.insert(sessionID, nil, time.Now().Unix())
+		if err != nil {
+			return nil, err
+		}
+		store = NewStore(sessionID, nil)
+	}
+
+	releaseDBRow(row)
+
+	return store, err
+}
+
+// Regenerate regenerate session
+func (pp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
+	var store *Store
+
+	row, err := pp.db.getSessionBySessionID(oldID)
+	now := time.Now().Unix()
+
+	if row.sessionID != "" { // Exists
+		_, err = pp.db.regenerate(newID, oldID, now)
+		if err != nil {
+			return nil, err
+		}
+
+		buff := bytebufferpool.Get()
+		buff.SetString(row.contents)
+		data, err := pp.config.UnSerializeFunc(buff.Bytes())
+		bytebufferpool.Put(buff)
+
+		if err != nil {
+			return nil, err
+		}
+
+		store = NewStore(newID, data)
+
+	} else { // Not exist
+		_, err := pp.db.insert(newID, nil, now)
+		if err != nil {
+			return nil, err
+		}
+		store = NewStore(newID, nil)
+	}
+
+	releaseDBRow(row)
+
+	return store, nil
+}
+
+// Destroy destroy session by sessionID
+func (pp *Provider) Destroy(sessionID []byte) error {
+	_, err := pp.db.deleteBySessionID(sessionID)
+	return err
+}
+
+// Count session values count
+func (pp *Provider) Count() int {
+	return pp.db.countSessions()
+}
+
+// NeedGC need gc
+func (pp *Provider) NeedGC() bool {
+	return true
+}
+
+// GC session mysql provider not need garbage collection
+func (pp *Provider) GC() {
+	_, err := pp.db.deleteSessionByMaxLifeTime(pp.maxLifeTime)
+	if err != nil {
+		panic(err)
+	}
+}
+
+// register session provider
+func init() {
+	session.Register(ProviderName, provider)
+}
