@@ -8,7 +8,7 @@ session
 
 Provide session storage to [fasthttp](https://github.com/valyala/fasthttp).
 
-This package follow the fasthttp philosophy, trying to avoid memory allocations in hot paths.
+This package follow the fasthttp philosophy, trying to avoid extra memory allocations in hot paths.
 
 See [examples](https://github.com/fasthttp/session/tree/master/examples) to see how to use it.
 
