@@ -6,6 +6,12 @@ session
 [![GoDoc](https://godoc.org/github.com/fasthttp/session?status.svg)](https://godoc.org/github.com/fasthttp/session)
 
 
+Provide session storage to [fasthttp](https://github.com/valyala/fasthttp).
+
+This package follow the fasthttp philosophy, trying to avoid memory allocations in hot paths.
+
+See [examples](https://github.com/fasthttp/session/tree/master/examples) to see how to use it.
+
 ## Providers
 
 - memory
@@ -22,3 +28,8 @@ session
 - Provide full session storage.
 - Convenient switching of session storage.
 - Customizable data serialization.
+
+
+## Bugs
+
+***If you find a bug, please open new issue.***
