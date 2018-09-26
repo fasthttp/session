@@ -90,14 +90,14 @@ func (db *Dao) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	}
 	defer buf.stmt.Close()
 
-	dataSet, err := buf.stmt.Query(args...)
+	rows, err := buf.stmt.Query(args...)
 	if err != nil {
 		return nil, err
 	}
 
 	releaseDaoBuffer(buf)
 
-	return dataSet, err
+	return rows, err
 }
 
 // QueryRow get just one data from database
