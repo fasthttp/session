@@ -1,7 +1,5 @@
 package main
 
-// session redis provider example
-
 import (
 	"flag"
 	"log"
