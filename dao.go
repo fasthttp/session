@@ -14,6 +14,7 @@ var daoBufferPool = sync.Pool{
 func (buf *daoBuffer) reset() {
 	buf.tx = nil
 	buf.stmt = nil
+	buf.res = nil
 }
 
 func acquireDaoBuffer() *daoBuffer {
@@ -67,11 +68,11 @@ func (db *Dao) Exec(query string, args ...interface{}) (int64, error) {
 	}
 	defer buf.stmt.Close()
 
-	res, err := buf.stmt.Exec(args...)
+	buf.res, err = buf.stmt.Exec(args...)
 	if err != nil {
 		return 0, err
 	}
-	x, err := res.RowsAffected()
+	x, err := buf.res.RowsAffected()
 	if err != nil {
 		return 0, nil
 	}

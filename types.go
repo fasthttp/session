@@ -81,6 +81,7 @@ type Dao struct {
 type daoBuffer struct {
 	tx   *sql.Tx
 	stmt *sql.Stmt
+	res  sql.Result
 }
 
 // Store store
