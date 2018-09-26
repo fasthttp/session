@@ -77,6 +77,12 @@ type Dao struct {
 	Connection *sql.DB
 }
 
+// daoBuffer dao buffer
+type daoBuffer struct {
+	tx   *sql.Tx
+	stmt *sql.Stmt
+}
+
 // Store store
 type Store struct {
 	sessionID []byte
