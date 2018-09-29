@@ -69,11 +69,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:41b7d05c80e7dadb3daea1fe9af4a686b59129c969ddb44008fd35359fd713c3"
+  digest = "1:dd037157a32ae87c637f0b34b5778be3d81c96e9d133f388dd348eb29cf8f28c"
   name = "github.com/savsgio/dictpool"
   packages = ["."]
   pruneopts = "UT"
-  revision = "bfb5acc8ab70a8e9f8eff8a4d70a4b3f8cac19b7"
+  revision = "4a64f9409f6438ec421654dce7665b5519682236"
 
 [[projects]]
   digest = "1:c468422f334a6b46a19448ad59aaffdfc0a36b08fdcc1c749a0b29b6453d7e59"
@@ -85,7 +85,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9aadc4ceaf99c20970db34777086d60315f22f315905ae21f885c584de833de7"
+  digest = "1:f50e0fcea5c6fc4aab2780a605dd523fa80e17ec18a27c9e0baacc48d2a86ce1"
   name = "github.com/valyala/fasthttp"
   packages = [
     ".",
@@ -93,7 +93,7 @@
     "stackless",
   ]
   pruneopts = "UT"
-  revision = "1ba43613e8dfb7ee0b7f974df9157dfb6f21c625"
+  revision = "761788a34bb692702c1447e149476362e8038a5a"
 
 [[projects]]
   branch = "master"
