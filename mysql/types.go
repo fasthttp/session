@@ -69,7 +69,7 @@ type Store struct {
 type Dao struct {
 	session.Dao
 
-	TableName string
+	tableName string
 
 	sqlGetSessionBySessionID      string
 	sqlCountSessions              string

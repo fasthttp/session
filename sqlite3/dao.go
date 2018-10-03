@@ -34,7 +34,7 @@ func (row *DBRow) Reset() {
 
 // NewDao create new database access object
 func NewDao(driver, dsn, tableName string) (*Dao, error) {
-	db := &Dao{TableName: tableName}
+	db := &Dao{tableName: tableName}
 	db.Driver = driver
 	db.Dsn = dsn
 
@@ -104,6 +104,6 @@ func (db *Dao) insert(sessionID, contents []byte, lastActiveTime int64) (int64, 
 }
 
 // insert new session
-func (db *Dao) regenerate(newID, oldID []byte, lastActiveTime int64) (int64, error) {
+func (db *Dao) regenerate(oldID, newID []byte, lastActiveTime int64) (int64, error) {
 	return db.Exec(db.sqlRegenerate, string(newID), lastActiveTime, string(oldID))
 }

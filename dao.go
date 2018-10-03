@@ -74,7 +74,7 @@ func (db *Dao) Exec(query string, args ...interface{}) (int64, error) {
 	}
 	x, err := buf.res.RowsAffected()
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 	err = buf.tx.Commit()
 
@@ -98,7 +98,7 @@ func (db *Dao) Query(query string, args ...interface{}) (*sql.Rows, error) {
 
 	releaseDaoBuffer(buf)
 
-	return rows, err
+	return rows, nil
 }
 
 // QueryRow get just one data from database
@@ -109,5 +109,9 @@ func (db *Dao) QueryRow(query string, args ...interface{}) (*sql.Row, error) {
 	}
 	defer buf.stmt.Close()
 
-	return buf.stmt.QueryRow(args...), nil
+	row := buf.stmt.QueryRow(args...)
+
+	releaseDaoBuffer(buf)
+
+	return row, nil
 }

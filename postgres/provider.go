@@ -93,7 +93,7 @@ func (pp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 	now := time.Now().Unix()
 
 	if row.sessionID != "" { // Exists
-		_, err = pp.db.regenerate(newID, oldID, now)
+		_, err = pp.db.regenerate(oldID, newID, now)
 		if err != nil {
 			return nil, err
 		}

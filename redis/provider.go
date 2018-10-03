@@ -87,7 +87,9 @@ func (rp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 
 	var store *Store
 
-	reply, err := redis.Bytes(conn.Do("GET", rp.getRedisSessionKey(sessionID)))
+	key := rp.getRedisSessionKey(sessionID)
+
+	reply, err := redis.Bytes(conn.Do("GET", key))
 	if err == nil { // Exist
 		data, err := rp.config.UnSerializeFunc(reply)
 		if err != nil {
@@ -97,7 +99,7 @@ func (rp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 		store = NewStore(sessionID, data)
 
 	} else if err == redis.ErrNil { // Not exist
-		conn.Do("SET", rp.getRedisSessionKey(sessionID), "", "EX", rp.maxLifeTime)
+		conn.Do("SET", key, "", "EX", rp.maxLifeTime)
 		store = NewStore(sessionID, nil)
 	}
 
@@ -113,13 +115,13 @@ func (rp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 	oldKey := rp.getRedisSessionKey(oldID)
 	newKey := rp.getRedisSessionKey(newID)
 
-	existed, err := redis.Int(conn.Do("EXISTS", oldKey))
-	if err != nil || existed == 0 {
-		// false
+	exists, err := redis.Bool(conn.Do("EXISTS", oldKey))
+	if err != nil || !exists { // Not exist
 		conn.Do("SET", newKey, "", "EX", rp.maxLifeTime)
 		return NewStore(newID, nil), nil
 	}
-	// true
+
+	// Exist
 	conn.Do("RENAME", oldKey, newKey)
 	conn.Do("EXPIRE", newKey, rp.maxLifeTime)
 
@@ -133,8 +135,8 @@ func (rp *Provider) Destroy(sessionID []byte) error {
 
 	key := rp.getRedisSessionKey(sessionID)
 
-	existed, err := redis.Int(conn.Do("EXISTS", key))
-	if err != nil || existed == 0 {
+	exists, err := redis.Bool(conn.Do("EXISTS", key))
+	if err != nil || !exists {
 		return nil
 	}
 	conn.Do("DEL", key)
