@@ -1,7 +1,9 @@
 package session
 
 import (
+	"bytes"
 	"database/sql"
+	"encoding/gob"
 	"sync"
 	"time"
 
@@ -92,7 +94,15 @@ type Store struct {
 }
 
 // Encrypt encrypt struct
-type Encrypt struct{}
+type Encrypt struct {
+	gobEncodingPool sync.Pool
+}
+
+type gobEncoding struct {
+	buff    *bytes.Buffer
+	encoder *gob.Encoder
+	decoder *gob.Decoder
+}
 
 // Cookie cookie struct
 type Cookie struct{}

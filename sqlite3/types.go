@@ -20,10 +20,10 @@ type Config struct {
 	SetMaxOpenConn int
 
 	// session value serialize func
-	SerializeFunc func(data *session.Dict) ([]byte, error)
+	SerializeFunc func(src *session.Dict) ([]byte, error)
 
 	// session value unSerialize func
-	UnSerializeFunc func(data []byte) (*session.Dict, error)
+	UnSerializeFunc func(src []byte) (*session.Dict, error)
 }
 
 // Provider provider struct
