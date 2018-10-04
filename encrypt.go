@@ -31,7 +31,6 @@ func (e *Encrypt) acquireGobEncoding() *gobEncoding {
 }
 
 func (e *Encrypt) releaseGobEncoding(ge *gobEncoding) {
-	ge.buff.Reset()
 	e.gobEncodingPool.Put(ge)
 }
 
@@ -43,6 +42,8 @@ func (e *Encrypt) GOBEncode(src *Dict) ([]byte, error) {
 
 	ge := e.acquireGobEncoding()
 	defer e.releaseGobEncoding(ge)
+
+	ge.buff = bytes.NewBuffer(nil)
 
 	err := ge.encoder.Encode(src)
 	if err != nil {
@@ -63,7 +64,7 @@ func (e *Encrypt) GOBDecode(src []byte) (*Dict, error) {
 	ge := e.acquireGobEncoding()
 	defer e.releaseGobEncoding(ge)
 
-	ge.buff.Write(src)
+	ge.buff = bytes.NewBuffer(src)
 
 	err := ge.decoder.Decode(dst)
 	if err != nil {
