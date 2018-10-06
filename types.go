@@ -95,12 +95,17 @@ type Store struct {
 
 // Encrypt encrypt struct
 type Encrypt struct {
-	gobEncodingPool sync.Pool
+	gobEncoderPool sync.Pool
+	gobDecoderPool sync.Pool
 }
 
-type gobEncoding struct {
+type gobEncoder struct {
 	buff    *bytes.Buffer
 	encoder *gob.Encoder
+}
+
+type gobDecoder struct {
+	reader  *bytes.Reader
 	decoder *gob.Decoder
 }
 
