@@ -15,7 +15,7 @@ func BenchmarkMSGPEncode(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.MSGPEncode(src)
+		e.MSGPEncode(*src)
 	}
 }
 
@@ -29,7 +29,7 @@ func BenchmarkMSGPDecode(b *testing.B) {
 	src.Set("k3", 3)
 	src.Set("k4", 4)
 
-	srcBytes, _ := e.MSGPEncode(src)
+	srcBytes, _ := e.MSGPEncode(*src)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -48,7 +48,7 @@ func BenchmarkBase64Encode(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Base64Encode(src)
+		e.Base64Encode(*src)
 	}
 }
 
@@ -62,7 +62,7 @@ func BenchmarkBase64Decode(b *testing.B) {
 	src.Set("k3", 3)
 	src.Set("k4", 4)
 
-	srcBytes, _ := e.Base64Encode(src)
+	srcBytes, _ := e.Base64Encode(*src)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

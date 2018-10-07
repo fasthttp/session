@@ -20,7 +20,7 @@ type Config struct {
 	SetMaxOpenConn int
 
 	// session value serialize func
-	SerializeFunc func(src *session.Dict) ([]byte, error)
+	SerializeFunc func(src session.Dict) ([]byte, error)
 
 	// session value unSerialize func
 	UnSerializeFunc func(src []byte, dst *session.Dict) error

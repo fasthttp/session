@@ -31,8 +31,8 @@ func (s *Store) GetBytes(key []byte) interface{} {
 }
 
 // GetAll get all data
-func (s *Store) GetAll() Dict {
-	return *s.data
+func (s *Store) GetData() *Dict {
+	return s.data
 }
 
 // Set set data

@@ -22,7 +22,7 @@ type Config struct {
 	KeyPrefix string
 
 	// SerializeFunc session value serialize func
-	SerializeFunc func(src *session.Dict) ([]byte, error)
+	SerializeFunc func(src session.Dict) ([]byte, error)
 
 	// UnSerializeFunc session value unSerialize func
 	UnSerializeFunc func(src []byte, dst *session.Dict) error

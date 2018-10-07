@@ -102,7 +102,7 @@ type Storer interface {
 	Save(ctx *fasthttp.RequestCtx) error
 	Get(key string) interface{}
 	GetBytes(key []byte) interface{}
-	GetAll() Dict
+	GetData() *Dict
 	Set(key string, value interface{})
 	SetBytes(key []byte, value interface{})
 	Delete(key string)

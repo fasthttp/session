@@ -12,7 +12,7 @@ func NewEncrypt() *Encrypt {
 }
 
 // MSGPEncode MessagePack encode
-func (e *Encrypt) MSGPEncode(src *Dict) ([]byte, error) {
+func (e *Encrypt) MSGPEncode(src Dict) ([]byte, error) {
 	if len(src.D) == 0 {
 		return nil, nil
 	}
@@ -41,7 +41,7 @@ func (e *Encrypt) MSGPDecode(src []byte, dst *Dict) error {
 }
 
 // Base64Encode base64 encode
-func (e *Encrypt) Base64Encode(src *Dict) ([]byte, error) {
+func (e *Encrypt) Base64Encode(src Dict) ([]byte, error) {
 	srcBytes, err := e.MSGPEncode(src)
 	if err != nil {
 		return nil, err
