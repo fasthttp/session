@@ -7,10 +7,11 @@ import (
 // Init init store data and sessionID
 func (s *Store) Init(sessionID []byte, data *Dict) {
 	s.sessionID = sessionID
-	s.data = Dict{}
 
 	if data != nil {
-		s.data.D = data.D
+		s.data = data
+	} else {
+		s.data = AcquireDict()
 	}
 }
 
@@ -31,7 +32,7 @@ func (s *Store) GetBytes(key []byte) interface{} {
 
 // GetAll get all data
 func (s *Store) GetAll() Dict {
-	return s.data
+	return *s.data
 }
 
 // Set set data

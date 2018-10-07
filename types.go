@@ -87,7 +87,7 @@ type daoBuffer struct {
 // Store store
 type Store struct {
 	sessionID []byte
-	data      Dict
+	data      *Dict
 	lock      sync.RWMutex
 }
 

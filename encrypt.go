@@ -26,19 +26,17 @@ func (e *Encrypt) MSGPEncode(src *Dict) ([]byte, error) {
 }
 
 // MSGPDecode MessagePack decode
-func (e *Encrypt) MSGPDecode(src []byte) (*Dict, error) {
-	dst := new(Dict)
-
+func (e *Encrypt) MSGPDecode(src []byte, dst *Dict) error {
 	if len(src) == 0 {
-		return dst, nil
+		return nil
 	}
 
 	_, err := dst.UnmarshalMsg(src)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return dst, nil
+	return nil
 }
 
 // Base64Encode base64 encode
@@ -55,12 +53,12 @@ func (e *Encrypt) Base64Encode(src *Dict) ([]byte, error) {
 }
 
 // Base64Decode base64 decode
-func (e *Encrypt) Base64Decode(src []byte) (*Dict, error) {
-	dst := make([]byte, b64Encoding.DecodedLen(len(src)))
-	n, err := b64Encoding.Decode(dst, src)
+func (e *Encrypt) Base64Decode(src []byte, dst *Dict) error {
+	tmp := make([]byte, b64Encoding.DecodedLen(len(src)))
+	n, err := b64Encoding.Decode(tmp, src)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return e.MSGPDecode(dst[:n])
+	return e.MSGPDecode(tmp[:n], dst)
 }

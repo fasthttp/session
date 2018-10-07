@@ -37,7 +37,7 @@ type Config struct {
 	SerializeFunc func(src *session.Dict) ([]byte, error)
 
 	// session value unSerialize func
-	UnSerializeFunc func(src []byte) (*session.Dict, error)
+	UnSerializeFunc func(src []byte, dst *session.Dict) error
 }
 
 // Provider provider struct

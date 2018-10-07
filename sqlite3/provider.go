@@ -58,9 +58,11 @@ func (sp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 	row, err := sp.db.getSessionBySessionID(sessionID)
 
 	if row.sessionID != "" { // Exist
+		data := new(session.Dict)
+
 		buff := bytebufferpool.Get()
 		buff.SetString(row.contents)
-		data, err := sp.config.UnSerializeFunc(buff.Bytes())
+		err := sp.config.UnSerializeFunc(buff.Bytes(), data)
 		bytebufferpool.Put(buff)
 
 		if err != nil {
@@ -95,9 +97,11 @@ func (sp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 			return nil, err
 		}
 
+		data := new(session.Dict)
+
 		buff := bytebufferpool.Get()
 		buff.SetString(row.contents)
-		data, err := sp.config.UnSerializeFunc(buff.Bytes())
+		err := sp.config.UnSerializeFunc(buff.Bytes(), data)
 		bytebufferpool.Put(buff)
 
 		if err != nil {

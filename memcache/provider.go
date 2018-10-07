@@ -92,7 +92,8 @@ func (mcp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 	item := acquireItem()
 	item, err := mcp.memCacheClient.Get(mcp.getMemCacheSessionKey(sessionID))
 	if err == nil { // Exist
-		data, err := mcp.config.UnSerializeFunc(item.Value)
+		data := new(session.Dict)
+		err := mcp.config.UnSerializeFunc(item.Value, data)
 		if err != nil {
 			return nil, err
 		}
@@ -132,7 +133,8 @@ func (mcp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 			return nil, err
 		}
 
-		data, err := mcp.config.UnSerializeFunc(newItem.Value)
+		data := new(session.Dict)
+		err := mcp.config.UnSerializeFunc(newItem.Value, data)
 		if err != nil {
 			return nil, err
 		}
