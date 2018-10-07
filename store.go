@@ -30,7 +30,7 @@ func (s *Store) GetBytes(key []byte) interface{} {
 	return s.data.GetBytes(key)
 }
 
-// GetAll get all data
+// GetData get all data
 func (s *Store) GetData() *Dict {
 	return s.data
 }
