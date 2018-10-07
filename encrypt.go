@@ -31,6 +31,7 @@ func (e *Encrypt) MSGPDecode(src []byte, dst *Dict) error {
 		return nil
 	}
 
+	dst.Reset()
 	_, err := dst.UnmarshalMsg(src)
 	if err != nil {
 		return err

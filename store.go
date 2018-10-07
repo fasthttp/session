@@ -11,7 +11,7 @@ func (s *Store) Init(sessionID []byte, data *Dict) {
 	if data != nil {
 		s.data = data
 	} else {
-		s.data = AcquireDict()
+		s.data = new(Dict)
 	}
 }
 
