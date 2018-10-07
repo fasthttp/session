@@ -58,10 +58,10 @@ func (mcp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
 
 	// init config serialize func
 	if mcp.config.SerializeFunc == nil {
-		mcp.config.SerializeFunc = encrypt.GOBEncode
+		mcp.config.SerializeFunc = encrypt.MSGPEncode
 	}
 	if mcp.config.UnSerializeFunc == nil {
-		mcp.config.UnSerializeFunc = encrypt.GOBDecode
+		mcp.config.UnSerializeFunc = encrypt.MSGPDecode
 	}
 
 	mcp.memCacheClient = memcache.New(mcp.config.ServerList...)

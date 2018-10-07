@@ -68,12 +68,28 @@
   version = "v1.9.0"
 
 [[projects]]
+  digest = "1:5e73b34a27d827212102605789de00bd411b2e434812133c83935fe9897c75e1"
+  name = "github.com/philhofer/fwd"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "bb6d471dc95d4fe11e432687f8b70ff496cf3136"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "master"
-  digest = "1:dd037157a32ae87c637f0b34b5778be3d81c96e9d133f388dd348eb29cf8f28c"
+  digest = "1:f3d2fbc1aee2a699289a74021c603dc39c28b448eb706149d152b0b02d153d24"
   name = "github.com/savsgio/dictpool"
   packages = ["."]
   pruneopts = "UT"
-  revision = "4a64f9409f6438ec421654dce7665b5519682236"
+  revision = "4034d8f88662286e614a7022e89fa5c4c9a42ff3"
+
+[[projects]]
+  digest = "1:eaa6698f44de8f2977e93c9b946e60a8af75f565058658aad2df8032b55c84e5"
+  name = "github.com/tinylib/msgp"
+  packages = ["msgp"]
+  pruneopts = "UT"
+  revision = "b2b6a672cf1e5b90748f79b8b81fc8c5cf0571a1"
+  version = "1.0.2"
 
 [[projects]]
   digest = "1:c468422f334a6b46a19448ad59aaffdfc0a36b08fdcc1c749a0b29b6453d7e59"
@@ -85,7 +101,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:28d98cdbcbe4b4c2a22f8121d3bffbe06c42f2be7ce734c4cd042a4b3bd6e84d"
+  digest = "1:71d4697600b36699831188365840b77814f1d5e740d6c27aa82278ffcf1e6ea1"
   name = "github.com/valyala/fasthttp"
   packages = [
     ".",
@@ -93,7 +109,7 @@
     "stackless",
   ]
   pruneopts = "UT"
-  revision = "4087354082e1ab9a610705ec9f7949603d3c46ab"
+  revision = "63ea2d380ff30e6f09dc8c39205363c7c064bc31"
 
 [[projects]]
   branch = "master"

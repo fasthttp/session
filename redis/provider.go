@@ -47,10 +47,10 @@ func (rp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
 
 	// init config serialize func
 	if rp.config.SerializeFunc == nil {
-		rp.config.SerializeFunc = encrypt.GOBEncode
+		rp.config.SerializeFunc = encrypt.MSGPEncode
 	}
 	if rp.config.UnSerializeFunc == nil {
-		rp.config.UnSerializeFunc = encrypt.GOBDecode
+		rp.config.UnSerializeFunc = encrypt.MSGPDecode
 	}
 
 	// create redis conn pool

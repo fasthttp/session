@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func BenchmarkGOBEncode(b *testing.B) {
+func BenchmarkMSGPEncode(b *testing.B) {
 	e := NewEncrypt()
 	src := new(Dict)
 
@@ -15,11 +15,11 @@ func BenchmarkGOBEncode(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.GOBEncode(src)
+		e.MSGPEncode(src)
 	}
 }
 
-func BenchmarkGOBDecode(b *testing.B) {
+func BenchmarkMSGPDecode(b *testing.B) {
 	e := NewEncrypt()
 	src := new(Dict)
 
@@ -28,11 +28,11 @@ func BenchmarkGOBDecode(b *testing.B) {
 	src.Set("k3", 3)
 	src.Set("k4", 4)
 
-	srcBytes, _ := e.GOBEncode(src)
+	srcBytes, _ := e.MSGPEncode(src)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.GOBDecode(srcBytes)
+		e.MSGPDecode(srcBytes)
 	}
 }
 
