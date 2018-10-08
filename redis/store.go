@@ -3,7 +3,6 @@ package redis
 import (
 	"sync"
 
-	"github.com/fasthttp/session"
 	"github.com/valyala/fasthttp"
 )
 
@@ -23,9 +22,9 @@ func releaseStore(store *Store) {
 }
 
 // NewStore new redis store
-func NewStore(sessionID []byte, data *session.Dict) *Store {
+func NewStore(sessionID []byte) *Store {
 	store := acquireStore()
-	store.Init(sessionID, data)
+	store.Init(sessionID)
 
 	return store
 }

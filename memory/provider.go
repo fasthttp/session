@@ -62,6 +62,11 @@ func (mp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 
 // Destroy destroy session by sessionID
 func (mp *Provider) Destroy(sessionID []byte) error {
+	val := mp.values.GetBytes(sessionID)
+	if val != nil {
+		releaseStore(val.(*Store))
+	}
+
 	mp.values.DelBytes(sessionID)
 
 	return nil

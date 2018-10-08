@@ -4,7 +4,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fasthttp/session"
 	"github.com/valyala/fasthttp"
 )
 
@@ -24,24 +23,24 @@ func releaseStore(store *Store) {
 }
 
 // NewStore new sqlite3 store
-func NewStore(sessionID []byte, data *session.Dict) *Store {
+func NewStore(sessionID []byte) *Store {
 	store := acquireStore()
-	store.Init(sessionID, data)
+	store.Init(sessionID)
 
 	return store
 }
 
 // Save save store
-func (ms *Store) Save(ctx *fasthttp.RequestCtx) error {
-	defer releaseStore(ms)
+func (ss *Store) Save(ctx *fasthttp.RequestCtx) error {
+	defer releaseStore(ss)
 
-	data := ms.GetData()
+	data := ss.GetData()
 	value, err := provider.config.SerializeFunc(*data)
 	if err != nil {
 		return err
 	}
 
-	_, err = provider.db.updateBySessionID(ms.GetSessionID(), value, time.Now().Unix())
+	_, err = provider.db.updateBySessionID(ss.GetSessionID(), value, time.Now().Unix())
 
 	return err
 }

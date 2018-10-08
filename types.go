@@ -109,7 +109,6 @@ type Storer interface {
 	DeleteBytes(key []byte)
 	Flush()
 	GetSessionID() []byte
-	SetSessionID(id []byte)
 	Reset()
 }
 

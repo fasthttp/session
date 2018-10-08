@@ -87,21 +87,17 @@ func (mcp *Provider) getMemCacheSessionKey(sessionID []byte) string {
 
 // ReadStore read session store by session id
 func (mcp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
-	var store *Store
+	store := NewStore(sessionID)
 
 	item := acquireItem()
 	item, err := mcp.memCacheClient.Get(mcp.getMemCacheSessionKey(sessionID))
 	if err == nil { // Exist
-		data := new(session.Dict)
-		err := mcp.config.UnSerializeFunc(item.Value, data)
+		err := mcp.config.UnSerializeFunc(item.Value, store.GetData())
 		if err != nil {
 			return nil, err
 		}
 
-		store = NewStore(sessionID, data)
-
 	} else if err == memcache.ErrCacheMiss { // Not exist
-		store = NewStore(sessionID, nil)
 		err = nil
 	}
 
@@ -112,7 +108,7 @@ func (mcp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 
 // Regenerate regenerate session
 func (mcp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
-	var store *Store
+	store := NewStore(newID)
 
 	oldKey := mcp.getMemCacheSessionKey(oldID)
 	newKey := mcp.getMemCacheSessionKey(newID)
@@ -133,19 +129,15 @@ func (mcp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 			return nil, err
 		}
 
-		data := new(session.Dict)
-		err := mcp.config.UnSerializeFunc(newItem.Value, data)
+		err := mcp.config.UnSerializeFunc(newItem.Value, store.GetData())
 		if err != nil {
 			return nil, err
 		}
 
 		releaseItem(newItem)
 
-		store = NewStore(newID, data)
-
 	} else if err == memcache.ErrCacheMiss { // Not exist
-		store = NewStore(newID, nil)
-
+		err = nil
 	}
 
 	releaseItem(oldItem)

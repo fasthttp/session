@@ -1,15 +1,31 @@
 package memory
 
 import (
+	"sync"
 	"time"
 
 	"github.com/valyala/fasthttp"
 )
 
+var storePool = sync.Pool{
+	New: func() interface{} {
+		return new(Store)
+	},
+}
+
+func acquireStore() *Store {
+	return storePool.Get().(*Store)
+}
+
+func releaseStore(store *Store) {
+	store.Reset()
+	storePool.Put(store)
+}
+
 // NewStore new memory store
 func NewStore(sessionID []byte) *Store {
-	memStore := new(Store)
-	memStore.Init(sessionID, nil)
+	memStore := acquireStore()
+	memStore.Init(sessionID)
 
 	return memStore
 }

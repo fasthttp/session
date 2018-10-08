@@ -85,24 +85,19 @@ func (rp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 	conn := rp.redisPool.Get()
 	defer conn.Close()
 
-	var store *Store
-
+	store := NewStore(sessionID)
 	key := rp.getRedisSessionKey(sessionID)
 
 	reply, err := redis.Bytes(conn.Do("GET", key))
 	if err == nil { // Exist
-		data := new(session.Dict)
-
-		err := rp.config.UnSerializeFunc(reply, data)
+		err := rp.config.UnSerializeFunc(reply, store.GetData())
 		if err != nil {
 			return nil, err
 		}
 
-		store = NewStore(sessionID, data)
-
 	} else if err == redis.ErrNil { // Not exist
 		conn.Do("SET", key, "", "EX", rp.maxLifeTime)
-		store = NewStore(sessionID, nil)
+		err = nil
 	}
 
 	return store, err
@@ -120,7 +115,7 @@ func (rp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 	exists, err := redis.Bool(conn.Do("EXISTS", oldKey))
 	if err != nil || !exists { // Not exist
 		conn.Do("SET", newKey, "", "EX", rp.maxLifeTime)
-		return NewStore(newID, nil), nil
+		return NewStore(newID), nil
 	}
 
 	// Exist

@@ -5,12 +5,10 @@ import (
 )
 
 // Init init store data and sessionID
-func (s *Store) Init(sessionID []byte, data *Dict) {
+func (s *Store) Init(sessionID []byte) {
 	s.sessionID = sessionID
 
-	if data != nil {
-		s.data = data
-	} else {
+	if s.data == nil { // Ensure store always has a valid pointer of Dict
 		s.data = new(Dict)
 	}
 }

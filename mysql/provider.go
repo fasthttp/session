@@ -56,30 +56,25 @@ func (mp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
 
 // ReadStore read session store by session id
 func (mp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
-	var store *Store
+	store := NewStore(sessionID)
 
 	row, err := mp.db.getSessionBySessionID(sessionID)
 
 	if row.sessionID != "" { // Exist
-		data := new(session.Dict)
-
 		buff := bytebufferpool.Get()
 		buff.SetString(row.contents)
-		err := mp.config.UnSerializeFunc(buff.Bytes(), data)
+		err := mp.config.UnSerializeFunc(buff.Bytes(), store.GetData())
 		bytebufferpool.Put(buff)
 
 		if err != nil {
 			return nil, err
 		}
 
-		store = NewStore(sessionID, data)
-
 	} else { // Not exist
 		_, err := mp.db.insert(sessionID, nil, time.Now().Unix())
 		if err != nil {
 			return nil, err
 		}
-		store = NewStore(sessionID, nil)
 	}
 
 	releaseDBRow(row)
@@ -89,7 +84,7 @@ func (mp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 
 // Regenerate regenerate session
 func (mp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
-	var store *Store
+	store := NewStore(newID)
 
 	row, err := mp.db.getSessionBySessionID(oldID)
 	now := time.Now().Unix()
@@ -100,25 +95,20 @@ func (mp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 			return nil, err
 		}
 
-		data := new(session.Dict)
-
 		buff := bytebufferpool.Get()
 		buff.SetString(row.contents)
-		err := mp.config.UnSerializeFunc(buff.Bytes(), data)
+		err := mp.config.UnSerializeFunc(buff.Bytes(), store.GetData())
 		bytebufferpool.Put(buff)
 
 		if err != nil {
 			return nil, err
 		}
 
-		store = NewStore(newID, data)
-
 	} else { // Not exist
 		_, err := mp.db.insert(newID, nil, now)
 		if err != nil {
 			return nil, err
 		}
-		store = NewStore(newID, nil)
 	}
 
 	releaseDBRow(row)

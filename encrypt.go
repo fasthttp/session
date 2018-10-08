@@ -33,11 +33,8 @@ func (e *Encrypt) MSGPDecode(src []byte, dst *Dict) error {
 
 	dst.Reset()
 	_, err := dst.UnmarshalMsg(src)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 // Base64Encode base64 encode

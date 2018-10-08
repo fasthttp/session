@@ -53,30 +53,25 @@ func (sp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
 
 // ReadStore read session store by session id
 func (sp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
-	var store *Store
+	store := NewStore(sessionID)
 
 	row, err := sp.db.getSessionBySessionID(sessionID)
 
 	if row.sessionID != "" { // Exist
-		data := new(session.Dict)
-
 		buff := bytebufferpool.Get()
 		buff.SetString(row.contents)
-		err := sp.config.UnSerializeFunc(buff.Bytes(), data)
+		err := sp.config.UnSerializeFunc(buff.Bytes(), store.GetData())
 		bytebufferpool.Put(buff)
 
 		if err != nil {
 			return nil, err
 		}
 
-		store = NewStore(sessionID, data)
-
 	} else { // Not exist
 		_, err := sp.db.insert(sessionID, nil, time.Now().Unix())
 		if err != nil {
 			return nil, err
 		}
-		store = NewStore(sessionID, nil)
 	}
 
 	releaseDBRow(row)
@@ -86,7 +81,7 @@ func (sp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 
 // Regenerate regenerate session
 func (sp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
-	var store *Store
+	store := NewStore(newID)
 
 	row, err := sp.db.getSessionBySessionID(oldID)
 	now := time.Now().Unix()
@@ -97,25 +92,20 @@ func (sp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 			return nil, err
 		}
 
-		data := new(session.Dict)
-
 		buff := bytebufferpool.Get()
 		buff.SetString(row.contents)
-		err := sp.config.UnSerializeFunc(buff.Bytes(), data)
+		err := sp.config.UnSerializeFunc(buff.Bytes(), store.GetData())
 		bytebufferpool.Put(buff)
 
 		if err != nil {
 			return nil, err
 		}
 
-		store = NewStore(newID, data)
-
 	} else { // Not exist
 		_, err := sp.db.insert(newID, nil, now)
 		if err != nil {
 			return nil, err
 		}
-		store = NewStore(newID, nil)
 	}
 
 	releaseDBRow(row)
