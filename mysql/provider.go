@@ -63,7 +63,7 @@ func (mp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 	if row.sessionID != "" { // Exist
 		buff := bytebufferpool.Get()
 		buff.SetString(row.contents)
-		err := mp.config.UnSerializeFunc(buff.Bytes(), store.GetData())
+		err := mp.config.UnSerializeFunc(buff.Bytes(), store.GetDataPointer())
 		bytebufferpool.Put(buff)
 
 		if err != nil {
@@ -97,7 +97,7 @@ func (mp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 
 		buff := bytebufferpool.Get()
 		buff.SetString(row.contents)
-		err := mp.config.UnSerializeFunc(buff.Bytes(), store.GetData())
+		err := mp.config.UnSerializeFunc(buff.Bytes(), store.GetDataPointer())
 		bytebufferpool.Put(buff)
 
 		if err != nil {

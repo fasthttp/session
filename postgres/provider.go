@@ -63,7 +63,7 @@ func (pp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 	if row.sessionID != "" { // Exist
 		buff := bytebufferpool.Get()
 		buff.SetString(row.contents)
-		err := pp.config.UnSerializeFunc(buff.Bytes(), store.GetData())
+		err := pp.config.UnSerializeFunc(buff.Bytes(), store.GetDataPointer())
 		bytebufferpool.Put(buff)
 
 		if err != nil {
@@ -97,7 +97,7 @@ func (pp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 
 		buff := bytebufferpool.Get()
 		buff.SetString(row.contents)
-		err := pp.config.UnSerializeFunc(buff.Bytes(), store.GetData())
+		err := pp.config.UnSerializeFunc(buff.Bytes(), store.GetDataPointer())
 		bytebufferpool.Put(buff)
 
 		if err != nil {

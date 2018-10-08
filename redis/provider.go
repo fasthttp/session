@@ -90,7 +90,7 @@ func (rp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 
 	reply, err := redis.Bytes(conn.Do("GET", key))
 	if err == nil { // Exist
-		err := rp.config.UnSerializeFunc(reply, store.GetData())
+		err := rp.config.UnSerializeFunc(reply, store.GetDataPointer())
 		if err != nil {
 			return nil, err
 		}

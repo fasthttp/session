@@ -28,8 +28,13 @@ func (s *Store) GetBytes(key []byte) interface{} {
 	return s.data.GetBytes(key)
 }
 
-// GetData get all data
-func (s *Store) GetData() *Dict {
+// GetAll get all data
+func (s *Store) GetAll() Dict {
+	return *s.data
+}
+
+// GetDataPointer get pointer of data
+func (s *Store) GetDataPointer() *Dict {
 	return s.data
 }
 

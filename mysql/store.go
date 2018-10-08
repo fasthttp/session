@@ -34,8 +34,8 @@ func NewStore(sessionID []byte) *Store {
 func (ms *Store) Save(ctx *fasthttp.RequestCtx) error {
 	defer releaseStore(ms)
 
-	data := ms.GetData()
-	value, err := provider.config.SerializeFunc(*data)
+	data := ms.GetAll()
+	value, err := provider.config.SerializeFunc(data)
 	if err != nil {
 		return err
 	}

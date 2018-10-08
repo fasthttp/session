@@ -125,7 +125,7 @@ func getAllHandle(ctx *fasthttp.RequestCtx) {
 	sessionStore.Set("foo3", "baa3")
 	sessionStore.Set("foo4", "baa5")
 
-	data := sessionStore.GetData()
+	data := sessionStore.GetAll()
 
 	fmt.Println(data)
 	ctx.SetBodyString("session get all data")
