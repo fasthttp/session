@@ -132,7 +132,7 @@ func (mp *Provider) NeedGC() bool {
 	return true
 }
 
-// GC session mysql provider not need garbage collection
+// GC session garbage collection
 func (mp *Provider) GC() {
 	_, err := mp.db.deleteSessionByMaxLifeTime(mp.maxLifeTime)
 	if err != nil {

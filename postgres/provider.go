@@ -12,7 +12,7 @@ var (
 	encrypt  = session.NewEncrypt()
 )
 
-// NewProvider new mysql provider
+// NewProvider new postgres provider
 func NewProvider() *Provider {
 	return &Provider{
 		config: new(Config),
@@ -132,7 +132,7 @@ func (pp *Provider) NeedGC() bool {
 	return true
 }
 
-// GC session mysql provider not need garbage collection
+// GC session garbage collection
 func (pp *Provider) GC() {
 	_, err := pp.db.deleteSessionByMaxLifeTime(pp.maxLifeTime)
 	if err != nil {

@@ -129,7 +129,7 @@ func (sp *Provider) NeedGC() bool {
 	return true
 }
 
-// GC session mysql provider not need garbage collection
+// GC session garbage collection
 func (sp *Provider) GC() {
 	_, err := sp.db.deleteSessionByMaxLifeTime(sp.maxLifeTime)
 	if err != nil {

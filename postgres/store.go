@@ -22,7 +22,7 @@ func releaseStore(store *Store) {
 	storePool.Put(store)
 }
 
-// NewStore new mysql store
+// NewStore new postgres store
 func NewStore(sessionID []byte) *Store {
 	store := acquireStore()
 	store.Init(sessionID)
