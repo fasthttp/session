@@ -48,6 +48,8 @@ func init() {
 		})
 	case "sqlite3":
 		err = serverSession.SetProvider("sqlite3", sqlite3.NewConfigWith("test.db", "session"))
+	default:
+		panic("Invalid provider")
 	}
 
 	if err != nil {
