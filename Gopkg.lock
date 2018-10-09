@@ -77,19 +77,19 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f3d2fbc1aee2a699289a74021c603dc39c28b448eb706149d152b0b02d153d24"
+  digest = "1:7ca94ff0a19082834674ed262f77154954f19e68cbe43932189bc38a125b3410"
   name = "github.com/savsgio/dictpool"
   packages = ["."]
   pruneopts = "UT"
-  revision = "4034d8f88662286e614a7022e89fa5c4c9a42ff3"
+  revision = "e017fbb68054ec67d9eae779146e8c1e9de6734d"
 
 [[projects]]
-  digest = "1:eaa6698f44de8f2977e93c9b946e60a8af75f565058658aad2df8032b55c84e5"
+  branch = "master"
+  digest = "1:3cb6dfe7cdece5716b1c3c3c0b5faf7fce2e83e2758e2baad2e9986d101980b8"
   name = "github.com/tinylib/msgp"
   packages = ["msgp"]
   pruneopts = "UT"
-  revision = "b2b6a672cf1e5b90748f79b8b81fc8c5cf0571a1"
-  version = "1.0.2"
+  revision = "f65876d3ea05943d6613bca6b8ed391843044bd4"
 
 [[projects]]
   digest = "1:c468422f334a6b46a19448ad59aaffdfc0a36b08fdcc1c749a0b29b6453d7e59"
