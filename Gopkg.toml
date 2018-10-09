@@ -34,6 +34,10 @@
   branch = "master"
   name = "github.com/valyala/fastrand"
 
+[[constraint]]
+  branch = "master"
+  name = "github.com/savsgio/gotils"
+
 [prune]
   go-tests = true
   unused-packages = true

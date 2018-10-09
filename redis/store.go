@@ -3,6 +3,7 @@ package redis
 import (
 	"sync"
 
+	"github.com/savsgio/gotils"
 	"github.com/valyala/fasthttp"
 )
 
@@ -40,7 +41,7 @@ func (rs *Store) Save(ctx *fasthttp.RequestCtx) error {
 	}
 
 	conn := provider.redisPool.Get()
-	_, err = conn.Do("SETEX", provider.getRedisSessionKey(rs.GetSessionID()), provider.maxLifeTime, string(b))
+	_, err = conn.Do("SETEX", provider.getRedisSessionKey(rs.GetSessionID()), provider.maxLifeTime, gotils.B2S(b))
 	conn.Close()
 
 	return err

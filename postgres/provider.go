@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/fasthttp/session"
-	"github.com/valyala/bytebufferpool"
+	"github.com/savsgio/gotils"
 )
 
 var (
@@ -61,11 +61,7 @@ func (pp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 	row, err := pp.db.getSessionBySessionID(sessionID)
 
 	if row.sessionID != "" { // Exist
-		buff := bytebufferpool.Get()
-		buff.SetString(row.contents)
-		err := pp.config.UnSerializeFunc(buff.Bytes(), store.GetDataPointer())
-		bytebufferpool.Put(buff)
-
+		err := pp.config.UnSerializeFunc(gotils.S2B(row.contents), store.GetDataPointer())
 		if err != nil {
 			return nil, err
 		}
@@ -95,11 +91,7 @@ func (pp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 			return nil, err
 		}
 
-		buff := bytebufferpool.Get()
-		buff.SetString(row.contents)
-		err := pp.config.UnSerializeFunc(buff.Bytes(), store.GetDataPointer())
-		bytebufferpool.Put(buff)
-
+		err := pp.config.UnSerializeFunc(gotils.S2B(row.contents), store.GetDataPointer())
 		if err != nil {
 			return nil, err
 		}

@@ -8,6 +8,7 @@ import (
 
 	// Import postgres driver
 	_ "github.com/lib/pq"
+	"github.com/savsgio/gotils"
 )
 
 var dbRowPool = sync.Pool{
@@ -56,7 +57,7 @@ func NewDao(driver, dsn, tableName string) (*Dao, error) {
 func (db *Dao) getSessionBySessionID(sessionID []byte) (*DBRow, error) {
 	data := acquireDBRow()
 
-	row, err := db.QueryRow(db.sqlGetSessionBySessionID, string(sessionID))
+	row, err := db.QueryRow(db.sqlGetSessionBySessionID, gotils.B2S(sessionID))
 	if err != nil {
 		return data, err
 	}
@@ -84,12 +85,12 @@ func (db *Dao) countSessions() int {
 
 // update session by sessionID
 func (db *Dao) updateBySessionID(sessionID, contents []byte, lastActiveTime int64) (int64, error) {
-	return db.Exec(db.sqlUpdateBySessionID, string(contents), lastActiveTime, string(sessionID))
+	return db.Exec(db.sqlUpdateBySessionID, gotils.B2S(contents), lastActiveTime, gotils.B2S(sessionID))
 }
 
 // delete session by sessionID
 func (db *Dao) deleteBySessionID(sessionID []byte) (int64, error) {
-	return db.Exec(db.sqlDeleteBySessionID, string(sessionID))
+	return db.Exec(db.sqlDeleteBySessionID, gotils.B2S(sessionID))
 }
 
 // delete session by maxLifeTime
@@ -100,10 +101,10 @@ func (db *Dao) deleteSessionByMaxLifeTime(maxLifeTime int64) (int64, error) {
 
 // insert new session
 func (db *Dao) insert(sessionID, contents []byte, lastActiveTime int64) (int64, error) {
-	return db.Exec(db.sqlInsert, string(sessionID), string(contents), lastActiveTime)
+	return db.Exec(db.sqlInsert, gotils.B2S(sessionID), gotils.B2S(contents), lastActiveTime)
 }
 
 // insert new session
 func (db *Dao) regenerate(oldID, newID []byte, lastActiveTime int64) (int64, error) {
-	return db.Exec(db.sqlRegenerate, string(newID), lastActiveTime, string(oldID))
+	return db.Exec(db.sqlRegenerate, gotils.B2S(newID), lastActiveTime, gotils.B2S(oldID))
 }

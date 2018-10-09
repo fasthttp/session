@@ -4,12 +4,13 @@ import (
 	"fmt"
 
 	"github.com/fasthttp/session"
+	"github.com/savsgio/gotils"
 	"github.com/valyala/fasthttp"
 )
 
 // request router
 func requestRouter(ctx *fasthttp.RequestCtx) {
-	switch string(ctx.Path()) {
+	switch gotils.B2S(ctx.Path()) {
 	case "/":
 		indexHandler(ctx)
 	case "/set":

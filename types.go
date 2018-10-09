@@ -1,11 +1,11 @@
 package session
 
 import (
-	"database/sql"
 	"sync"
 	"time"
 
 	"github.com/savsgio/dictpool"
+	"github.com/savsgio/gotils/dao"
 	"github.com/valyala/fasthttp"
 )
 
@@ -72,16 +72,7 @@ type Session struct {
 
 // Dao database connection
 type Dao struct {
-	Driver     string
-	Dsn        string
-	Connection *sql.DB
-}
-
-// daoBuffer dao buffer
-type daoBuffer struct {
-	tx   *sql.Tx
-	stmt *sql.Stmt
-	res  sql.Result
+	dao.Dao
 }
 
 // Store store

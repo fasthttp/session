@@ -85,6 +85,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:8a80bfa75634d18dc7cbf9aad3f72ee0a0836f3dd8e6fa7d684ba57cfe5521ec"
+  name = "github.com/savsgio/gotils"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ec8a00e2c9a79a884a46c47e1c1732b8c99f0188"
+
+[[projects]]
+  branch = "master"
   digest = "1:3cb6dfe7cdece5716b1c3c3c0b5faf7fce2e83e2758e2baad2e9986d101980b8"
   name = "github.com/tinylib/msgp"
   packages = ["msgp"]
@@ -137,6 +145,7 @@
     "github.com/lib/pq",
     "github.com/mattn/go-sqlite3",
     "github.com/savsgio/dictpool",
+    "github.com/savsgio/gotils",
     "github.com/valyala/bytebufferpool",
     "github.com/valyala/fasthttp",
     "github.com/valyala/fastrand",
