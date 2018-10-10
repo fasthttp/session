@@ -25,10 +25,10 @@ type Config struct {
 	// >0 is the time.Duration which the session cookies should expire.
 	Expires time.Duration
 
-	// gc life time(s)
+	// gc life time to execute it
 	GCLifetime time.Duration
 
-	// session life time(s)
+	// session life time in seconds
 	SessionLifetime int64
 
 	// set whether to pass this bar cookie only through HTTPS
