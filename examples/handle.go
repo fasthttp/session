@@ -151,7 +151,11 @@ func flushHandle(ctx *fasthttp.RequestCtx) {
 // destroy handle
 func destroyHandle(ctx *fasthttp.RequestCtx) {
 	// destroy session
-	serverSession.Destroy(ctx)
+	err := serverSession.Destroy(ctx)
+	if err != nil {
+		ctx.SetBodyString(err.Error())
+		return
+	}
 
 	ctx.SetBodyString("session destroy")
 }

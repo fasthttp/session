@@ -13,12 +13,7 @@ func NewCookie() *Cookie {
 
 // Get get cookie by name
 func (c *Cookie) Get(ctx *fasthttp.RequestCtx, name string) []byte {
-	cookieByte := ctx.Request.Header.Cookie(name)
-	if len(cookieByte) > 0 {
-		return cookieByte
-	}
-
-	return nil
+	return ctx.Request.Header.Cookie(name)
 }
 
 // Set response set cookie

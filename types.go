@@ -26,7 +26,7 @@ type Config struct {
 	Expires time.Duration
 
 	// gc life time(s)
-	GCLifetime int64
+	GCLifetime time.Duration
 
 	// session life time(s)
 	SessionLifetime int64
