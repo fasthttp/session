@@ -49,12 +49,7 @@ type Config struct {
 	// SessionIDGeneratorFunc should returns a random session id.
 	SessionIDGeneratorFunc func() []byte
 
-	// Encode the cookie value if not nil.
-	EncodeFunc func(cookieValue []byte) ([]byte, error)
-
-	// Decode the cookie value if not nil.
-	DecodeFunc func(cookieValue []byte) ([]byte, error)
-
+	// value cookie lenght
 	cookieLen uint32
 }
 
