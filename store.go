@@ -8,7 +8,7 @@ import (
 func (s *Store) Init(sessionID []byte) {
 	s.sessionID = sessionID
 
-	if s.data == nil { // Ensure store always has a valid pointer of Dict
+	if s.data == nil { // Ensure the store always has a valid pointer of Dict
 		s.data = new(Dict)
 	}
 }

@@ -8,7 +8,7 @@ import (
 func NewDefaultConfig() *Config {
 	config := &Config{
 		CookieName:              defaultSessionKeyName,
-		Domain:                  "",
+		Domain:                  defaultDomain,
 		Expires:                 defaultExpires,
 		GCLifetime:              defaultGCLifetime,
 		SessionLifetime:         defaultSessionLifetime,
