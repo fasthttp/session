@@ -23,8 +23,8 @@ func NewDefaultConfig() *Config {
 	return &Config{
 		Charset:        "utf8",
 		Collate:        "utf8_general_ci",
-		Database:       "test",
-		TableName:      "test",
+		Database:       "session",
+		TableName:      "session",
 		Host:           "127.0.0.1",
 		Port:           3306,
 		Username:       "root",

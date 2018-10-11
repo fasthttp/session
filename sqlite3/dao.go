@@ -59,12 +59,15 @@ func (db *Dao) getSessionBySessionID(sessionID []byte) (*DBRow, error) {
 
 	row, err := db.QueryRow(db.sqlGetSessionBySessionID, gotils.B2S(sessionID))
 	if err != nil {
-		return data, err
+		return nil, err
 	}
 
 	err = row.Scan(&data.sessionID, &data.contents, &data.lastActive)
+	if err != nil {
+		return nil, err
+	}
 
-	return data, err
+	return data, nil
 }
 
 // count sessions

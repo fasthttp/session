@@ -12,6 +12,8 @@ func NewConfigWith(dbPath, tableName string) *Config {
 // NewDefaultConfig return default configuration
 func NewDefaultConfig() *Config {
 	cf := &Config{
+		DBPath:         "./",
+		TableName:      "session",
 		SetMaxOpenConn: 500,
 		SetMaxIdleConn: 50,
 	}

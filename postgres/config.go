@@ -26,8 +26,8 @@ func NewDefaultConfig() *Config {
 		Username:       "root",
 		Password:       "",
 		ConnTimeout:    3000,
-		Database:       "test",
-		TableName:      "test",
+		Database:       "session",
+		TableName:      "session",
 		SetMaxOpenConn: 500,
 		SetMaxIdleConn: 50,
 	}

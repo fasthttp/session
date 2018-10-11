@@ -1,4 +1,4 @@
 package sqlite3
 
-// ProviderName sqlite provider name
+// ProviderName sqlite3 provider name
 const ProviderName = "sqlite3"

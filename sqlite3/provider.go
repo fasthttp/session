@@ -80,6 +80,10 @@ func (sp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 	store := NewStore(newID)
 
 	row, err := sp.db.getSessionBySessionID(oldID)
+	if err != nil {
+		return nil, err
+	}
+
 	now := time.Now().Unix()
 
 	if row.sessionID != "" { // Exists
@@ -88,13 +92,13 @@ func (sp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 			return nil, err
 		}
 
-		err := sp.config.UnSerializeFunc(gotils.S2B(row.contents), store.GetDataPointer())
+		err = sp.config.UnSerializeFunc(gotils.S2B(row.contents), store.GetDataPointer())
 		if err != nil {
 			return nil, err
 		}
 
 	} else { // Not exist
-		_, err := sp.db.insert(newID, nil, now)
+		_, err = sp.db.insert(newID, nil, now)
 		if err != nil {
 			return nil, err
 		}

@@ -59,15 +59,18 @@ func (pp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 	store := NewStore(sessionID)
 
 	row, err := pp.db.getSessionBySessionID(sessionID)
+	if err != nil {
+		return nil, err
+	}
 
 	if row.sessionID != "" { // Exist
-		err := pp.config.UnSerializeFunc(gotils.S2B(row.contents), store.GetDataPointer())
+		err = pp.config.UnSerializeFunc(gotils.S2B(row.contents), store.GetDataPointer())
 		if err != nil {
 			return nil, err
 		}
 
 	} else { // Not exist
-		_, err := pp.db.insert(sessionID, nil, time.Now().Unix())
+		_, err = pp.db.insert(sessionID, nil, time.Now().Unix())
 		if err != nil {
 			return nil, err
 		}
@@ -75,7 +78,7 @@ func (pp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 
 	releaseDBRow(row)
 
-	return store, err
+	return store, nil
 }
 
 // Regenerate regenerate session
@@ -83,6 +86,10 @@ func (pp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 	store := NewStore(newID)
 
 	row, err := pp.db.getSessionBySessionID(oldID)
+	if err != nil {
+		return nil, err
+	}
+
 	now := time.Now().Unix()
 
 	if row.sessionID != "" { // Exists
@@ -91,13 +98,13 @@ func (pp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 			return nil, err
 		}
 
-		err := pp.config.UnSerializeFunc(gotils.S2B(row.contents), store.GetDataPointer())
+		err = pp.config.UnSerializeFunc(gotils.S2B(row.contents), store.GetDataPointer())
 		if err != nil {
 			return nil, err
 		}
 
 	} else { // Not exist
-		_, err := pp.db.insert(newID, nil, now)
+		_, err = pp.db.insert(newID, nil, now)
 		if err != nil {
 			return nil, err
 		}
