@@ -63,7 +63,7 @@ func (db *Dao) getSessionBySessionID(sessionID []byte) (*DBRow, error) {
 	}
 
 	err = row.Scan(&data.sessionID, &data.contents, &data.lastActive)
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
 
