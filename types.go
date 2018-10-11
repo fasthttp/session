@@ -49,7 +49,7 @@ type Config struct {
 	// SessionIDGeneratorFunc should returns a random session id.
 	SessionIDGeneratorFunc func() []byte
 
-	// value cookie lenght
+	// value cookie length
 	cookieLen uint32
 }
 
