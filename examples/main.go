@@ -11,6 +11,8 @@ import (
 	"github.com/fasthttp/session/postgres"
 	"github.com/fasthttp/session/redis"
 	"github.com/fasthttp/session/sqlite3"
+
+	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 )
 
@@ -61,9 +63,20 @@ func init() {
 
 func main() {
 	addr := "0.0.0.0:8086"
+	router := fasthttprouter.New()
 	log.Println("Session example server listen: http://" + addr)
-	// Fasthttp start listen serve
-	err := fasthttp.ListenAndServe(addr, requestRouter)
+
+	router.GET("/", indexHandler)
+	router.GET("/set", setHandler)
+	router.GET("/get", getHandler)
+	router.GET("/delete", deleteHandler)
+	router.GET("/getAll", getAllHandler)
+	router.GET("/flush", flushHandler)
+	router.GET("/destroy", destroyHandler)
+	router.GET("/sessionid", sessionIdHandler)
+	router.GET("/regenerate", regenerateHandler)
+
+	err := fasthttp.ListenAndServe(addr, router.Handler)
 	if err != nil {
 		log.Println("listen server error :" + err.Error())
 	}

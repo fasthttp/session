@@ -4,35 +4,8 @@ import (
 	"fmt"
 
 	"github.com/fasthttp/session"
-	"github.com/savsgio/gotils"
 	"github.com/valyala/fasthttp"
 )
-
-// request router
-func requestRouter(ctx *fasthttp.RequestCtx) {
-	switch gotils.B2S(ctx.Path()) {
-	case "/":
-		indexHandler(ctx)
-	case "/set":
-		setHandler(ctx)
-	case "/get":
-		getHandler(ctx)
-	case "/delete":
-		deleteHandle(ctx)
-	case "/getAll":
-		getAllHandle(ctx)
-	case "/flush":
-		flushHandle(ctx)
-	case "/destroy":
-		destroyHandle(ctx)
-	case "/sessionid":
-		sessionIDHandle(ctx)
-	case "/regenerate":
-		regenerateHandle(ctx)
-	default:
-		ctx.Error("Unsupported path", fasthttp.StatusNotFound)
-	}
-}
 
 // index handler
 func indexHandler(ctx *fasthttp.RequestCtx) {
@@ -90,7 +63,7 @@ func getHandler(ctx *fasthttp.RequestCtx) {
 }
 
 // delete handler
-func deleteHandle(ctx *fasthttp.RequestCtx) {
+func deleteHandler(ctx *fasthttp.RequestCtx) {
 	// start session
 	sessionStore, err := serverSession.Start(ctx)
 	if err != nil {
@@ -111,7 +84,7 @@ func deleteHandle(ctx *fasthttp.RequestCtx) {
 }
 
 // get all handler
-func getAllHandle(ctx *fasthttp.RequestCtx) {
+func getAllHandler(ctx *fasthttp.RequestCtx) {
 	// start session
 	sessionStore, err := serverSession.Start(ctx)
 	if err != nil {
@@ -133,7 +106,7 @@ func getAllHandle(ctx *fasthttp.RequestCtx) {
 }
 
 // flush handle
-func flushHandle(ctx *fasthttp.RequestCtx) {
+func flushHandler(ctx *fasthttp.RequestCtx) {
 	// start session
 	sessionStore, err := serverSession.Start(ctx)
 	if err != nil {
@@ -149,7 +122,7 @@ func flushHandle(ctx *fasthttp.RequestCtx) {
 }
 
 // destroy handle
-func destroyHandle(ctx *fasthttp.RequestCtx) {
+func destroyHandler(ctx *fasthttp.RequestCtx) {
 	// destroy session
 	err := serverSession.Destroy(ctx)
 	if err != nil {
@@ -161,7 +134,7 @@ func destroyHandle(ctx *fasthttp.RequestCtx) {
 }
 
 // get sessionID handle
-func sessionIDHandle(ctx *fasthttp.RequestCtx) {
+func sessionIdHandler(ctx *fasthttp.RequestCtx) {
 	// start session
 	sessionStore, err := serverSession.Start(ctx)
 	if err != nil {
@@ -177,7 +150,7 @@ func sessionIDHandle(ctx *fasthttp.RequestCtx) {
 }
 
 // regenerate handler
-func regenerateHandle(ctx *fasthttp.RequestCtx) {
+func regenerateHandler(ctx *fasthttp.RequestCtx) {
 	// start session
 	sessionStore, err := serverSession.Regenerate(ctx)
 	if err != nil {
