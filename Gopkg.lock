@@ -10,6 +10,14 @@
   revision = "bc664df9673713a0ccf26e3b55a673ec7301088b"
 
 [[projects]]
+  branch = "master"
+  digest = "1:fb3c75e64d77a8292ee7c984420bcd8c23b8933d5013a43bc9abacc3148b5a03"
+  name = "github.com/fasthttp/router"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "9d27f9ad21125232953cccec963a6be73d7cc437"
+
+[[projects]]
   digest = "1:adea5a94903eb4384abef30f3d878dc9ff6b6b5b0722da25b82e5169216dfb61"
   name = "github.com/go-sql-driver/mysql"
   packages = ["."]
@@ -77,19 +85,22 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7ca94ff0a19082834674ed262f77154954f19e68cbe43932189bc38a125b3410"
+  digest = "1:7ad61bd927d6857949d7b7ffd63999aaaa8b94b759214e7d0c49c14d2b6d05bf"
   name = "github.com/savsgio/dictpool"
   packages = ["."]
   pruneopts = "UT"
-  revision = "e017fbb68054ec67d9eae779146e8c1e9de6734d"
+  revision = "f20ec519b5bf21bfe27f15c0b83300c78cd7b7f1"
 
 [[projects]]
   branch = "master"
-  digest = "1:8a80bfa75634d18dc7cbf9aad3f72ee0a0836f3dd8e6fa7d684ba57cfe5521ec"
+  digest = "1:418c47173d7adc05f56252cd50e5d5adb4ad162ef0d79ae21568d99a1b1c844d"
   name = "github.com/savsgio/gotils"
-  packages = ["."]
+  packages = [
+    ".",
+    "dao",
+  ]
   pruneopts = "UT"
-  revision = "ec8a00e2c9a79a884a46c47e1c1732b8c99f0188"
+  revision = "d83bfa86a17b74ca9db3ea25851fe88079e64937"
 
 [[projects]]
   branch = "master"
@@ -109,7 +120,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:71d4697600b36699831188365840b77814f1d5e740d6c27aa82278ffcf1e6ea1"
+  digest = "1:04f09ce9dfdf7a7a7b8fb6be2b94a76a48ee1250f30b609cce89d9adfebdc47a"
   name = "github.com/valyala/fasthttp"
   packages = [
     ".",
@@ -117,7 +128,7 @@
     "stackless",
   ]
   pruneopts = "UT"
-  revision = "63ea2d380ff30e6f09dc8c39205363c7c064bc31"
+  revision = "996610f021ff45fdc98c2ce7884d5fa4e7f9199b"
 
 [[projects]]
   branch = "master"
@@ -140,12 +151,14 @@
   analyzer-version = 1
   input-imports = [
     "github.com/bradfitz/gomemcache/memcache",
+    "github.com/fasthttp/router",
     "github.com/go-sql-driver/mysql",
     "github.com/gomodule/redigo/redis",
     "github.com/lib/pq",
     "github.com/mattn/go-sqlite3",
     "github.com/savsgio/dictpool",
     "github.com/savsgio/gotils",
+    "github.com/savsgio/gotils/dao",
     "github.com/valyala/bytebufferpool",
     "github.com/valyala/fasthttp",
     "github.com/valyala/fastrand",

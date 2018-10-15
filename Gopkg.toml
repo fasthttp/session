@@ -38,6 +38,10 @@
   branch = "master"
   name = "github.com/savsgio/gotils"
 
+[[constraint]]
+  branch = "master"
+  name = "github.com/fasthttp/router"
+
 [prune]
   go-tests = true
   unused-packages = true
