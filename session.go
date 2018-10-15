@@ -169,6 +169,9 @@ func (s *Session) Get(ctx *fasthttp.RequestCtx) (Storer, error) {
 //
 // Use this function if you want to avoid some extra-allocations
 // This will save the store into provider and will return it to the pool
+//
+// Warning: Don't use more the store after exec this function, because, you will lose the after data.Save
+// For avoid it, defer this function in your request handler
 func (s *Session) Save(store Storer) error {
 	err := store.Save()
 	if err != nil {
