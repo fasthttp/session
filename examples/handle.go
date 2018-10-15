@@ -34,7 +34,7 @@ func setHandler(ctx *fasthttp.RequestCtx) {
 		ctx.SetBodyString(err.Error())
 		return
 	}
-	// must defer store.save(ctx)
+	// must defer serverSession.save(ctx)
 	defer serverSession.Save(store)
 
 	store.Set("name", "session")
@@ -50,7 +50,7 @@ func getHandler(ctx *fasthttp.RequestCtx) {
 		ctx.SetBodyString(err.Error())
 		return
 	}
-	// must defer store.save(ctx)
+	// must defer serverSession.save(ctx)
 	defer serverSession.Save(store)
 
 	s := store.Get("name")
@@ -70,7 +70,7 @@ func deleteHandler(ctx *fasthttp.RequestCtx) {
 		ctx.SetBodyString(err.Error())
 		return
 	}
-	// must defer store.save(ctx)
+	// must defer serverSession.save(ctx)
 	defer serverSession.Save(store)
 
 	store.Delete("name")
@@ -91,7 +91,7 @@ func getAllHandler(ctx *fasthttp.RequestCtx) {
 		ctx.SetBodyString(err.Error())
 		return
 	}
-	// must defer store.save(ctx)
+	// must defer serverSession.save(ctx)
 	defer serverSession.Save(store)
 
 	store.Set("foo1", "baa1")
@@ -113,7 +113,7 @@ func flushHandler(ctx *fasthttp.RequestCtx) {
 		ctx.SetBodyString(err.Error())
 		return
 	}
-	// must defer store.save(ctx)
+	// must defer serverSession.save(ctx)
 	defer serverSession.Save(store)
 
 	store.Flush()
@@ -141,7 +141,7 @@ func sessionIDHandler(ctx *fasthttp.RequestCtx) {
 		ctx.SetBodyString(err.Error())
 		return
 	}
-	// must defer store.save(ctx)
+	// must defer serverSession.save(ctx)
 	defer serverSession.Save(store)
 
 	sessionID := store.GetSessionID()
@@ -157,7 +157,7 @@ func regenerateHandler(ctx *fasthttp.RequestCtx) {
 		ctx.SetBodyString(err.Error())
 		return
 	}
-	// must defer store.save(ctx)
+	// must defer serverSession.save(ctx)
 	defer serverSession.Save(store)
 
 	sessionID := store.GetSessionID()

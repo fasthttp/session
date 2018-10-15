@@ -1,6 +1,8 @@
 package redis
 
 import (
+	"sync"
+
 	"github.com/fasthttp/session"
 	"github.com/gomodule/redigo/redis"
 )
@@ -44,6 +46,8 @@ type Provider struct {
 	config      *Config
 	redisPool   *redis.Pool
 	maxLifeTime int64
+
+	storePool sync.Pool
 }
 
 // Store store struct

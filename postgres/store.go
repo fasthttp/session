@@ -1,37 +1,11 @@
 package postgres
 
 import (
-	"sync"
 	"time"
 )
 
-var storePool = sync.Pool{
-	New: func() interface{} {
-		return new(Store)
-	},
-}
-
-func acquireStore() *Store {
-	return storePool.Get().(*Store)
-}
-
-func releaseStore(store *Store) {
-	store.Reset()
-	storePool.Put(store)
-}
-
-// NewStore new postgres store
-func NewStore(sessionID []byte) *Store {
-	store := acquireStore()
-	store.Init(sessionID)
-
-	return store
-}
-
 // Save save store
 func (ps *Store) Save() error {
-	defer releaseStore(ps)
-
 	data := ps.GetAll()
 	value, err := provider.config.SerializeFunc(data)
 	if err != nil {

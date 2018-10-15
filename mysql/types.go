@@ -1,6 +1,8 @@
 package mysql
 
 import (
+	"sync"
+
 	"github.com/fasthttp/session"
 )
 
@@ -58,6 +60,8 @@ type Provider struct {
 	config      *Config
 	db          *Dao
 	maxLifeTime int64
+
+	storePool sync.Pool
 }
 
 // Store store struct

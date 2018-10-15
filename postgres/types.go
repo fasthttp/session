@@ -1,6 +1,10 @@
 package postgres
 
-import "github.com/fasthttp/session"
+import (
+	"sync"
+
+	"github.com/fasthttp/session"
+)
 
 // Config session postgres configuration
 type Config struct {
@@ -45,6 +49,8 @@ type Provider struct {
 	config      *Config
 	db          *Dao
 	maxLifeTime int64
+
+	storePool sync.Pool
 }
 
 // Store store struct

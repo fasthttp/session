@@ -37,8 +37,25 @@ func NewProvider() *Provider {
 	return &Provider{
 		config:         new(Config),
 		memCacheClient: new(memcache.Client),
-		st
+
+		storePool: sync.Pool{
+			New: func() interface{} {
+				return new(Store)
+			},
+		},
 	}
+}
+
+func (mcp *Provider) acquireStore(sessionID []byte) *Store {
+	store := mcp.storePool.Get().(*Store)
+	store.Init(sessionID)
+
+	return store
+}
+
+func (mcp *Provider) releaseStore(store *Store) {
+	store.Reset()
+	mcp.storePool.Put(store)
 }
 
 // Init init provider config
@@ -88,7 +105,7 @@ func (mcp *Provider) getMemCacheSessionKey(sessionID []byte) string {
 
 // Get read session store by session id
 func (mcp *Provider) Get(sessionID []byte) (session.Storer, error) {
-	store := NewStore(sessionID)
+	store := mcp.acquireStore(sessionID)
 
 	item := acquireItem()
 	item, err := mcp.memCacheClient.Get(mcp.getMemCacheSessionKey(sessionID))
@@ -107,9 +124,14 @@ func (mcp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	return store, err
 }
 
+// Put put store into the pool.
+func (mcp *Provider) Put(store session.Storer) {
+	mcp.releaseStore(store.(*Store))
+}
+
 // Regenerate regenerate session
 func (mcp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
-	store := NewStore(newID)
+	store := mcp.acquireStore(newID)
 
 	oldKey := mcp.getMemCacheSessionKey(oldID)
 	newKey := mcp.getMemCacheSessionKey(newID)

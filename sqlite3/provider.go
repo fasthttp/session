@@ -1,6 +1,7 @@
 package sqlite3
 
 import (
+	"sync"
 	"time"
 
 	"github.com/fasthttp/session"
@@ -17,7 +18,25 @@ func NewProvider() *Provider {
 	return &Provider{
 		config: new(Config),
 		db:     new(Dao),
+
+		storePool: sync.Pool{
+			New: func() interface{} {
+				return new(Store)
+			},
+		},
 	}
+}
+
+func (sp *Provider) acquireStore(sessionID []byte) *Store {
+	store := sp.storePool.Get().(*Store)
+	store.Init(sessionID)
+
+	return store
+}
+
+func (sp *Provider) releaseStore(store *Store) {
+	store.Reset()
+	sp.storePool.Put(store)
 }
 
 // Init init provider config
@@ -53,7 +72,7 @@ func (sp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
 
 // Get read session store by session id
 func (sp *Provider) Get(sessionID []byte) (session.Storer, error) {
-	store := NewStore(sessionID)
+	store := sp.acquireStore(sessionID)
 
 	row, err := sp.db.getSessionBySessionID(sessionID)
 
@@ -75,9 +94,14 @@ func (sp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	return store, err
 }
 
+// Put put store into the pool.
+func (sp *Provider) Put(store session.Storer) {
+	sp.releaseStore(store.(*Store))
+}
+
 // Regenerate regenerate session
 func (sp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
-	store := NewStore(newID)
+	store := sp.acquireStore(newID)
 
 	row, err := sp.db.getSessionBySessionID(oldID)
 	if err != nil {

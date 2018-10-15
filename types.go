@@ -100,6 +100,7 @@ type Storer interface {
 type Provider interface {
 	Init(lifeTime int64, cfg ProviderConfig) error
 	Get(id []byte) (Storer, error)
+	Put(store Storer)
 	Destroy(id []byte) error
 	Regenerate(oldID, newID []byte) (Storer, error)
 	Count() int

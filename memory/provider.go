@@ -61,6 +61,11 @@ func (mp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	return newStore, nil
 }
 
+// Put put store into the pool.
+//
+// In Memory provider, only put again the store into the pool when destroy the session
+func (mp *Provider) Put(store session.Storer) {}
+
 // Regenerate regenerate session
 func (mp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 	var store *Store
