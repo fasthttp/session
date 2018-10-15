@@ -165,14 +165,15 @@ func (s *Session) Get(ctx *fasthttp.RequestCtx) (Storer, error) {
 	return store, nil
 }
 
-// Save save user session with current store
+// Save save the user session with current store
+//
+// Use this function if you want to avoid some extra-allocations
+// This will save the store into provider and will return it to the pool
 func (s *Session) Save(store Storer) error {
 	err := store.Save()
 	if err != nil {
 		return err
 	}
-
-	fmt.Printf("SAVE --- %p\n", store)
 
 	s.provider.Put(store)
 
