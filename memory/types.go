@@ -15,6 +15,8 @@ type Provider struct {
 	values      *session.Dict
 	maxLifeTime int64
 
+	storePool sync.Pool
+
 	lock sync.RWMutex
 }
 

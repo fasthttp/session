@@ -3,8 +3,6 @@ package postgres
 import (
 	"sync"
 	"time"
-
-	"github.com/valyala/fasthttp"
 )
 
 var storePool = sync.Pool{
@@ -31,7 +29,7 @@ func NewStore(sessionID []byte) *Store {
 }
 
 // Save save store
-func (ps *Store) Save(ctx *fasthttp.RequestCtx) error {
+func (ps *Store) Save() error {
 	defer releaseStore(ps)
 
 	data := ps.GetAll()

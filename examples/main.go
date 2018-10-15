@@ -73,7 +73,7 @@ func main() {
 	r.GET("/getAll", getAllHandler)
 	r.GET("/flush", flushHandler)
 	r.GET("/destroy", destroyHandler)
-	r.GET("/sessionid", sessionIdHandler)
+	r.GET("/sessionid", sessionIDHandler)
 	r.GET("/regenerate", regenerateHandler)
 
 	err := fasthttp.ListenAndServe(addr, r.Handler)

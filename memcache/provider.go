@@ -37,6 +37,7 @@ func NewProvider() *Provider {
 	return &Provider{
 		config:         new(Config),
 		memCacheClient: new(memcache.Client),
+		st
 	}
 }
 
@@ -85,8 +86,8 @@ func (mcp *Provider) getMemCacheSessionKey(sessionID []byte) string {
 	return keyStr
 }
 
-// ReadStore read session store by session id
-func (mcp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
+// Get read session store by session id
+func (mcp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	store := NewStore(sessionID)
 
 	item := acquireItem()

@@ -51,8 +51,8 @@ func (sp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
 	return sp.db.Connection.Ping()
 }
 
-// ReadStore read session store by session id
-func (sp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
+// Get read session store by session id
+func (sp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	store := NewStore(sessionID)
 
 	row, err := sp.db.getSessionBySessionID(sessionID)

@@ -1,9 +1,5 @@
 package session
 
-import (
-	"github.com/valyala/fasthttp"
-)
-
 // Init init store data and sessionID
 func (s *Store) Init(sessionID []byte) {
 	s.sessionID = sessionID
@@ -14,7 +10,7 @@ func (s *Store) Init(sessionID []byte) {
 }
 
 // Save save store
-func (s *Store) Save(ctx *fasthttp.RequestCtx) error {
+func (s *Store) Save() error {
 	return nil
 }
 

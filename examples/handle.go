@@ -29,31 +29,31 @@ func indexHandler(ctx *fasthttp.RequestCtx) {
 // set handler
 func setHandler(ctx *fasthttp.RequestCtx) {
 	// start session
-	sessionStore, err := serverSession.Start(ctx)
+	store, err := serverSession.Get(ctx)
 	if err != nil {
 		ctx.SetBodyString(err.Error())
 		return
 	}
-	// must defer sessionStore.save(ctx)
-	defer sessionStore.Save(ctx)
+	// must defer store.save(ctx)
+	defer serverSession.Save(store)
 
-	sessionStore.Set("name", "session")
+	store.Set("name", "session")
 
-	ctx.SetBodyString(fmt.Sprintf("session setted key name= %s ok", sessionStore.Get("name").(string)))
+	ctx.SetBodyString(fmt.Sprintf("session setted key name= %s ok", store.Get("name").(string)))
 }
 
 // get handler
 func getHandler(ctx *fasthttp.RequestCtx) {
 	// start session
-	sessionStore, err := serverSession.Start(ctx)
+	store, err := serverSession.Get(ctx)
 	if err != nil {
 		ctx.SetBodyString(err.Error())
 		return
 	}
-	// must defer sessionStore.save(ctx)
-	defer sessionStore.Save(ctx)
+	// must defer store.save(ctx)
+	defer serverSession.Save(store)
 
-	s := sessionStore.Get("name")
+	s := store.Get("name")
 	if s == nil {
 		ctx.SetBodyString("session get name is nil")
 		return
@@ -65,17 +65,17 @@ func getHandler(ctx *fasthttp.RequestCtx) {
 // delete handler
 func deleteHandler(ctx *fasthttp.RequestCtx) {
 	// start session
-	sessionStore, err := serverSession.Start(ctx)
+	store, err := serverSession.Get(ctx)
 	if err != nil {
 		ctx.SetBodyString(err.Error())
 		return
 	}
-	// must defer sessionStore.save(ctx)
-	defer sessionStore.Save(ctx)
+	// must defer store.save(ctx)
+	defer serverSession.Save(store)
 
-	sessionStore.Delete("name")
+	store.Delete("name")
 
-	s := sessionStore.Get("name")
+	s := store.Get("name")
 	if s == nil {
 		ctx.SetBodyString("session delete key name ok")
 		return
@@ -86,20 +86,20 @@ func deleteHandler(ctx *fasthttp.RequestCtx) {
 // get all handler
 func getAllHandler(ctx *fasthttp.RequestCtx) {
 	// start session
-	sessionStore, err := serverSession.Start(ctx)
+	store, err := serverSession.Get(ctx)
 	if err != nil {
 		ctx.SetBodyString(err.Error())
 		return
 	}
-	// must defer sessionStore.save(ctx)
-	defer sessionStore.Save(ctx)
+	// must defer store.save(ctx)
+	defer serverSession.Save(store)
 
-	sessionStore.Set("foo1", "baa1")
-	sessionStore.Set("foo2", "baa2")
-	sessionStore.Set("foo3", "baa3")
-	sessionStore.Set("foo4", "baa5")
+	store.Set("foo1", "baa1")
+	store.Set("foo2", "baa2")
+	store.Set("foo3", "baa3")
+	store.Set("foo4", "baa5")
 
-	data := sessionStore.GetAll()
+	data := store.GetAll()
 
 	fmt.Println(data)
 	ctx.SetBodyString("session get all data")
@@ -108,15 +108,15 @@ func getAllHandler(ctx *fasthttp.RequestCtx) {
 // flush handle
 func flushHandler(ctx *fasthttp.RequestCtx) {
 	// start session
-	sessionStore, err := serverSession.Start(ctx)
+	store, err := serverSession.Get(ctx)
 	if err != nil {
 		ctx.SetBodyString(err.Error())
 		return
 	}
-	// must defer sessionStore.save(ctx)
-	defer sessionStore.Save(ctx)
+	// must defer store.save(ctx)
+	defer serverSession.Save(store)
 
-	sessionStore.Flush()
+	store.Flush()
 
 	ctx.SetBodyString("session flush data")
 }
@@ -134,17 +134,17 @@ func destroyHandler(ctx *fasthttp.RequestCtx) {
 }
 
 // get sessionID handle
-func sessionIdHandler(ctx *fasthttp.RequestCtx) {
+func sessionIDHandler(ctx *fasthttp.RequestCtx) {
 	// start session
-	sessionStore, err := serverSession.Start(ctx)
+	store, err := serverSession.Get(ctx)
 	if err != nil {
 		ctx.SetBodyString(err.Error())
 		return
 	}
-	// must defer sessionStore.save(ctx)
-	defer sessionStore.Save(ctx)
+	// must defer store.save(ctx)
+	defer serverSession.Save(store)
 
-	sessionID := sessionStore.GetSessionID()
+	sessionID := store.GetSessionID()
 	ctx.SetBodyString("session sessionID: ")
 	ctx.Write(sessionID)
 }
@@ -152,15 +152,15 @@ func sessionIdHandler(ctx *fasthttp.RequestCtx) {
 // regenerate handler
 func regenerateHandler(ctx *fasthttp.RequestCtx) {
 	// start session
-	sessionStore, err := serverSession.Regenerate(ctx)
+	store, err := serverSession.Regenerate(ctx)
 	if err != nil {
 		ctx.SetBodyString(err.Error())
 		return
 	}
-	// must defer sessionStore.save(ctx)
-	defer sessionStore.Save(ctx)
+	// must defer store.save(ctx)
+	defer serverSession.Save(store)
 
-	sessionID := sessionStore.GetSessionID()
+	sessionID := store.GetSessionID()
 
 	ctx.SetBodyString("session regenerate sessionID: ")
 	ctx.Write(sessionID)

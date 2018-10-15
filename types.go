@@ -6,7 +6,6 @@ import (
 
 	"github.com/savsgio/dictpool"
 	"github.com/savsgio/gotils/dao"
-	"github.com/valyala/fasthttp"
 )
 
 // Config config struct
@@ -85,7 +84,7 @@ type Cookie struct{}
 
 // Storer session store interface
 type Storer interface {
-	Save(ctx *fasthttp.RequestCtx) error
+	Save() error
 	Get(key string) interface{}
 	GetBytes(key []byte) interface{}
 	GetAll() Dict
@@ -100,7 +99,7 @@ type Storer interface {
 // Provider provider interface
 type Provider interface {
 	Init(lifeTime int64, cfg ProviderConfig) error
-	ReadStore(id []byte) (Storer, error)
+	Get(id []byte) (Storer, error)
 	Destroy(id []byte) error
 	Regenerate(oldID, newID []byte) (Storer, error)
 	Count() int

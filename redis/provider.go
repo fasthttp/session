@@ -80,8 +80,8 @@ func (rp *Provider) getRedisSessionKey(sessionID []byte) string {
 	return keyStr
 }
 
-// ReadStore read session store by session id
-func (rp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
+// Get read session store by session id
+func (rp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	conn := rp.redisPool.Get()
 	defer conn.Close()
 
@@ -122,7 +122,7 @@ func (rp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 	conn.Do("RENAME", oldKey, newKey)
 	conn.Do("EXPIRE", newKey, rp.maxLifeTime)
 
-	return rp.ReadStore(newID)
+	return rp.Get(newID)
 }
 
 // Destroy destroy session by sessionID

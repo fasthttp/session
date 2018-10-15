@@ -2,8 +2,6 @@ package memcache
 
 import (
 	"sync"
-
-	"github.com/valyala/fasthttp"
 )
 
 var storePool = sync.Pool{
@@ -30,7 +28,7 @@ func NewStore(sessionID []byte) *Store {
 }
 
 // Save save store
-func (mcs *Store) Save(ctx *fasthttp.RequestCtx) error {
+func (mcs *Store) Save() error {
 	defer releaseStore(mcs)
 
 	data := mcs.GetAll()

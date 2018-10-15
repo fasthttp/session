@@ -138,11 +138,11 @@ func (s *Session) GetSessionID(ctx *fasthttp.RequestCtx) []byte {
 	return nil
 }
 
-// Start session start
+// Get get user session from provider
 // 1. get sessionID from fasthttp ctx
 // 2. if sessionID is empty, generator sessionID and set response Set-Cookie
 // 3. return session provider store
-func (s *Session) Start(ctx *fasthttp.RequestCtx) (Storer, error) {
+func (s *Session) Get(ctx *fasthttp.RequestCtx) (Storer, error) {
 	if s.provider == nil {
 		return nil, errNotSetProvider
 	}
@@ -157,12 +157,17 @@ func (s *Session) Start(ctx *fasthttp.RequestCtx) (Storer, error) {
 		s.setHTTPValues(ctx, sessionID)
 	}
 
-	store, err := s.provider.ReadStore(sessionID)
+	store, err := s.provider.Get(sessionID)
 	if err != nil {
 		return nil, err
 	}
 
 	return store, nil
+}
+
+// Save save user session with current store
+func (s *Session) Save(store Storer) error {
+	return store.Save()
 }
 
 // Regenerate regenerate a session id for this Storer

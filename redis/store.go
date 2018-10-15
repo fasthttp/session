@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"github.com/savsgio/gotils"
-	"github.com/valyala/fasthttp"
 )
 
 var storePool = sync.Pool{
@@ -31,7 +30,7 @@ func NewStore(sessionID []byte) *Store {
 }
 
 // Save save store
-func (rs *Store) Save(ctx *fasthttp.RequestCtx) error {
+func (rs *Store) Save() error {
 	defer releaseStore(rs)
 
 	data := rs.GetAll()

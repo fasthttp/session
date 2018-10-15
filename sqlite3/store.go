@@ -3,8 +3,6 @@ package sqlite3
 import (
 	"sync"
 	"time"
-
-	"github.com/valyala/fasthttp"
 )
 
 var storePool = sync.Pool{
@@ -31,7 +29,7 @@ func NewStore(sessionID []byte) *Store {
 }
 
 // Save save store
-func (ss *Store) Save(ctx *fasthttp.RequestCtx) error {
+func (ss *Store) Save() error {
 	defer releaseStore(ss)
 
 	data := ss.GetAll()

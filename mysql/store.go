@@ -3,8 +3,6 @@ package mysql
 import (
 	"sync"
 	"time"
-
-	"github.com/valyala/fasthttp"
 )
 
 var storePool = sync.Pool{
@@ -31,7 +29,7 @@ func NewStore(sessionID []byte) *Store {
 }
 
 // Save save store
-func (ms *Store) Save(ctx *fasthttp.RequestCtx) error {
+func (ms *Store) Save() error {
 	defer releaseStore(ms)
 
 	data := ms.GetAll()

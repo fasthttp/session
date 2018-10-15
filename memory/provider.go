@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"sync"
 	"time"
 
 	"github.com/fasthttp/session"
@@ -14,7 +15,25 @@ func NewProvider() *Provider {
 		config:      new(Config),
 		values:      new(session.Dict),
 		maxLifeTime: 0,
+
+		storePool: sync.Pool{
+			New: func() interface{} {
+				return new(Store)
+			},
+		},
 	}
+}
+
+func (mp *Provider) acquireStore(sessionID []byte) *Store {
+	store := mp.storePool.Get().(*Store)
+	store.Init(sessionID)
+
+	return store
+}
+
+func (mp *Provider) releaseStore(store *Store) {
+	store.Reset()
+	mp.storePool.Put(store)
 }
 
 // Init init provider configuration
@@ -29,14 +48,14 @@ func (mp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
 	return nil
 }
 
-// ReadStore read session by id
-func (mp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
+// Get get session store by id
+func (mp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	currentStore := mp.values.GetBytes(sessionID)
 	if currentStore != nil {
 		return currentStore.(*Store), nil
 	}
 
-	newStore := NewStore(sessionID)
+	newStore := mp.acquireStore(sessionID)
 	mp.values.SetBytes(sessionID, newStore)
 
 	return newStore, nil
@@ -53,7 +72,7 @@ func (mp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 		mp.values.SetBytes(newID, store)
 		mp.values.DelBytes(oldID)
 	} else {
-		store = NewStore(newID)
+		store = mp.acquireStore(newID)
 		mp.values.SetBytes(newID, store)
 	}
 
@@ -64,7 +83,7 @@ func (mp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 func (mp *Provider) Destroy(sessionID []byte) error {
 	val := mp.values.GetBytes(sessionID)
 	if val != nil {
-		releaseStore(val.(*Store))
+		mp.releaseStore(val.(*Store))
 	}
 
 	mp.values.DelBytes(sessionID)
