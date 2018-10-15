@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 )
 
-var b64Encoding = base64.NewEncoding(base64Table)
+var b64Encoding = base64.StdEncoding
 
 // NewEncrypt return new encrypt instance
 func NewEncrypt() *Encrypt {

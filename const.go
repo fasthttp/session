@@ -14,6 +14,4 @@ const defaultSessionIDInURLQuery = false
 const defaultSessionIDInHTTPHeader = false
 const defaultCookieLen uint32 = 32
 
-const base64Table = "1234567890poiuytreqwasdfghjklmnbvcxzQWERTYUIOPLKJHGFDSAZXCVBNM-_"
-
 const cookieCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
