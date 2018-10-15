@@ -1,6 +1,8 @@
 package memcache
 
 import (
+	"sync"
+
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/fasthttp/session"
 )
@@ -33,6 +35,8 @@ type Provider struct {
 	config         *Config
 	memCacheClient *memcache.Client
 	maxLifeTime    int64
+
+	storePool sync.Pool
 }
 
 // Store store struct

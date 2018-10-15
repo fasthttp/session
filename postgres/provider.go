@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"sync"
 	"time"
 
 	"github.com/fasthttp/session"
@@ -17,7 +18,25 @@ func NewProvider() *Provider {
 	return &Provider{
 		config: new(Config),
 		db:     new(Dao),
+
+		storePool: sync.Pool{
+			New: func() interface{} {
+				return new(Store)
+			},
+		},
 	}
+}
+
+func (pp *Provider) acquireStore(sessionID []byte) *Store {
+	store := pp.storePool.Get().(*Store)
+	store.Init(sessionID)
+
+	return store
+}
+
+func (pp *Provider) releaseStore(store *Store) {
+	store.Reset()
+	pp.storePool.Put(store)
 }
 
 // Init init provider config
@@ -54,9 +73,9 @@ func (pp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
 	return pp.db.Connection.Ping()
 }
 
-// ReadStore read session store by session id
-func (pp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
-	store := NewStore(sessionID)
+// Get read session store by session id
+func (pp *Provider) Get(sessionID []byte) (session.Storer, error) {
+	store := pp.acquireStore(sessionID)
 
 	row, err := pp.db.getSessionBySessionID(sessionID)
 	if err != nil {
@@ -81,9 +100,14 @@ func (pp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 	return store, nil
 }
 
+// Put put store into the pool.
+func (pp *Provider) Put(store session.Storer) {
+	pp.releaseStore(store.(*Store))
+}
+
 // Regenerate regenerate session
 func (pp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
-	store := NewStore(newID)
+	store := pp.acquireStore(newID)
 
 	row, err := pp.db.getSessionBySessionID(oldID)
 	if err != nil {

@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"sync"
 	"time"
 
 	"github.com/fasthttp/session"
@@ -17,7 +18,25 @@ func NewProvider() *Provider {
 	return &Provider{
 		config: new(Config),
 		db:     new(Dao),
+
+		storePool: sync.Pool{
+			New: func() interface{} {
+				return new(Store)
+			},
+		},
 	}
+}
+
+func (mp *Provider) acquireStore(sessionID []byte) *Store {
+	store := mp.storePool.Get().(*Store)
+	store.Init(sessionID)
+
+	return store
+}
+
+func (mp *Provider) releaseStore(store *Store) {
+	store.Reset()
+	mp.storePool.Put(store)
 }
 
 // Init init provider config
@@ -54,9 +73,9 @@ func (mp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
 	return mp.db.Connection.Ping()
 }
 
-// ReadStore read session store by session id
-func (mp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
-	store := NewStore(sessionID)
+// Get read session store by session id
+func (mp *Provider) Get(sessionID []byte) (session.Storer, error) {
+	store := mp.acquireStore(sessionID)
 
 	row, err := mp.db.getSessionBySessionID(sessionID)
 	if err != nil {
@@ -81,9 +100,14 @@ func (mp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 	return store, nil
 }
 
+// Put put store into the pool.
+func (mp *Provider) Put(store session.Storer) {
+	mp.releaseStore(store.(*Store))
+}
+
 // Regenerate regenerate session
 func (mp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
-	store := NewStore(newID)
+	store := mp.acquireStore(newID)
 
 	row, err := mp.db.getSessionBySessionID(oldID)
 	if err != nil {

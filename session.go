@@ -110,11 +110,11 @@ func (s *Session) delHTTPValues(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// GetSessionID get session id
+// get session id
 // 1. get session id from cookie
 // 2. get session id from http headers
 // 3. get session id from query string
-func (s *Session) GetSessionID(ctx *fasthttp.RequestCtx) []byte {
+func (s *Session) getSessionID(ctx *fasthttp.RequestCtx) []byte {
 	val := ctx.Request.Header.Cookie(s.config.CookieName)
 	if len(val) > 0 {
 		return val
@@ -138,16 +138,16 @@ func (s *Session) GetSessionID(ctx *fasthttp.RequestCtx) []byte {
 	return nil
 }
 
-// Start session start
+// Get get user session from provider
 // 1. get sessionID from fasthttp ctx
 // 2. if sessionID is empty, generator sessionID and set response Set-Cookie
 // 3. return session provider store
-func (s *Session) Start(ctx *fasthttp.RequestCtx) (Storer, error) {
+func (s *Session) Get(ctx *fasthttp.RequestCtx) (Storer, error) {
 	if s.provider == nil {
 		return nil, errNotSetProvider
 	}
 
-	sessionID := s.GetSessionID(ctx)
+	sessionID := s.getSessionID(ctx)
 	if len(sessionID) == 0 {
 		sessionID = s.config.SessionIDGeneratorFunc()
 		if len(sessionID) == 0 {
@@ -157,12 +157,30 @@ func (s *Session) Start(ctx *fasthttp.RequestCtx) (Storer, error) {
 		s.setHTTPValues(ctx, sessionID)
 	}
 
-	store, err := s.provider.ReadStore(sessionID)
+	store, err := s.provider.Get(sessionID)
 	if err != nil {
 		return nil, err
 	}
 
 	return store, nil
+}
+
+// Save save the user session with current store
+//
+// Use this function if you want to avoid some extra-allocations
+// This will save the store into provider and will return it to the pool
+//
+// Warning: Don't use more the store after exec this function, because, you will lose the after data
+// For avoid it, defer this function in your request handler
+func (s *Session) Save(store Storer) error {
+	err := store.Save()
+	if err != nil {
+		return err
+	}
+
+	s.provider.Put(store)
+
+	return nil
 }
 
 // Regenerate regenerate a session id for this Storer
@@ -175,7 +193,7 @@ func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) (Storer, error) {
 	if len(newID) == 0 {
 		return nil, errEmptySessionID
 	}
-	oldID := s.GetSessionID(ctx)
+	oldID := s.getSessionID(ctx)
 
 	store, err := s.provider.Regenerate(oldID, newID)
 	if err != nil {
@@ -189,7 +207,7 @@ func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) (Storer, error) {
 
 // Destroy destroy session in fasthttp ctx
 func (s *Session) Destroy(ctx *fasthttp.RequestCtx) error {
-	sessionID := s.GetSessionID(ctx)
+	sessionID := s.getSessionID(ctx)
 	if len(sessionID) == 0 {
 		return nil
 	}

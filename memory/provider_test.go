@@ -16,13 +16,13 @@ func getServerSession() *session.Session {
 	return serverSession
 }
 
-func Benchmark_Start(b *testing.B) {
+func Benchmark_Get(b *testing.B) {
 	ctx := new(fasthttp.RequestCtx)
 	serverSession := getServerSession()
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		serverSession.Start(ctx)
+		serverSession.Get(ctx)
 	}
 }
 

@@ -2,6 +2,7 @@ package redis
 
 import (
 	"errors"
+	"sync"
 
 	"github.com/fasthttp/session"
 	"github.com/gomodule/redigo/redis"
@@ -19,7 +20,25 @@ func NewProvider() *Provider {
 	return &Provider{
 		config:    new(Config),
 		redisPool: new(redis.Pool),
+
+		storePool: sync.Pool{
+			New: func() interface{} {
+				return new(Store)
+			},
+		},
 	}
+}
+
+func (rp *Provider) acquireStore(sessionID []byte) *Store {
+	store := rp.storePool.Get().(*Store)
+	store.Init(sessionID)
+
+	return store
+}
+
+func (rp *Provider) releaseStore(store *Store) {
+	store.Reset()
+	rp.storePool.Put(store)
 }
 
 // Init init provider config
@@ -80,12 +99,12 @@ func (rp *Provider) getRedisSessionKey(sessionID []byte) string {
 	return keyStr
 }
 
-// ReadStore read session store by session id
-func (rp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
+// Get read session store by session id
+func (rp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	conn := rp.redisPool.Get()
 	defer conn.Close()
 
-	store := NewStore(sessionID)
+	store := rp.acquireStore(sessionID)
 	key := rp.getRedisSessionKey(sessionID)
 
 	reply, err := redis.Bytes(conn.Do("GET", key))
@@ -104,6 +123,11 @@ func (rp *Provider) ReadStore(sessionID []byte) (session.Storer, error) {
 
 }
 
+// Put put store into the pool.
+func (rp *Provider) Put(store session.Storer) {
+	rp.releaseStore(store.(*Store))
+}
+
 // Regenerate regenerate session
 func (rp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 	conn := rp.redisPool.Get()
@@ -115,14 +139,14 @@ func (rp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 	exists, err := redis.Bool(conn.Do("EXISTS", oldKey))
 	if err != nil || !exists { // Not exist
 		conn.Do("SET", newKey, "", "EX", rp.maxLifeTime)
-		return NewStore(newID), nil
+		return rp.acquireStore(newID), nil
 	}
 
 	// Exist
 	conn.Do("RENAME", oldKey, newKey)
 	conn.Do("EXPIRE", newKey, rp.maxLifeTime)
 
-	return rp.ReadStore(newID)
+	return rp.Get(newID)
 }
 
 // Destroy destroy session by sessionID
