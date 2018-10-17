@@ -17,31 +17,47 @@ func getServerSession() *session.Session {
 }
 
 func Benchmark_Get(b *testing.B) {
-	ctx := new(fasthttp.RequestCtx)
+	testCtx := new(fasthttp.RequestCtx)
 	serverSession := getServerSession()
+
+	handler := func(ctx *fasthttp.RequestCtx) {
+		store, _ := serverSession.Get(ctx)
+		store.Set("k1", 1)
+		serverSession.Save(store)
+	}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		serverSession.Get(ctx)
+		handler(testCtx)
 	}
 }
 
 func Benchmark_Regenerate(b *testing.B) {
-	ctx := new(fasthttp.RequestCtx)
+	testCtx := new(fasthttp.RequestCtx)
 	serverSession := getServerSession()
+
+	handler := func(ctx *fasthttp.RequestCtx) {
+		store, _ := serverSession.Regenerate(ctx)
+		store.Set("k1", 1)
+		serverSession.Save(store)
+	}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		serverSession.Regenerate(ctx)
+		handler(testCtx)
 	}
 }
 
 func Benchmark_Destroy(b *testing.B) {
-	ctx := new(fasthttp.RequestCtx)
+	testCtx := new(fasthttp.RequestCtx)
 	serverSession := getServerSession()
+
+	handler := func(ctx *fasthttp.RequestCtx) {
+		serverSession.Destroy(ctx)
+	}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		serverSession.Destroy(ctx)
+		handler(testCtx)
 	}
 }
