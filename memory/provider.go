@@ -13,7 +13,7 @@ var provider = NewProvider()
 func NewProvider() *Provider {
 	return &Provider{
 		config:      new(Config),
-		values:      new(session.Dict),
+		memoryDB:    new(session.Dict),
 		maxLifeTime: 0,
 
 		storePool: sync.Pool{
@@ -50,13 +50,13 @@ func (mp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
 
 // Get get session store by id
 func (mp *Provider) Get(sessionID []byte) (session.Storer, error) {
-	currentStore := mp.values.GetBytes(sessionID)
+	currentStore := mp.memoryDB.GetBytes(sessionID)
 	if currentStore != nil {
 		return currentStore.(*Store), nil
 	}
 
 	newStore := mp.acquireStore(sessionID)
-	mp.values.SetBytes(sessionID, newStore)
+	mp.memoryDB.SetBytes(sessionID, newStore)
 
 	return newStore, nil
 }
@@ -70,15 +70,15 @@ func (mp *Provider) Put(store session.Storer) {}
 func (mp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 	var store *Store
 
-	val := mp.values.GetBytes(oldID)
+	val := mp.memoryDB.GetBytes(oldID)
 	if val != nil {
 		store = val.(*Store)
 		store.SetSessionID(newID)
-		mp.values.SetBytes(newID, store)
-		mp.values.DelBytes(oldID)
+		mp.memoryDB.SetBytes(newID, store)
+		mp.memoryDB.DelBytes(oldID)
 	} else {
 		store = mp.acquireStore(newID)
-		mp.values.SetBytes(newID, store)
+		mp.memoryDB.SetBytes(newID, store)
 	}
 
 	return store, nil
@@ -86,19 +86,19 @@ func (mp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 
 // Destroy destroy session by sessionID
 func (mp *Provider) Destroy(sessionID []byte) error {
-	val := mp.values.GetBytes(sessionID)
+	val := mp.memoryDB.GetBytes(sessionID)
 	if val != nil {
 		mp.releaseStore(val.(*Store))
 	}
 
-	mp.values.DelBytes(sessionID)
+	mp.memoryDB.DelBytes(sessionID)
 
 	return nil
 }
 
 // Count session values count
 func (mp *Provider) Count() int {
-	return len(mp.values.D)
+	return len(mp.memoryDB.D)
 }
 
 // NeedGC need gc
@@ -108,7 +108,7 @@ func (mp *Provider) NeedGC() bool {
 
 // GC session garbage collection
 func (mp *Provider) GC() {
-	for _, kv := range mp.values.D {
+	for _, kv := range mp.memoryDB.D {
 		if time.Now().Unix() >= (kv.Value.(*Store).lastActiveTime + mp.maxLifeTime) {
 			mp.Destroy(kv.Key)
 		}

@@ -12,7 +12,7 @@ type Config struct{}
 // Provider provider struct
 type Provider struct {
 	config      *Config
-	values      *session.Dict
+	memoryDB    *session.Dict
 	maxLifeTime int64
 
 	storePool sync.Pool
