@@ -75,6 +75,9 @@ func (sp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	store := sp.acquireStore(sessionID)
 
 	row, err := sp.db.getSessionBySessionID(sessionID)
+	if err != nil {
+		return nil, err
+	}
 
 	if row.sessionID != "" { // Exist
 		err := sp.config.UnSerializeFunc(gotils.S2B(row.contents), store.GetDataPointer())
