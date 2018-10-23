@@ -4,7 +4,6 @@ package memcache
 func (mcs *Store) Save() error {
 	data := mcs.GetAll()
 	value, err := provider.config.SerializeFunc(data)
-
 	if err != nil {
 		return err
 	}
@@ -12,9 +11,9 @@ func (mcs *Store) Save() error {
 	item := acquireItem()
 	item.Key = provider.getMemCacheSessionKey(mcs.GetSessionID())
 	item.Value = value
-	item.Expiration = int32(provider.maxLifeTime)
+	item.Expiration = provider.maxLifeTime
 
-	err = provider.memCacheClient.Set(item)
+	err = provider.db.Set(item)
 
 	releaseItem(item)
 
