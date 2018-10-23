@@ -2,9 +2,10 @@ package redis
 
 import (
 	"sync"
+	"time"
 
 	"github.com/fasthttp/session"
-	"github.com/gomodule/redigo/redis"
+	"github.com/go-redis/redis"
 )
 
 // Config session redis config
@@ -16,8 +17,8 @@ type Config struct {
 	// Redis server port
 	Port int64
 
-	// Maximum number of idle connections in the redis server pool.
-	MaxIdle int
+	// Maximum number of socket connections.
+	PoolSize int
 
 	// Close connections after remaining idle for this duration. If the value
 	// is zero, then idle connections are not closed. Applications should set
@@ -44,8 +45,8 @@ type Config struct {
 // Provider provider struct
 type Provider struct {
 	config      *Config
-	redisPool   *redis.Pool
-	maxLifeTime int64
+	db          *redis.Client
+	maxLifeTime time.Duration
 
 	storePool sync.Pool
 }

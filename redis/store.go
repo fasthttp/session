@@ -1,9 +1,5 @@
 package redis
 
-import (
-	"github.com/savsgio/gotils"
-)
-
 // Save save store
 func (rs *Store) Save() error {
 	data := rs.GetAll()
@@ -12,9 +8,7 @@ func (rs *Store) Save() error {
 		return err
 	}
 
-	conn := provider.redisPool.Get()
-	_, err = conn.Do("SETEX", provider.getRedisSessionKey(rs.GetSessionID()), provider.maxLifeTime, gotils.B2S(b))
-	conn.Close()
+	err = provider.db.Set(provider.getRedisSessionKey(rs.GetSessionID()), b, provider.maxLifeTime).Err()
 
 	return err
 }

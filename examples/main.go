@@ -43,7 +43,7 @@ func init() {
 		config = &redis.Config{
 			Host:        "127.0.0.1",
 			Port:        6379,
-			MaxIdle:     8,
+			PoolSize:    8,
 			IdleTimeout: 300,
 			KeyPrefix:   "session",
 		}

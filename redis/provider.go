@@ -2,10 +2,12 @@ package redis
 
 import (
 	"errors"
+	"fmt"
 	"sync"
+	"time"
 
 	"github.com/fasthttp/session"
-	"github.com/gomodule/redigo/redis"
+	"github.com/go-redis/redis"
 	"github.com/valyala/bytebufferpool"
 )
 
@@ -18,8 +20,8 @@ var (
 // NewProvider new redis provider
 func NewProvider() *Provider {
 	return &Provider{
-		config:    new(Config),
-		redisPool: new(redis.Pool),
+		config: new(Config),
+		db:     new(redis.Client),
 
 		storePool: sync.Pool{
 			New: func() interface{} {
@@ -48,7 +50,7 @@ func (rp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
 	}
 
 	rp.config = cfg.(*Config)
-	rp.maxLifeTime = lifeTime
+	rp.maxLifeTime = time.Duration(lifeTime) * time.Second
 
 	// config check
 	if rp.config.Host == "" {
@@ -57,8 +59,8 @@ func (rp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
 	if rp.config.Port == 0 {
 		return errConfigPortZero
 	}
-	if rp.config.MaxIdle <= 0 {
-		return errConfigMaxIdleZero
+	if rp.config.PoolSize <= 0 {
+		return errConfigPoolSizeZero
 	}
 	if rp.config.IdleTimeout <= 0 {
 		return errConfigIdleTimeoutZero
@@ -73,15 +75,20 @@ func (rp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
 	}
 
 	// create redis conn pool
-	rp.redisPool = newRedisPool(rp.config)
+	rp.db = redis.NewClient(&redis.Options{
+		Addr:        fmt.Sprintf("%s:%d", rp.config.Host, rp.config.Port),
+		Password:    rp.config.Password,
+		DB:          rp.config.DbNumber,
+		PoolSize:    rp.config.PoolSize,
+		IdleTimeout: time.Duration(rp.config.IdleTimeout) * time.Second,
+	})
 
 	// check redis conn
-	conn := rp.redisPool.Get()
-	defer conn.Close()
-	_, err := conn.Do("PING")
+	err := rp.db.Ping().Err()
 	if err != nil {
 		return errRedisConnection(err)
 	}
+
 	return nil
 }
 
@@ -101,25 +108,22 @@ func (rp *Provider) getRedisSessionKey(sessionID []byte) string {
 
 // Get read session store by session id
 func (rp *Provider) Get(sessionID []byte) (session.Storer, error) {
-	conn := rp.redisPool.Get()
-	defer conn.Close()
-
 	store := rp.acquireStore(sessionID)
 	key := rp.getRedisSessionKey(sessionID)
 
-	reply, err := redis.Bytes(conn.Do("GET", key))
-	if err == nil { // Exist
-		err := rp.config.UnSerializeFunc(reply, store.GetDataPointer())
+	reply, err := rp.db.Get(key).Bytes()
+	if err != nil && err != redis.Nil {
+		return nil, err
+	}
+
+	if len(reply) > 0 { // Exist
+		err = rp.config.UnSerializeFunc(reply, store.GetDataPointer())
 		if err != nil {
 			return nil, err
 		}
-
-	} else if err == redis.ErrNil { // Not exist
-		conn.Do("SET", key, "", "EX", rp.maxLifeTime)
-		err = nil
 	}
 
-	return store, err
+	return store, nil
 
 }
 
@@ -130,47 +134,37 @@ func (rp *Provider) Put(store session.Storer) {
 
 // Regenerate regenerate session
 func (rp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
-	conn := rp.redisPool.Get()
-	defer conn.Close()
-
 	oldKey := rp.getRedisSessionKey(oldID)
 	newKey := rp.getRedisSessionKey(newID)
 
-	exists, err := redis.Bool(conn.Do("EXISTS", oldKey))
-	if err != nil || !exists { // Not exist
-		conn.Do("SET", newKey, "", "EX", rp.maxLifeTime)
-		return rp.acquireStore(newID), nil
+	exists, err := rp.db.Exists(oldKey).Result()
+	if err != nil {
+		return nil, err
 	}
 
-	// Exist
-	conn.Do("RENAME", oldKey, newKey)
-	conn.Do("EXPIRE", newKey, rp.maxLifeTime)
+	if exists > 0 { // Exist
+		err = rp.db.Rename(oldKey, newKey).Err()
+		if err != nil {
+			return nil, err
+		}
+		err = rp.db.Expire(newKey, rp.maxLifeTime).Err()
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return rp.Get(newID)
 }
 
 // Destroy destroy session by sessionID
 func (rp *Provider) Destroy(sessionID []byte) error {
-	conn := rp.redisPool.Get()
-	defer conn.Close()
-
 	key := rp.getRedisSessionKey(sessionID)
-
-	exists, err := redis.Bool(conn.Do("EXISTS", key))
-	if err != nil || !exists {
-		return nil
-	}
-	conn.Do("DEL", key)
-
-	return nil
+	return rp.db.Del(key).Err()
 }
 
 // Count session values count
 func (rp *Provider) Count() int {
-	conn := rp.redisPool.Get()
-	defer conn.Close()
-
-	reply, err := redis.ByteSlices(conn.Do("KEYS", rp.getRedisSessionKey(all)))
+	reply, err := rp.db.Keys(rp.getRedisSessionKey(all)).Result()
 	if err != nil {
 		return 0
 	}
