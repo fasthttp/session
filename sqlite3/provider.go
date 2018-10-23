@@ -94,7 +94,7 @@ func (sp *Provider) Get(sessionID []byte) (session.Storer, error) {
 
 	releaseDBRow(row)
 
-	return store, err
+	return store, nil
 }
 
 // Put put store into the pool.
