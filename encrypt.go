@@ -26,7 +26,7 @@ func (e *Encrypt) MSGPEncode(src Dict) ([]byte, error) {
 }
 
 // MSGPDecode MessagePack decode
-func (e *Encrypt) MSGPDecode(src []byte, dst *Dict) error {
+func (e *Encrypt) MSGPDecode(dst *Dict, src []byte) error {
 	if len(src) == 0 {
 		return nil
 	}
@@ -51,12 +51,12 @@ func (e *Encrypt) Base64Encode(src Dict) ([]byte, error) {
 }
 
 // Base64Decode base64 decode
-func (e *Encrypt) Base64Decode(src []byte, dst *Dict) error {
+func (e *Encrypt) Base64Decode(dst *Dict, src []byte) error {
 	tmp := make([]byte, b64Encoding.DecodedLen(len(src)))
 	n, err := b64Encoding.Decode(tmp, src)
 	if err != nil {
 		return err
 	}
 
-	return e.MSGPDecode(tmp[:n], dst)
+	return e.MSGPDecode(dst, tmp[:n])
 }

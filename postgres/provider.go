@@ -83,7 +83,7 @@ func (pp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	}
 
 	if row.sessionID != "" { // Exist
-		err = pp.config.UnSerializeFunc(gotils.S2B(row.contents), store.GetDataPointer())
+		err = pp.config.UnSerializeFunc(store.GetDataPointer(), gotils.S2B(row.contents))
 		if err != nil {
 			return nil, err
 		}
@@ -122,7 +122,7 @@ func (pp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 			return nil, err
 		}
 
-		err = pp.config.UnSerializeFunc(gotils.S2B(row.contents), store.GetDataPointer())
+		err = pp.config.UnSerializeFunc(store.GetDataPointer(), gotils.S2B(row.contents))
 		if err != nil {
 			return nil, err
 		}
