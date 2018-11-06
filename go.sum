@@ -1,7 +1,7 @@
 github.com/bradfitz/gomemcache v0.0.0-20180710155616-bc664df96737 h1:rRISKWyXfVxvoa702s91Zl5oREZTrR3yv+tXrrX7G/g=
 github.com/bradfitz/gomemcache v0.0.0-20180710155616-bc664df96737/go.mod h1:PmM6Mmwb0LSuEubjR8N7PtNe1KxZLtOUHtbeikc5h60=
-github.com/fasthttp/router v0.2.0 h1:0EXdP2XpmxWEIdFDkyyIdQ0pDkEt5B5dnezDE7jHtw4=
-github.com/fasthttp/router v0.2.0/go.mod h1:vgWu9Rb5tBJdw/1xy3J7oC+Yl5GJMn4DMKEaqXom8Lg=
+github.com/fasthttp/router v0.2.0 h1:1k4jLGRwDTPq1QbIYVa5+zJxWixWCWYxgOG5mwbpRvA=
+github.com/fasthttp/router v0.2.0/go.mod h1:ENXeGFIg8mQS+sUPNQ/DboXat7SpQMKlDKMpKgE39pc=
 github.com/go-redis/redis v6.14.2+incompatible h1:UE9pLhzmWf+xHNmZsoccjXosPicuiNaInPgym8nzfg0=
 github.com/go-redis/redis v6.14.2+incompatible/go.mod h1:NAIEuMOZ/fxfXJIrKDQDz8wamY7mA7PouImQ2Jvg6kA=
 github.com/go-sql-driver/mysql v1.4.0 h1:7LxgVwFb2hIQtMm87NdgAVfXjnt4OePseqT1tKx+opk=
@@ -25,7 +25,6 @@ github.com/tinylib/msgp v0.0.0-20180912221530-f65876d3ea05 h1:2WupMeo2EsfmK/s6OK
 github.com/tinylib/msgp v0.0.0-20180912221530-f65876d3ea05/go.mod h1:+d+yLhGm8mzTaHzB+wgMYrodPfmZrzkirds8fDWklFE=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
-github.com/valyala/fasthttp v0.0.0-20181101044417-192515395f6f/go.mod h1:4vX61m6KN+xDduDNwXrhIAVZaZaZiQ1luJk8LWSxF3s=
 github.com/valyala/fasthttp v1.0.0 h1:BwIoZQbBsTo3v2F5lz5Oy3TlTq4wLKTLV260EVTEWco=
 github.com/valyala/fasthttp v1.0.0/go.mod h1:4vX61m6KN+xDduDNwXrhIAVZaZaZiQ1luJk8LWSxF3s=
 github.com/valyala/fastrand v0.0.0-20170531153657-19dd0f0bf014 h1:wMIk7zCJy828JUr6OlYwXO11ijcXtEPDxoCaktP5p8w=
