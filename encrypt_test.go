@@ -29,7 +29,7 @@ func TestMSGPEncodeDecode(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = encryptTester.MSGPDecode(b1, dst)
+	err = encryptTester.MSGPDecode(dst, b1)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,7 +53,7 @@ func TestBase64EncodeDecode(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = encryptTester.Base64Decode(b1, dst)
+	err = encryptTester.Base64Decode(dst, b1)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -87,7 +87,7 @@ func BenchmarkMSGPDecode(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.MSGPDecode(srcBytes, dst)
+		e.MSGPDecode(dst, srcBytes)
 	}
 }
 
@@ -110,6 +110,6 @@ func BenchmarkBase64Decode(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		e.Base64Decode(srcBytes, dst)
+		e.Base64Decode(dst, srcBytes)
 	}
 }
