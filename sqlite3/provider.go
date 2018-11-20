@@ -80,7 +80,7 @@ func (sp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	}
 
 	if row.sessionID != "" { // Exist
-		err := sp.config.UnSerializeFunc(store.GetDataPointer(), gotils.S2B(row.contents))
+		err := sp.config.UnSerializeFunc(store.DataPointer(), gotils.S2B(row.contents))
 		if err != nil {
 			return nil, err
 		}
@@ -119,7 +119,7 @@ func (sp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 			return nil, err
 		}
 
-		err = sp.config.UnSerializeFunc(store.GetDataPointer(), gotils.S2B(row.contents))
+		err = sp.config.UnSerializeFunc(store.DataPointer(), gotils.S2B(row.contents))
 		if err != nil {
 			return nil, err
 		}

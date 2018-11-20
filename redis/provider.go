@@ -117,7 +117,7 @@ func (rp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	}
 
 	if len(reply) > 0 { // Exist
-		err = rp.config.UnSerializeFunc(store.GetDataPointer(), reply)
+		err = rp.config.UnSerializeFunc(store.DataPointer(), reply)
 		if err != nil {
 			return nil, err
 		}

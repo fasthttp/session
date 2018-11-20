@@ -29,8 +29,8 @@ func (s *Store) GetAll() Dict {
 	return *s.data
 }
 
-// GetDataPointer get pointer of data
-func (s *Store) GetDataPointer() *Dict {
+// DataPointer get pointer of data
+func (s *Store) DataPointer() *Dict {
 	return s.data
 }
 

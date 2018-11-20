@@ -114,7 +114,7 @@ func (mcp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	}
 
 	if item != nil { // Exist
-		err := mcp.config.UnSerializeFunc(store.GetDataPointer(), item.Value)
+		err := mcp.config.UnSerializeFunc(store.DataPointer(), item.Value)
 		if err != nil {
 			return nil, err
 		}
@@ -156,7 +156,7 @@ func (mcp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 			return nil, err
 		}
 
-		err := mcp.config.UnSerializeFunc(store.GetDataPointer(), newItem.Value)
+		err := mcp.config.UnSerializeFunc(store.DataPointer(), newItem.Value)
 		if err != nil {
 			return nil, err
 		}
