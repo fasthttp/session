@@ -11,14 +11,16 @@ import (
 var providers Dict
 
 // Register register session provider
-func Register(providerName string, provider Provider) {
+func Register(providerName string, provider Provider) error {
 	if provider == nil {
-		panic("session register error, provider " + providerName + " is nil!")
+		return errRegisterNilProvider(providerName)
 	} else if providers.Has(providerName) {
-		panic("session register error, provider " + providerName + " already registered!")
+		return errProviderAlreadyRegisted(providerName)
 	}
 
 	providers.Set(providerName, provider)
+
+	return nil
 }
 
 // New return new Session

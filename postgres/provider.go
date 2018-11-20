@@ -165,5 +165,8 @@ func (pp *Provider) GC() {
 
 // register session provider
 func init() {
-	session.Register(ProviderName, provider)
+	err := session.Register(ProviderName, provider)
+	if err != nil {
+		panic(err)
+	}
 }
