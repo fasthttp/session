@@ -73,6 +73,6 @@ func (s *Store) SetSessionID(id []byte) {
 
 // Reset reset store
 func (s *Store) Reset() {
-	s.sessionID = nil
+	s.sessionID = s.sessionID[:0]
 	s.data.Reset()
 }
