@@ -13,5 +13,3 @@ const defaultSecure = true
 const defaultSessionIDInURLQuery = false
 const defaultSessionIDInHTTPHeader = false
 const defaultCookieLen uint32 = 32
-
-const cookieCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"

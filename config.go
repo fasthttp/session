@@ -1,7 +1,7 @@
 package session
 
 import (
-	"github.com/valyala/fastrand"
+	"github.com/savsgio/gotils"
 )
 
 // NewDefaultConfig return new default configuration
@@ -26,14 +26,10 @@ func NewDefaultConfig() *Config {
 	return config
 }
 
-// default sessionID generator. Returns a random session id
 func (c *Config) defaultSessionIDGenerator() []byte {
 	b := make([]byte, c.cookieLen)
 
-	for i := 0; i < int(c.cookieLen); i++ {
-		pos := fastrand.Uint32n(c.cookieLen)
-		b[i] = cookieCharset[pos]
-	}
+	gotils.RandBytes(b)
 
 	return b
 }

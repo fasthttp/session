@@ -23,7 +23,7 @@ func Benchmark_Get(b *testing.B) {
 	handler := func(ctx *fasthttp.RequestCtx) {
 		store, _ := serverSession.Get(ctx)
 		store.Set("k1", 1)
-		serverSession.Save(store)
+		serverSession.Save(ctx, store)
 	}
 
 	b.ResetTimer()
@@ -39,7 +39,7 @@ func Benchmark_Regenerate(b *testing.B) {
 	handler := func(ctx *fasthttp.RequestCtx) {
 		store, _ := serverSession.Regenerate(ctx)
 		store.Set("k1", 1)
-		serverSession.Save(store)
+		serverSession.Save(ctx, store)
 	}
 
 	b.ResetTimer()
