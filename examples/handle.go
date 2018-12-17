@@ -29,16 +29,10 @@ func indexHandler(ctx *fasthttp.RequestCtx) {
 func setHandler(ctx *fasthttp.RequestCtx) {
 	store, err := serverSession.Get(ctx)
 	if err != nil {
-		ctx.Error(err.Error(), 500)
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 		return
 	}
-	defer func() {
-		err = serverSession.Save(store)
-		if err != nil {
-			ctx.Error(err.Error(), 500)
-			return
-		}
-	}()
+	defer serverSession.Save(ctx, store)
 
 	store.Set("foo", "bar")
 
@@ -49,15 +43,10 @@ func setHandler(ctx *fasthttp.RequestCtx) {
 func getHandler(ctx *fasthttp.RequestCtx) {
 	store, err := serverSession.Get(ctx)
 	if err != nil {
-		ctx.Error(err.Error(), 500)
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 		return
 	}
-	defer func() {
-		err = serverSession.Save(store)
-		if err != nil {
-			ctx.Error(err.Error(), 500)
-		}
-	}()
+	defer serverSession.Save(ctx, store)
 
 	val := store.Get("foo")
 	if val == nil {
@@ -72,15 +61,10 @@ func getHandler(ctx *fasthttp.RequestCtx) {
 func deleteHandler(ctx *fasthttp.RequestCtx) {
 	store, err := serverSession.Get(ctx)
 	if err != nil {
-		ctx.Error(err.Error(), 500)
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 		return
 	}
-	defer func() {
-		err = serverSession.Save(store)
-		if err != nil {
-			ctx.Error(err.Error(), 500)
-		}
-	}()
+	defer serverSession.Save(ctx, store)
 
 	store.Delete("foo")
 
@@ -96,15 +80,10 @@ func deleteHandler(ctx *fasthttp.RequestCtx) {
 func getAllHandler(ctx *fasthttp.RequestCtx) {
 	store, err := serverSession.Get(ctx)
 	if err != nil {
-		ctx.Error(err.Error(), 500)
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 		return
 	}
-	defer func() {
-		err = serverSession.Save(store)
-		if err != nil {
-			ctx.Error(err.Error(), 500)
-		}
-	}()
+	defer serverSession.Save(ctx, store)
 
 	store.Set("foo1", "bar1")
 	store.Set("foo2", 2)
@@ -122,15 +101,10 @@ func getAllHandler(ctx *fasthttp.RequestCtx) {
 func flushHandler(ctx *fasthttp.RequestCtx) {
 	store, err := serverSession.Get(ctx)
 	if err != nil {
-		ctx.Error(err.Error(), 500)
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 		return
 	}
-	defer func() {
-		err = serverSession.Save(store)
-		if err != nil {
-			ctx.Error(err.Error(), 500)
-		}
-	}()
+	defer serverSession.Save(ctx, store)
 
 	store.Flush()
 
@@ -145,7 +119,7 @@ func flushHandler(ctx *fasthttp.RequestCtx) {
 func destroyHandler(ctx *fasthttp.RequestCtx) {
 	err := serverSession.Destroy(ctx)
 	if err != nil {
-		ctx.Error(err.Error(), 500)
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 		return
 	}
 
@@ -156,15 +130,10 @@ func destroyHandler(ctx *fasthttp.RequestCtx) {
 func sessionIDHandler(ctx *fasthttp.RequestCtx) {
 	store, err := serverSession.Get(ctx)
 	if err != nil {
-		ctx.Error(err.Error(), 500)
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 		return
 	}
-	defer func() {
-		err = serverSession.Save(store)
-		if err != nil {
-			ctx.Error(err.Error(), 500)
-		}
-	}()
+	defer serverSession.Save(ctx, store)
 
 	sessionID := store.GetSessionID()
 	ctx.SetBodyString("Session: Current session id: ")
@@ -175,15 +144,10 @@ func sessionIDHandler(ctx *fasthttp.RequestCtx) {
 func regenerateHandler(ctx *fasthttp.RequestCtx) {
 	store, err := serverSession.Regenerate(ctx)
 	if err != nil {
-		ctx.Error(err.Error(), 500)
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 		return
 	}
-	defer func() {
-		err = serverSession.Save(store)
-		if err != nil {
-			ctx.Error(err.Error(), 500)
-		}
-	}()
+	defer serverSession.Save(ctx, store)
 
 	sessionID := store.GetSessionID()
 

@@ -174,15 +174,14 @@ func (s *Session) Get(ctx *fasthttp.RequestCtx) (Storer, error) {
 //
 // Warning: Don't use more the store after exec this function, because, you will lose the after data
 // For avoid it, defer this function in your request handler
-func (s *Session) Save(store Storer) error {
+func (s *Session) Save(ctx *fasthttp.RequestCtx, store Storer) {
 	err := store.Save()
 	if err != nil {
-		return err
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
+		return
 	}
 
 	s.provider.Put(store)
-
-	return nil
 }
 
 // Regenerate regenerate a session id for this Storer
