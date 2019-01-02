@@ -4,6 +4,7 @@ session
 [![Build Status](https://img.shields.io/shippable/5444c5ecb904a4b21567b0ff.svg)](https://travis-ci.org/fasthttp/session)
 [![Go Report Card](https://goreportcard.com/badge/github.com/fasthttp/session)](https://goreportcard.com/report/github.com/fasthttp/session)
 [![GoDoc](https://godoc.org/github.com/fasthttp/session?status.svg)](https://godoc.org/github.com/fasthttp/session)
+[![GitHub release](https://img.shields.io/github/release/fasthttp/session.svg)](https://github.com/fasthttp/session/releases)
 
 
 Provide session storage to [fasthttp](https://github.com/valyala/fasthttp).
