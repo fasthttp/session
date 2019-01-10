@@ -2,7 +2,7 @@ module github.com/fasthttp/session
 
 require (
 	github.com/bradfitz/gomemcache v0.0.0-20180710155616-bc664df96737
-	github.com/fasthttp/router v0.3.1 // indirect
+	github.com/fasthttp/router v0.3.2 // indirect
 	github.com/go-redis/redis v6.15.0+incompatible
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/lib/pq v1.0.0

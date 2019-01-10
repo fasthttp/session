@@ -1,5 +1,5 @@
 github.com/bradfitz/gomemcache v0.0.0-20180710155616-bc664df96737/go.mod h1:PmM6Mmwb0LSuEubjR8N7PtNe1KxZLtOUHtbeikc5h60=
-github.com/fasthttp/router v0.3.1/go.mod h1:C1OkehIG26rJvWVmXXPKPy6cuXe0r07rE0cBk6mUGrM=
+github.com/fasthttp/router v0.3.2/go.mod h1:wF1teMmwB7qKWzC48vEHt0sjLJMXCGnypbM+zB4ao2g=
 github.com/go-redis/redis v6.15.0+incompatible/go.mod h1:NAIEuMOZ/fxfXJIrKDQDz8wamY7mA7PouImQ2Jvg6kA=
 github.com/go-sql-driver/mysql v1.4.1/go.mod h1:zAC/RDZ24gD3HViQzih4MyKcchzm+sOG5ZlKdlhCg5w=
 github.com/klauspost/compress v1.4.0 h1:8nsMz3tWa9SWWPL60G1V6CUsf4lLjWLTNEtibhe8gh8=
@@ -13,14 +13,12 @@ github.com/philhofer/fwd v1.0.0/go.mod h1:gk3iGcWd9+svBvR0sR+KPcfE+RNWozjowpeBVG
 github.com/savsgio/dictpool v0.0.0-20181102113313-3e531052c450 h1:RKTGTUclzZGrsgmbukc92sz98prLN0/BLqiS9L9uKLY=
 github.com/savsgio/dictpool v0.0.0-20181102113313-3e531052c450/go.mod h1:O08MaETf4V8eGnAK12CWnxxmN7GvVQ9cck9Len7HYDg=
 github.com/savsgio/gotils v0.0.0-20181019073832-3c5ca22740af/go.mod h1:w803/Fg1m0hrp1ZT9KNfQe4E4+WOMMFLcgzPvOcye10=
-github.com/savsgio/gotils v0.0.0-20181102112957-636156ff2e0e/go.mod h1:w803/Fg1m0hrp1ZT9KNfQe4E4+WOMMFLcgzPvOcye10=
 github.com/savsgio/gotils v0.0.0-20181217102925-dc772c0d89a4 h1:NxZM/YEOq7/NjewVUB8Vx+nHsxv/zqS5n8IlUaqxSoI=
 github.com/savsgio/gotils v0.0.0-20181217102925-dc772c0d89a4/go.mod h1:w803/Fg1m0hrp1ZT9KNfQe4E4+WOMMFLcgzPvOcye10=
 github.com/tinylib/msgp v0.0.0-20180912221530-f65876d3ea05 h1:2WupMeo2EsfmK/s6OKzo3v4621b8qk5U64iWucam9M8=
 github.com/tinylib/msgp v0.0.0-20180912221530-f65876d3ea05/go.mod h1:+d+yLhGm8mzTaHzB+wgMYrodPfmZrzkirds8fDWklFE=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
-github.com/valyala/fasthttp v1.0.0/go.mod h1:4vX61m6KN+xDduDNwXrhIAVZaZaZiQ1luJk8LWSxF3s=
 github.com/valyala/fasthttp v1.1.0 h1:3BohG7mqwj4lq7PTX//7gLbUlzNvZSPmuHFnloXT0lw=
 github.com/valyala/fasthttp v1.1.0/go.mod h1:4vX61m6KN+xDduDNwXrhIAVZaZaZiQ1luJk8LWSxF3s=
 github.com/valyala/tcplisten v0.0.0-20161114210144-ceec8f93295a/go.mod h1:v3UYOV9WzVtRmSR+PDvWpU/qWl4Wa5LApYYX4ZtKbio=
