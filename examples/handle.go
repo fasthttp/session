@@ -3,13 +3,12 @@ package main
 import (
 	"fmt"
 
-	"github.com/fasthttp/session"
 	"github.com/valyala/fasthttp"
 )
 
 // index handler
 func indexHandler(ctx *fasthttp.RequestCtx) {
-	html := "<h2>Welcome to use session " + session.Version() + ", you should request to the: </h2>"
+	html := "<h2>Welcome to use session, you should request to the: </h2>"
 
 	html += `> <a href="/">/</a><br>`
 	html += `> <a href="/set">set</a><br>`

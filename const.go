@@ -2,8 +2,6 @@ package session
 
 import "time"
 
-const version = "v1.0.0"
-
 const defaultSessionKeyName = "sessionid"
 const defaultDomain = ""
 const defaultExpires = 2 * time.Hour

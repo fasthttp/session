@@ -222,8 +222,3 @@ func (s *Session) Destroy(ctx *fasthttp.RequestCtx) error {
 
 	return nil
 }
-
-// Version return session version
-func Version() string {
-	return version
-}
