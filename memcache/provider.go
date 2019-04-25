@@ -1,7 +1,9 @@
 package memcache
 
 import (
+	"math"
 	"sync"
+	"time"
 
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/fasthttp/session"
@@ -46,9 +48,9 @@ func NewProvider() *Provider {
 	}
 }
 
-func (mcp *Provider) acquireStore(sessionID []byte) *Store {
+func (mcp *Provider) acquireStore(sessionID []byte, expiration time.Duration) *Store {
 	store := mcp.storePool.Get().(*Store)
-	store.Init(sessionID)
+	store.Init(sessionID, expiration)
 
 	return store
 }
@@ -59,7 +61,7 @@ func (mcp *Provider) releaseStore(store *Store) {
 }
 
 // Init init provider config
-func (mcp *Provider) Init(expiration int64, cfg session.ProviderConfig) error {
+func (mcp *Provider) Init(expiration time.Duration, cfg session.ProviderConfig) error {
 	if cfg.Name() != ProviderName {
 		return errInvalidProviderConfig
 	}
@@ -84,7 +86,10 @@ func (mcp *Provider) Init(expiration int64, cfg session.ProviderConfig) error {
 
 	mcp.db = memcache.New(mcp.config.ServerList...)
 	mcp.db.MaxIdleConns = mcp.config.MaxIdleConns
-	mcp.expiration = int32(expiration)
+	if expiration > math.MaxInt32 {
+		return errExpirationIsTooBig
+	}
+	mcp.expiration = expiration
 
 	return nil
 }
@@ -105,7 +110,7 @@ func (mcp *Provider) getMemCacheSessionKey(sessionID []byte) string {
 
 // Get read session store by session id
 func (mcp *Provider) Get(sessionID []byte) (session.Storer, error) {
-	store := mcp.acquireStore(sessionID)
+	var store *Store
 	key := mcp.getMemCacheSessionKey(sessionID)
 
 	item, err := mcp.db.Get(key)
@@ -114,6 +119,9 @@ func (mcp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	}
 
 	if item != nil { // Exist
+
+		store = mcp.acquireStore(sessionID, time.Duration(item.Expiration))
+
 		err := mcp.config.UnSerializeFunc(store.DataPointer(), item.Value)
 		if err != nil {
 			return nil, err
@@ -132,7 +140,7 @@ func (mcp *Provider) Put(store session.Storer) {
 
 // Regenerate regenerate session
 func (mcp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
-	store := mcp.acquireStore(newID)
+	store := mcp.acquireStore(newID, mcp.expiration)
 
 	oldKey := mcp.getMemCacheSessionKey(oldID)
 	newKey := mcp.getMemCacheSessionKey(newID)
@@ -146,7 +154,9 @@ func (mcp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 		newItem := acquireItem()
 		newItem.Key = newKey
 		newItem.Value = oldItem.Value
-		newItem.Expiration = oldItem.Expiration
+		// Expiration can be converted safely from time.Duration to in32 because
+		// mcp.expiration has been checked to be safely castable in Init method.
+		newItem.Expiration = int32(mcp.expiration)
 
 		if err = mcp.db.Set(newItem); err != nil {
 			return nil, err

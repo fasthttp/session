@@ -31,9 +31,9 @@ func NewProvider() *Provider {
 	}
 }
 
-func (rp *Provider) acquireStore(sessionID []byte) *Store {
+func (rp *Provider) acquireStore(sessionID []byte, expiration time.Duration) *Store {
 	store := rp.storePool.Get().(*Store)
-	store.Init(sessionID)
+	store.Init(sessionID, expiration)
 
 	return store
 }
@@ -44,13 +44,13 @@ func (rp *Provider) releaseStore(store *Store) {
 }
 
 // Init init provider config
-func (rp *Provider) Init(expiration int64, cfg session.ProviderConfig) error {
+func (rp *Provider) Init(expiration time.Duration, cfg session.ProviderConfig) error {
 	if cfg.Name() != ProviderName {
 		return errors.New("session redis provider init error, config must redis config")
 	}
 
 	rp.config = cfg.(*Config)
-	rp.expiration = time.Duration(expiration) * time.Second
+	rp.expiration = expiration * time.Second
 
 	// config check
 	if rp.config.Host == "" {
@@ -108,7 +108,7 @@ func (rp *Provider) getRedisSessionKey(sessionID []byte) string {
 
 // Get read session store by session id
 func (rp *Provider) Get(sessionID []byte) (session.Storer, error) {
-	store := rp.acquireStore(sessionID)
+	var store *Store
 	key := rp.getRedisSessionKey(sessionID)
 
 	reply, err := rp.db.Get(key).Bytes()
@@ -117,6 +117,12 @@ func (rp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	}
 
 	if len(reply) > 0 { // Exist
+		expiration, err := rp.db.TTL(key).Result()
+		if err != nil {
+			return nil, err
+		}
+		store = rp.acquireStore(sessionID, expiration)
+
 		err = rp.config.UnSerializeFunc(store.DataPointer(), reply)
 		if err != nil {
 			return nil, err

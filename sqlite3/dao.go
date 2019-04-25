@@ -42,13 +42,13 @@ func NewDao(driver, dsn, tableName string) (*Dao, error) {
 	var err error
 	db.Connection, err = sql.Open(db.Driver, db.Dsn)
 
-	db.sqlGetSessionBySessionID = fmt.Sprintf("SELECT session_id,contents,last_active FROM %s WHERE session_id=?", tableName)
+	db.sqlGetSessionBySessionID = fmt.Sprintf("SELECT session_id,contents,last_active,expiration FROM %s WHERE session_id=?", tableName)
 	db.sqlCountSessions = fmt.Sprintf("SELECT count(*) as total FROM %s", tableName)
-	db.sqlUpdateBySessionID = fmt.Sprintf("UPDATE %s SET contents=?,last_active=? WHERE session_id=?", tableName)
+	db.sqlUpdateBySessionID = fmt.Sprintf("UPDATE %s SET contents=?,last_active=?,expiration=? WHERE session_id=?", tableName)
 	db.sqlDeleteBySessionID = fmt.Sprintf("DELETE FROM %s WHERE session_id=?", tableName)
-	db.sqldeleteSessionByExpiration = fmt.Sprintf("DELETE FROM %s WHERE last_active<=?", tableName)
-	db.sqlInsert = fmt.Sprintf("INSERT INTO %s (session_id, contents, last_active) VALUES (?,?,?)", tableName)
-	db.sqlRegenerate = fmt.Sprintf("UPDATE %s SET session_id=?,last_active=? WHERE session_id=?", tableName)
+	db.sqlDeleteExpiredSessions = fmt.Sprintf("DELETE FROM %s WHERE last_active+expiration<=? AND expiration<>0", tableName)
+	db.sqlInsert = fmt.Sprintf("INSERT INTO %s (session_id, contents, last_active, expiration) VALUES (?,?,?,?)", tableName)
+	db.sqlRegenerate = fmt.Sprintf("UPDATE %s SET session_id=?,last_active=?,expiration=? WHERE session_id=?", tableName)
 
 	return db, err
 }
@@ -62,7 +62,7 @@ func (db *Dao) getSessionBySessionID(sessionID []byte) (*DBRow, error) {
 		return nil, err
 	}
 
-	err = row.Scan(&data.sessionID, &data.contents, &data.lastActive)
+	err = row.Scan(&data.sessionID, &data.contents, &data.lastActive, &data.expiration)
 	if err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
@@ -87,8 +87,8 @@ func (db *Dao) countSessions() int {
 }
 
 // update session by sessionID
-func (db *Dao) updateBySessionID(sessionID, contents []byte, lastActiveTime int64) (int64, error) {
-	return db.Exec(db.sqlUpdateBySessionID, gotils.B2S(contents), lastActiveTime, gotils.B2S(sessionID))
+func (db *Dao) updateBySessionID(sessionID, contents []byte, lastActiveTime int64, expiration time.Duration) (int64, error) {
+	return db.Exec(db.sqlUpdateBySessionID, gotils.B2S(contents), lastActiveTime, expiration, gotils.B2S(sessionID))
 }
 
 // delete session by sessionID
@@ -97,17 +97,16 @@ func (db *Dao) deleteBySessionID(sessionID []byte) (int64, error) {
 }
 
 // delete session by expiration
-func (db *Dao) deleteSessionByExpiration(expiration int64) (int64, error) {
-	lastTime := time.Now().Unix() - expiration
-	return db.Exec(db.sqldeleteSessionByExpiration, lastTime)
+func (db *Dao) deleteExpiredSessions() (int64, error) {
+	return db.Exec(db.sqlDeleteExpiredSessions, time.Now().Unix())
 }
 
 // insert new session
-func (db *Dao) insert(sessionID, contents []byte, lastActiveTime int64) (int64, error) {
-	return db.Exec(db.sqlInsert, gotils.B2S(sessionID), gotils.B2S(contents), lastActiveTime)
+func (db *Dao) insert(sessionID, contents []byte, lastActiveTime int64, expiration time.Duration) (int64, error) {
+	return db.Exec(db.sqlInsert, gotils.B2S(sessionID), gotils.B2S(contents), lastActiveTime, expiration)
 }
 
 // insert new session
-func (db *Dao) regenerate(oldID, newID []byte, lastActiveTime int64) (int64, error) {
-	return db.Exec(db.sqlRegenerate, gotils.B2S(newID), lastActiveTime, gotils.B2S(oldID))
+func (db *Dao) regenerate(oldID, newID []byte, lastActiveTime int64, expiration time.Duration) (int64, error) {
+	return db.Exec(db.sqlRegenerate, gotils.B2S(newID), lastActiveTime, expiration, gotils.B2S(oldID))
 }

@@ -27,9 +27,9 @@ func NewProvider() *Provider {
 	}
 }
 
-func (sp *Provider) acquireStore(sessionID []byte) *Store {
+func (sp *Provider) acquireStore(sessionID []byte, expiration time.Duration) *Store {
 	store := sp.storePool.Get().(*Store)
-	store.Init(sessionID)
+	store.Init(sessionID, expiration)
 
 	return store
 }
@@ -40,7 +40,7 @@ func (sp *Provider) releaseStore(store *Store) {
 }
 
 // Init init provider config
-func (sp *Provider) Init(expiration int64, cfg session.ProviderConfig) error {
+func (sp *Provider) Init(expiration time.Duration, cfg session.ProviderConfig) error {
 	if cfg.Name() != ProviderName {
 		return errInvalidProviderConfig
 	}
@@ -72,7 +72,7 @@ func (sp *Provider) Init(expiration int64, cfg session.ProviderConfig) error {
 
 // Get read session store by session id
 func (sp *Provider) Get(sessionID []byte) (session.Storer, error) {
-	store := sp.acquireStore(sessionID)
+	var store *Store
 
 	row, err := sp.db.getSessionBySessionID(sessionID)
 	if err != nil {
@@ -80,16 +80,21 @@ func (sp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	}
 
 	if row.sessionID != "" { // Exist
+		store = sp.acquireStore(sessionID, row.expiration)
+
 		err := sp.config.UnSerializeFunc(store.DataPointer(), gotils.S2B(row.contents))
 		if err != nil {
 			return nil, err
 		}
 
 	} else { // Not exist
-		_, err := sp.db.insert(sessionID, nil, time.Now().Unix())
+		store = sp.acquireStore(sessionID, sp.expiration)
+
+		_, err := sp.db.insert(sessionID, nil, time.Now().Unix(), sp.expiration)
 		if err != nil {
 			return nil, err
 		}
+
 	}
 
 	releaseDBRow(row)
@@ -104,7 +109,7 @@ func (sp *Provider) Put(store session.Storer) {
 
 // Regenerate regenerate session
 func (sp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
-	store := sp.acquireStore(newID)
+	store := sp.acquireStore(newID, sp.expiration)
 
 	row, err := sp.db.getSessionBySessionID(oldID)
 	if err != nil {
@@ -114,7 +119,7 @@ func (sp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 	now := time.Now().Unix()
 
 	if row.sessionID != "" { // Exists
-		_, err = sp.db.regenerate(oldID, newID, now)
+		_, err = sp.db.regenerate(oldID, newID, now, sp.expiration)
 		if err != nil {
 			return nil, err
 		}
@@ -125,7 +130,7 @@ func (sp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 		}
 
 	} else { // Not exist
-		_, err = sp.db.insert(newID, nil, now)
+		_, err = sp.db.insert(newID, nil, now, sp.expiration)
 		if err != nil {
 			return nil, err
 		}
@@ -149,16 +154,12 @@ func (sp *Provider) Count() int {
 
 // NeedGC need gc
 func (sp *Provider) NeedGC() bool {
-	if sp.expiration == 0 {
-		return false
-	}
-
 	return true
 }
 
 // GC session garbage collection
 func (sp *Provider) GC() {
-	_, err := sp.db.deleteSessionByExpiration(sp.expiration)
+	_, err := sp.db.deleteExpiredSessions()
 	if err != nil {
 		panic(err)
 	}

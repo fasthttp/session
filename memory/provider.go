@@ -24,9 +24,9 @@ func NewProvider() *Provider {
 	}
 }
 
-func (mp *Provider) acquireStore(sessionID []byte) *Store {
+func (mp *Provider) acquireStore(sessionID []byte, expiration time.Duration) *Store {
 	store := mp.storePool.Get().(*Store)
-	store.Init(sessionID)
+	store.Init(sessionID, expiration)
 
 	return store
 }
@@ -37,7 +37,7 @@ func (mp *Provider) releaseStore(store *Store) {
 }
 
 // Init init provider configuration
-func (mp *Provider) Init(expiration int64, cfg session.ProviderConfig) error {
+func (mp *Provider) Init(expiration time.Duration, cfg session.ProviderConfig) error {
 	if cfg.Name() != ProviderName {
 		return errInvalidProviderConfig
 	}
@@ -55,7 +55,7 @@ func (mp *Provider) Get(sessionID []byte) (session.Storer, error) {
 		return currentStore.(*Store), nil
 	}
 
-	newStore := mp.acquireStore(sessionID)
+	newStore := mp.acquireStore(sessionID, mp.expiration)
 	mp.memoryDB.SetBytes(sessionID, newStore)
 
 	return newStore, nil
@@ -77,7 +77,7 @@ func (mp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 		mp.memoryDB.SetBytes(newID, store)
 		mp.memoryDB.DelBytes(oldID)
 	} else {
-		store = mp.acquireStore(newID)
+		store = mp.acquireStore(newID, mp.expiration)
 		mp.memoryDB.SetBytes(newID, store)
 	}
 
@@ -103,17 +103,20 @@ func (mp *Provider) Count() int {
 
 // NeedGC need gc
 func (mp *Provider) NeedGC() bool {
-	if mp.expiration == 0 {
-		return false
-	}
-
 	return true
 }
 
 // GC session garbage collection
 func (mp *Provider) GC() {
 	for _, kv := range mp.memoryDB.D {
-		if time.Now().Unix() >= (kv.Value.(*Store).lastActiveTime + mp.expiration) {
+		store := kv.Value.(*Store)
+		expiration := store.GetExpiration()
+		// Do not expire the session if expiration is set to 0
+		if expiration == 0 {
+			continue
+		}
+
+		if time.Now().Unix() >= (store.lastActiveTime + int64(expiration)) {
 			mp.Destroy(kv.Key)
 		}
 	}

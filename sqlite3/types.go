@@ -2,6 +2,7 @@ package sqlite3
 
 import (
 	"sync"
+	"time"
 
 	"github.com/fasthttp/session"
 )
@@ -32,7 +33,7 @@ type Config struct {
 type Provider struct {
 	config     *Config
 	db         *Dao
-	expiration int64
+	expiration time.Duration
 
 	storePool sync.Pool
 }
@@ -48,18 +49,19 @@ type Dao struct {
 
 	tableName string
 
-	sqlGetSessionBySessionID     string
-	sqlCountSessions             string
-	sqlUpdateBySessionID         string
-	sqlDeleteBySessionID         string
-	sqldeleteSessionByExpiration string
-	sqlInsert                    string
-	sqlRegenerate                string
+	sqlGetSessionBySessionID string
+	sqlCountSessions         string
+	sqlUpdateBySessionID     string
+	sqlDeleteBySessionID     string
+	sqlDeleteExpiredSessions string
+	sqlInsert                string
+	sqlRegenerate            string
 }
 
 // DBRow database row definition
 type DBRow struct {
 	sessionID  string
 	contents   string
-	lastActive int
+	lastActive int64
+	expiration time.Duration
 }
