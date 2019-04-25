@@ -45,6 +45,10 @@ func New(cfg *Config) *Session {
 		cfg.SessionIDGeneratorFunc = cfg.defaultSessionIDGenerator
 	}
 
+	if cfg.IsSecureFunc == nil {
+		cfg.IsSecureFunc = cfg.defaultIsSecureFunc
+	}
+
 	session := &Session{
 		config: cfg,
 		cookie: NewCookie(),
@@ -92,7 +96,8 @@ func (s *Session) startGC() {
 }
 
 func (s *Session) setHTTPValues(ctx *fasthttp.RequestCtx, sessionID []byte) {
-	s.cookie.Set(ctx, s.config.CookieName, sessionID, s.config.Domain, s.config.Expires, s.config.Secure)
+	secure := s.config.Secure && s.config.IsSecureFunc(ctx)
+	s.cookie.Set(ctx, s.config.CookieName, sessionID, s.config.Domain, s.config.Expires, secure)
 
 	if s.config.SessionIDInHTTPHeader {
 		ctx.Request.Header.SetBytesV(s.config.SessionNameInHTTPHeader, sessionID)

@@ -4,6 +4,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/valyala/fasthttp"
+
 	"github.com/savsgio/dictpool"
 	"github.com/savsgio/gotils/dao"
 )
@@ -44,6 +46,10 @@ type Config struct {
 
 	// SessionIDGeneratorFunc should returns a random session id.
 	SessionIDGeneratorFunc func() []byte
+
+	// IsSecureFunc should return whether the communication channel is secure
+	// in order to set the secure flag to true according to Secure flag.
+	IsSecureFunc func(*fasthttp.RequestCtx) bool
 
 	// value cookie length
 	cookieLen uint32

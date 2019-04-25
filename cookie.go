@@ -34,7 +34,7 @@ func (c *Cookie) Set(ctx *fasthttp.RequestCtx, name string, value []byte, domain
 		}
 	}
 
-	if ctx.IsTLS() && secure {
+	if secure {
 		cookie.SetSecure(true)
 	}
 
