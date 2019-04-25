@@ -94,8 +94,8 @@ func (s *Session) startGC() {
 	}()
 }
 
-func (s *Session) setHTTPValues(ctx *fasthttp.RequestCtx, sessionID []byte) {
-	s.cookie.Set(ctx, s.config.CookieName, sessionID, s.config.Domain, s.config.Expires, s.config.Secure)
+func (s *Session) setHTTPValues(ctx *fasthttp.RequestCtx, sessionID []byte, expires time.Duration) {
+	s.cookie.Set(ctx, s.config.CookieName, sessionID, s.config.Domain, expires, s.config.Secure)
 
 	if s.config.SessionIDInHTTPHeader {
 		ctx.Request.Header.SetBytesV(s.config.SessionNameInHTTPHeader, sessionID)
@@ -156,7 +156,7 @@ func (s *Session) Get(ctx *fasthttp.RequestCtx) (Storer, error) {
 			return nil, errEmptySessionID
 		}
 
-		s.setHTTPValues(ctx, sessionID)
+		s.setHTTPValues(ctx, sessionID, s.config.Expires)
 	}
 
 	store, err := s.provider.Get(sessionID)
@@ -201,9 +201,20 @@ func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) (Storer, error) {
 		return nil, err
 	}
 
-	s.setHTTPValues(ctx, newID)
+	s.setHTTPValues(ctx, newID, s.config.Expires)
 
 	return store, nil
+}
+
+// UpdateExpires update the cookie expiration for this storer.
+func (s *Session) UpdateExpires(ctx *fasthttp.RequestCtx, expires time.Duration) error {
+	sessionID := s.getSessionID(ctx)
+	if len(sessionID) == 0 {
+		return errEmptySessionID
+	}
+
+	s.setHTTPValues(ctx, sessionID, expires)
+	return nil
 }
 
 // Destroy destroy session in fasthttp ctx
