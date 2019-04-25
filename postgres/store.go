@@ -12,7 +12,7 @@ func (ps *Store) Save() error {
 		return err
 	}
 
-	_, err = provider.db.updateBySessionID(ps.GetSessionID(), value, time.Now().Unix())
+	_, err = provider.db.updateBySessionID(ps.GetSessionID(), value, time.Now().Unix(), ps.GetExpiration())
 
 	return err
 }

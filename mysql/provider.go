@@ -27,9 +27,9 @@ func NewProvider() *Provider {
 	}
 }
 
-func (mp *Provider) acquireStore(sessionID []byte) *Store {
+func (mp *Provider) acquireStore(sessionID []byte, expiration time.Duration) *Store {
 	store := mp.storePool.Get().(*Store)
-	store.Init(sessionID)
+	store.Init(sessionID, expiration)
 
 	return store
 }
@@ -40,7 +40,7 @@ func (mp *Provider) releaseStore(store *Store) {
 }
 
 // Init init provider config
-func (mp *Provider) Init(expiration int64, cfg session.ProviderConfig) error {
+func (mp *Provider) Init(expiration time.Duration, cfg session.ProviderConfig) error {
 	if cfg.Name() != ProviderName {
 		return errInvalidProviderConfig
 	}
@@ -75,7 +75,7 @@ func (mp *Provider) Init(expiration int64, cfg session.ProviderConfig) error {
 
 // Get read session store by session id
 func (mp *Provider) Get(sessionID []byte) (session.Storer, error) {
-	store := mp.acquireStore(sessionID)
+	var store *Store
 
 	row, err := mp.db.getSessionBySessionID(sessionID)
 	if err != nil {
@@ -83,13 +83,17 @@ func (mp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	}
 
 	if row.sessionID != "" { // Exist
+		store = mp.acquireStore(sessionID, row.expiration)
+
 		err = mp.config.UnSerializeFunc(store.DataPointer(), gotils.S2B(row.contents))
 		if err != nil {
 			return nil, err
 		}
 
 	} else { // Not exist
-		_, err = mp.db.insert(sessionID, nil, time.Now().Unix())
+		store = mp.acquireStore(sessionID, mp.expiration)
+
+		_, err = mp.db.insert(sessionID, nil, time.Now().Unix(), mp.expiration)
 		if err != nil {
 			return nil, err
 		}
@@ -107,7 +111,7 @@ func (mp *Provider) Put(store session.Storer) {
 
 // Regenerate regenerate session
 func (mp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
-	store := mp.acquireStore(newID)
+	store := mp.acquireStore(newID, mp.expiration)
 
 	row, err := mp.db.getSessionBySessionID(oldID)
 	if err != nil {
@@ -117,7 +121,7 @@ func (mp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 	now := time.Now().Unix()
 
 	if row.sessionID != "" { // Exists
-		_, err = mp.db.regenerate(oldID, newID, now)
+		_, err = mp.db.regenerate(oldID, newID, now, mp.expiration)
 		if err != nil {
 			return nil, err
 		}
@@ -128,7 +132,7 @@ func (mp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 		}
 
 	} else { // Not exist
-		_, err = mp.db.insert(newID, nil, now)
+		_, err = mp.db.insert(newID, nil, now, mp.expiration)
 		if err != nil {
 			return nil, err
 		}
@@ -152,16 +156,12 @@ func (mp *Provider) Count() int {
 
 // NeedGC need gc
 func (mp *Provider) NeedGC() bool {
-	if mp.expiration == 0 {
-		return false
-	}
-
 	return true
 }
 
 // GC session garbage collection
 func (mp *Provider) GC() {
-	_, err := mp.db.deleteSessionByExpiration(mp.expiration)
+	_, err := mp.db.deleteExpiredSessions()
 	if err != nil {
 		panic(err)
 	}

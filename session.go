@@ -64,7 +64,7 @@ func (s *Session) SetProvider(name string, cfg ProviderConfig) error {
 	}
 	s.provider = providers.Get(name).(Provider)
 
-	err := s.provider.Init(int64(s.config.Expires), cfg)
+	err := s.provider.Init(s.config.Expires, cfg)
 	if err != nil {
 		return err
 	}
@@ -95,9 +95,9 @@ func (s *Session) startGC() {
 	}()
 }
 
-func (s *Session) setHTTPValues(ctx *fasthttp.RequestCtx, sessionID []byte) {
+func (s *Session) setHTTPValues(ctx *fasthttp.RequestCtx, sessionID []byte, expires time.Duration) {
 	secure := s.config.Secure && s.config.IsSecureFunc(ctx)
-	s.cookie.Set(ctx, s.config.CookieName, sessionID, s.config.Domain, s.config.Expires, secure)
+	s.cookie.Set(ctx, s.config.CookieName, sessionID, s.config.Domain, expires, secure)
 
 	if s.config.SessionIDInHTTPHeader {
 		ctx.Request.Header.SetBytesV(s.config.SessionNameInHTTPHeader, sessionID)
@@ -151,6 +151,7 @@ func (s *Session) Get(ctx *fasthttp.RequestCtx) (Storer, error) {
 		return nil, errNotSetProvider
 	}
 
+	var newSessionGenerated bool
 	sessionID := s.getSessionID(ctx)
 	if len(sessionID) == 0 {
 		sessionID = s.config.SessionIDGeneratorFunc()
@@ -158,12 +159,16 @@ func (s *Session) Get(ctx *fasthttp.RequestCtx) (Storer, error) {
 			return nil, errEmptySessionID
 		}
 
-		s.setHTTPValues(ctx, sessionID)
+		newSessionGenerated = true
 	}
 
 	store, err := s.provider.Get(sessionID)
 	if err != nil {
 		return nil, err
+	}
+
+	if newSessionGenerated {
+		s.setHTTPValues(ctx, sessionID, store.GetExpiration())
 	}
 
 	return store, nil
@@ -181,6 +186,10 @@ func (s *Session) Save(ctx *fasthttp.RequestCtx, store Storer) {
 	if err != nil {
 		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 		return
+	}
+
+	if store.HasExpirationChanged() {
+		s.setHTTPValues(ctx, store.GetSessionID(), store.GetExpiration())
 	}
 
 	s.provider.Put(store)
@@ -203,7 +212,7 @@ func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) (Storer, error) {
 		return nil, err
 	}
 
-	s.setHTTPValues(ctx, newID)
+	s.setHTTPValues(ctx, newID, store.GetExpiration())
 
 	return store, nil
 }

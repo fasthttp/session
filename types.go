@@ -74,9 +74,11 @@ type Dao struct {
 
 // Store store
 type Store struct {
-	sessionID []byte
-	data      *Dict
-	lock      sync.RWMutex
+	sessionID     []byte
+	data          *Dict
+	expiration    time.Duration
+	newExpiration time.Duration
+	lock          sync.RWMutex
 }
 
 // Encrypt encrypt struct
@@ -97,15 +99,18 @@ type Storer interface {
 	DeleteBytes(key []byte)
 	Flush()
 	GetSessionID() []byte
+	SetExpiration(expiration time.Duration) error
+	GetExpiration() time.Duration
+	HasExpirationChanged() bool
 }
 
 // Provider provider interface
 type Provider interface {
-	Init(expiration int64, cfg ProviderConfig) error
+	Init(expiration time.Duration, cfg ProviderConfig) error
 	Get(id []byte) (Storer, error)
 	Put(store Storer)
 	Destroy(id []byte) error
-	Regenerate(oldID, newID []byte) (Storer, error)
+	Regenerate(oldID, newID []byte) (Storer, error) // the expiration is also reset to original value
 	Count() int
 	NeedGC() bool
 	GC()

@@ -2,6 +2,7 @@ package memcache
 
 import (
 	"sync"
+	"time"
 
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/fasthttp/session"
@@ -34,7 +35,7 @@ type Config struct {
 type Provider struct {
 	config     *Config
 	db         *memcache.Client
-	expiration int32
+	expiration time.Duration
 
 	storePool sync.Pool
 }
@@ -42,4 +43,6 @@ type Provider struct {
 // Store store struct
 type Store struct {
 	session.Store
+
+	newExpiration time.Duration
 }

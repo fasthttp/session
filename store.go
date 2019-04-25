@@ -1,8 +1,12 @@
 package session
 
+import "time"
+
 // Init init store data and sessionID
-func (s *Store) Init(sessionID []byte) {
+func (s *Store) Init(sessionID []byte, expiration time.Duration) {
 	s.sessionID = sessionID
+	s.expiration = expiration
+	s.newExpiration = expiration
 
 	if s.data == nil { // Ensure the store always has a valid pointer of Dict
 		s.data = new(Dict)
@@ -69,6 +73,22 @@ func (s *Store) SetSessionID(id []byte) {
 	s.lock.Lock()
 	s.sessionID = id
 	s.lock.Unlock()
+}
+
+// SetExpiration set expiration for the session
+func (s *Store) SetExpiration(expiration time.Duration) error {
+	s.newExpiration = expiration
+	return nil
+}
+
+// GetExpiration get expiration for the session
+func (s *Store) GetExpiration() time.Duration {
+	return s.newExpiration
+}
+
+// HasExpirationChanged check wether the expiration has been changed
+func (s *Store) HasExpirationChanged() bool {
+	return s.expiration != s.newExpiration
 }
 
 // Reset reset store

@@ -2,6 +2,7 @@ package memory
 
 import (
 	"sync"
+	"time"
 
 	"github.com/fasthttp/session"
 )
@@ -13,7 +14,7 @@ type Config struct{}
 type Provider struct {
 	config     *Config
 	memoryDB   *session.Dict
-	expiration int64
+	expiration time.Duration
 
 	storePool sync.Pool
 
