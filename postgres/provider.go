@@ -152,6 +152,10 @@ func (pp *Provider) Count() int {
 
 // NeedGC need gc
 func (pp *Provider) NeedGC() bool {
+	if pp.expiration == 0 {
+		return false
+	}
+
 	return true
 }
 

@@ -149,6 +149,10 @@ func (sp *Provider) Count() int {
 
 // NeedGC need gc
 func (sp *Provider) NeedGC() bool {
+	if sp.expiration == 0 {
+		return false
+	}
+
 	return true
 }
 

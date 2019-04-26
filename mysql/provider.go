@@ -152,6 +152,10 @@ func (mp *Provider) Count() int {
 
 // NeedGC need gc
 func (mp *Provider) NeedGC() bool {
+	if mp.expiration == 0 {
+		return false
+	}
+
 	return true
 }
 
