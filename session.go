@@ -155,14 +155,14 @@ func (s *Session) Get(ctx *fasthttp.RequestCtx) (Storer, error) {
 		if len(sessionID) == 0 {
 			return nil, errEmptySessionID
 		}
-
-		s.setHTTPValues(ctx, sessionID)
 	}
 
 	store, err := s.provider.Get(sessionID)
 	if err != nil {
 		return nil, err
 	}
+
+	s.setHTTPValues(ctx, sessionID)
 
 	return store, nil
 }
