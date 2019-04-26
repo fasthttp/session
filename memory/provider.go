@@ -12,9 +12,9 @@ var provider = NewProvider()
 // NewProvider new memory provider
 func NewProvider() *Provider {
 	return &Provider{
-		config:      new(Config),
-		memoryDB:    new(session.Dict),
-		maxLifeTime: 0,
+		config:     new(Config),
+		memoryDB:   new(session.Dict),
+		expiration: 0,
 
 		storePool: sync.Pool{
 			New: func() interface{} {
@@ -37,13 +37,13 @@ func (mp *Provider) releaseStore(store *Store) {
 }
 
 // Init init provider configuration
-func (mp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
+func (mp *Provider) Init(expiration int64, cfg session.ProviderConfig) error {
 	if cfg.Name() != ProviderName {
 		return errInvalidProviderConfig
 	}
 
 	mp.config = cfg.(*Config)
-	mp.maxLifeTime = lifeTime
+	mp.expiration = expiration
 
 	return nil
 }
@@ -109,7 +109,11 @@ func (mp *Provider) NeedGC() bool {
 // GC session garbage collection
 func (mp *Provider) GC() {
 	for _, kv := range mp.memoryDB.D {
-		if time.Now().Unix() >= (kv.Value.(*Store).lastActiveTime + mp.maxLifeTime) {
+		if mp.expiration == 0 {
+			continue
+		}
+
+		if time.Now().Unix() >= (kv.Value.(*Store).lastActiveTime + mp.expiration) {
 			mp.Destroy(kv.Key)
 		}
 	}

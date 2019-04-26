@@ -40,13 +40,13 @@ func (mp *Provider) releaseStore(store *Store) {
 }
 
 // Init init provider config
-func (mp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
+func (mp *Provider) Init(expiration int64, cfg session.ProviderConfig) error {
 	if cfg.Name() != ProviderName {
 		return errInvalidProviderConfig
 	}
 
 	mp.config = cfg.(*Config)
-	mp.maxLifeTime = lifeTime
+	mp.expiration = expiration
 
 	if mp.config.Host == "" {
 		return errConfigHostEmpty
@@ -152,12 +152,16 @@ func (mp *Provider) Count() int {
 
 // NeedGC need gc
 func (mp *Provider) NeedGC() bool {
+	if mp.expiration == 0 {
+		return false
+	}
+
 	return true
 }
 
 // GC session garbage collection
 func (mp *Provider) GC() {
-	_, err := mp.db.deleteSessionByMaxLifeTime(mp.maxLifeTime)
+	_, err := mp.db.deleteSessionByExpiration(mp.expiration)
 	if err != nil {
 		panic(err)
 	}

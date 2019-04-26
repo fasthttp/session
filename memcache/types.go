@@ -32,9 +32,9 @@ type Config struct {
 
 // Provider provider struct
 type Provider struct {
-	config      *Config
-	db          *memcache.Client
-	maxLifeTime int32
+	config     *Config
+	db         *memcache.Client
+	expiration int32
 
 	storePool sync.Pool
 }

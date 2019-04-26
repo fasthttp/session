@@ -40,9 +40,6 @@ func New(cfg *Config) *Session {
 	if cfg.GCLifetime == 0 {
 		cfg.GCLifetime = defaultGCLifetime
 	}
-	if cfg.SessionLifetime == 0 {
-		cfg.SessionLifetime = defaultSessionLifetime
-	}
 
 	if cfg.SessionIDGeneratorFunc == nil {
 		cfg.SessionIDGeneratorFunc = cfg.defaultSessionIDGenerator
@@ -63,7 +60,7 @@ func (s *Session) SetProvider(name string, cfg ProviderConfig) error {
 	}
 	s.provider = providers.Get(name).(Provider)
 
-	err := s.provider.Init(s.config.SessionLifetime, cfg)
+	err := s.provider.Init(int64(s.config.Expires), cfg)
 	if err != nil {
 		return err
 	}
