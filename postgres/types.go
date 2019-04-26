@@ -46,9 +46,9 @@ type Config struct {
 
 // Provider provider struct
 type Provider struct {
-	config      *Config
-	db          *Dao
-	maxLifeTime int64
+	config     *Config
+	db         *Dao
+	expiration int64
 
 	storePool sync.Pool
 }
@@ -64,13 +64,13 @@ type Dao struct {
 
 	tableName string
 
-	sqlGetSessionBySessionID      string
-	sqlCountSessions              string
-	sqlUpdateBySessionID          string
-	sqlDeleteBySessionID          string
-	sqlDeleteSessionByMaxLifeTime string
-	sqlInsert                     string
-	sqlRegenerate                 string
+	sqlGetSessionBySessionID     string
+	sqlCountSessions             string
+	sqlUpdateBySessionID         string
+	sqlDeleteBySessionID         string
+	sqldeleteSessionByExpiration string
+	sqlInsert                    string
+	sqlRegenerate                string
 }
 
 // DBRow database row definition

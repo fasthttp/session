@@ -46,7 +46,7 @@ func NewDao(driver, dsn, tableName string) (*Dao, error) {
 	db.sqlCountSessions = fmt.Sprintf("SELECT count(*) as total FROM %s", tableName)
 	db.sqlUpdateBySessionID = fmt.Sprintf("UPDATE %s SET contents=$1,last_active=$2 WHERE session_id=$3", tableName)
 	db.sqlDeleteBySessionID = fmt.Sprintf("DELETE FROM %s WHERE session_id=$1", tableName)
-	db.sqlDeleteSessionByMaxLifeTime = fmt.Sprintf("DELETE FROM %s WHERE last_active<=$1", tableName)
+	db.sqldeleteSessionByExpiration = fmt.Sprintf("DELETE FROM %s WHERE last_active<=$1", tableName)
 	db.sqlInsert = fmt.Sprintf("INSERT INTO %s (session_id, contents, last_active) VALUES ($1,$2,$3)", tableName)
 	db.sqlRegenerate = fmt.Sprintf("UPDATE %s SET session_id=$1,last_active=$2 WHERE session_id=$3", tableName)
 
@@ -96,10 +96,10 @@ func (db *Dao) deleteBySessionID(sessionID []byte) (int64, error) {
 	return db.Exec(db.sqlDeleteBySessionID, gotils.B2S(sessionID))
 }
 
-// delete session by maxLifeTime
-func (db *Dao) deleteSessionByMaxLifeTime(maxLifeTime int64) (int64, error) {
-	lastTime := time.Now().Unix() - maxLifeTime
-	return db.Exec(db.sqlDeleteSessionByMaxLifeTime, lastTime)
+// delete session by expiration
+func (db *Dao) deleteSessionByExpiration(expiration int64) (int64, error) {
+	lastTime := time.Now().Unix() - expiration
+	return db.Exec(db.sqldeleteSessionByExpiration, lastTime)
 }
 
 // insert new session

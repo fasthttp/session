@@ -59,7 +59,7 @@ func (mcp *Provider) releaseStore(store *Store) {
 }
 
 // Init init provider config
-func (mcp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
+func (mcp *Provider) Init(expiration int64, cfg session.ProviderConfig) error {
 	if cfg.Name() != ProviderName {
 		return errInvalidProviderConfig
 	}
@@ -84,7 +84,7 @@ func (mcp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
 
 	mcp.db = memcache.New(mcp.config.ServerList...)
 	mcp.db.MaxIdleConns = mcp.config.MaxIdleConns
-	mcp.maxLifeTime = int32(lifeTime)
+	mcp.expiration = int32(expiration)
 
 	return nil
 }

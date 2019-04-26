@@ -11,7 +11,6 @@ func NewDefaultConfig() *Config {
 		Domain:                  defaultDomain,
 		Expires:                 defaultExpires,
 		GCLifetime:              defaultGCLifetime,
-		SessionLifetime:         defaultSessionLifetime,
 		Secure:                  defaultSecure,
 		SessionIDInURLQuery:     defaultSessionIDInURLQuery,
 		SessionNameInURLQuery:   defaultSessionKeyName,

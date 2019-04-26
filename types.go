@@ -27,9 +27,6 @@ type Config struct {
 	// gc life time to execute it
 	GCLifetime time.Duration
 
-	// session life time in seconds
-	SessionLifetime int64
-
 	// set whether to pass this bar cookie only through HTTPS
 	Secure bool
 
@@ -98,7 +95,7 @@ type Storer interface {
 
 // Provider provider interface
 type Provider interface {
-	Init(lifeTime int64, cfg ProviderConfig) error
+	Init(expiration int64, cfg ProviderConfig) error
 	Get(id []byte) (Storer, error)
 	Put(store Storer)
 	Destroy(id []byte) error

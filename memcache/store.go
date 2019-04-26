@@ -11,7 +11,7 @@ func (mcs *Store) Save() error {
 	item := acquireItem()
 	item.Key = provider.getMemCacheSessionKey(mcs.GetSessionID())
 	item.Value = value
-	item.Expiration = provider.maxLifeTime
+	item.Expiration = provider.expiration
 
 	err = provider.db.Set(item)
 

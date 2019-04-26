@@ -44,13 +44,13 @@ func (rp *Provider) releaseStore(store *Store) {
 }
 
 // Init init provider config
-func (rp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
+func (rp *Provider) Init(expiration int64, cfg session.ProviderConfig) error {
 	if cfg.Name() != ProviderName {
 		return errors.New("session redis provider init error, config must redis config")
 	}
 
 	rp.config = cfg.(*Config)
-	rp.maxLifeTime = time.Duration(lifeTime) * time.Second
+	rp.expiration = time.Duration(expiration) * time.Second
 
 	// config check
 	if rp.config.Host == "" {
@@ -147,7 +147,7 @@ func (rp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 		if err != nil {
 			return nil, err
 		}
-		err = rp.db.Expire(newKey, rp.maxLifeTime).Err()
+		err = rp.db.Expire(newKey, rp.expiration).Err()
 		if err != nil {
 			return nil, err
 		}

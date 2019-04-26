@@ -11,9 +11,9 @@ type Config struct{}
 
 // Provider provider struct
 type Provider struct {
-	config      *Config
-	memoryDB    *session.Dict
-	maxLifeTime int64
+	config     *Config
+	memoryDB   *session.Dict
+	expiration int64
 
 	storePool sync.Pool
 

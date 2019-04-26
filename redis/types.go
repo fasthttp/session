@@ -44,9 +44,9 @@ type Config struct {
 
 // Provider provider struct
 type Provider struct {
-	config      *Config
-	db          *redis.Client
-	maxLifeTime time.Duration
+	config     *Config
+	db         *redis.Client
+	expiration time.Duration
 
 	storePool sync.Pool
 }

@@ -40,13 +40,13 @@ func (sp *Provider) releaseStore(store *Store) {
 }
 
 // Init init provider config
-func (sp *Provider) Init(lifeTime int64, cfg session.ProviderConfig) error {
+func (sp *Provider) Init(expiration int64, cfg session.ProviderConfig) error {
 	if cfg.Name() != ProviderName {
 		return errInvalidProviderConfig
 	}
 
 	sp.config = cfg.(*Config)
-	sp.maxLifeTime = lifeTime
+	sp.expiration = expiration
 
 	if sp.config.DBPath == "" {
 		return errConfigDBPathEmpty
@@ -154,7 +154,7 @@ func (sp *Provider) NeedGC() bool {
 
 // GC session garbage collection
 func (sp *Provider) GC() {
-	_, err := sp.db.deleteSessionByMaxLifeTime(sp.maxLifeTime)
+	_, err := sp.db.deleteSessionByExpiration(sp.expiration)
 	if err != nil {
 		panic(err)
 	}
