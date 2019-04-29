@@ -103,16 +103,16 @@ func (mp *Provider) Count() int {
 
 // NeedGC need gc
 func (mp *Provider) NeedGC() bool {
+	if mp.expiration == 0 {
+		return false
+	}
+
 	return true
 }
 
 // GC session garbage collection
 func (mp *Provider) GC() {
 	for _, kv := range mp.memoryDB.D {
-		if mp.expiration == 0 {
-			continue
-		}
-
 		if time.Now().Unix() >= (kv.Value.(*Store).lastActiveTime + mp.expiration) {
 			mp.Destroy(kv.Key)
 		}
