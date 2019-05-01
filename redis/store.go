@@ -8,7 +8,7 @@ func (rs *Store) Save() error {
 		return err
 	}
 
-	err = provider.db.Set(provider.getRedisSessionKey(rs.GetSessionID()), b, provider.expiration).Err()
+	err = provider.db.Set(provider.getRedisSessionKey(rs.GetSessionID()), b, rs.GetExpiration()).Err()
 
 	return err
 }

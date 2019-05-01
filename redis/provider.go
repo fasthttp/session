@@ -50,7 +50,7 @@ func (rp *Provider) Init(expiration time.Duration, cfg session.ProviderConfig) e
 	}
 
 	rp.config = cfg.(*Config)
-	rp.expiration = expiration * time.Second
+	rp.expiration = expiration
 
 	// config check
 	if rp.config.Host == "" {
@@ -108,7 +108,6 @@ func (rp *Provider) getRedisSessionKey(sessionID []byte) string {
 
 // Get read session store by session id
 func (rp *Provider) Get(sessionID []byte) (session.Storer, error) {
-	var store *Store
 	key := rp.getRedisSessionKey(sessionID)
 
 	reply, err := rp.db.Get(key).Bytes()
@@ -116,13 +115,18 @@ func (rp *Provider) Get(sessionID []byte) (session.Storer, error) {
 		return nil, err
 	}
 
-	if len(reply) > 0 { // Exist
-		expiration, err := rp.db.TTL(key).Result()
-		if err != nil {
-			return nil, err
-		}
-		store = rp.acquireStore(sessionID, expiration)
+	expiration, err := rp.db.TTL(key).Result()
+	if err != nil {
+		return nil, err
+	}
 
+	if expiration < 0 {
+		expiration = rp.expiration
+	}
+
+	store := rp.acquireStore(sessionID, expiration)
+
+	if len(reply) > 0 { // Exist
 		err = rp.config.UnSerializeFunc(store.DataPointer(), reply)
 		if err != nil {
 			return nil, err

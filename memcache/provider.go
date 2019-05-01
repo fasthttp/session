@@ -86,7 +86,7 @@ func (mcp *Provider) Init(expiration time.Duration, cfg session.ProviderConfig) 
 
 	mcp.db = memcache.New(mcp.config.ServerList...)
 	mcp.db.MaxIdleConns = mcp.config.MaxIdleConns
-	if expiration > math.MaxInt32 {
+	if expiration/time.Second > math.MaxInt32 {
 		return errExpirationIsTooBig
 	}
 	mcp.expiration = expiration
@@ -119,13 +119,14 @@ func (mcp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	}
 
 	if item != nil { // Exist
-
-		store = mcp.acquireStore(sessionID, time.Duration(item.Expiration))
+		store = mcp.acquireStore(sessionID, time.Duration(item.Expiration)*time.Second)
 
 		err := mcp.config.UnSerializeFunc(store.DataPointer(), item.Value)
 		if err != nil {
 			return nil, err
 		}
+	} else {
+		store = mcp.acquireStore(sessionID, mcp.expiration)
 	}
 
 	releaseItem(item)
@@ -156,7 +157,7 @@ func (mcp *Provider) Regenerate(oldID, newID []byte) (session.Storer, error) {
 		newItem.Value = oldItem.Value
 		// Expiration can be converted safely from time.Duration to in32 because
 		// mcp.expiration has been checked to be safely castable in Init method.
-		newItem.Expiration = int32(mcp.expiration)
+		newItem.Expiration = int32(mcp.expiration / time.Second)
 
 		if err = mcp.db.Set(newItem); err != nil {
 			return nil, err

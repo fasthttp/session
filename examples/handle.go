@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/valyala/fasthttp"
 )
@@ -152,4 +153,36 @@ func regenerateHandler(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetBodyString("Session REGENERATE: New session id: ")
 	ctx.Write(sessionID)
+}
+
+// get expiration handler
+func getExpirationHandler(ctx *fasthttp.RequestCtx) {
+	store, err := serverSession.Get(ctx)
+	if err != nil {
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
+		return
+	}
+
+	expiration := store.GetExpiration()
+
+	ctx.SetBodyString("Session Expiration: ")
+	ctx.WriteString(expiration.String())
+}
+
+// set expiration handler
+func setExpirationHandler(ctx *fasthttp.RequestCtx) {
+	store, err := serverSession.Get(ctx)
+	if err != nil {
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
+		return
+	}
+	defer serverSession.Save(ctx, store)
+
+	err = store.SetExpiration(30 * time.Second)
+	if err != nil {
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
+		return
+	}
+
+	ctx.SetBodyString("Session Expiration set to 30 seconds")
 }

@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS session (
   contents TEXT NOT NULL,
   last_active INT(10) NOT NULL DEFAULT '0',
   expiration INT(10) NOT NULL DEFAULT '0'
-)
+);
 
 CREATE INDEX last_active ON SESSION (last_active);
 CREATE INDEX expiration ON SESSION (expiration);
