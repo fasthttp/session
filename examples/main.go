@@ -72,6 +72,8 @@ func main() {
 	r.GET("/destroy", destroyHandler)
 	r.GET("/sessionid", sessionIDHandler)
 	r.GET("/regenerate", regenerateHandler)
+	r.GET("/setexpiration", setExpirationHandler)
+	r.GET("/getexpiration", getExpirationHandler)
 
 	addr := "0.0.0.0:8086"
 	log.Println("Session example server listen: http://" + addr)

@@ -47,7 +47,7 @@ func NewDao(driver, dsn, tableName string) (*Dao, error) {
 	db.sqlUpdateBySessionID = fmt.Sprintf("UPDATE %s SET contents=?,last_active=?,expiration=? WHERE session_id=?", tableName)
 	db.sqlDeleteBySessionID = fmt.Sprintf("DELETE FROM %s WHERE session_id=?", tableName)
 	db.sqlDeleteExpiredSessions = fmt.Sprintf("DELETE FROM %s WHERE last_active+expiration<=? AND expiration<>0", tableName)
-	db.sqlInsert = fmt.Sprintf("INSERT INTO %s (session_id, contents, last_active) VALUES (?,?,?)", tableName)
+	db.sqlInsert = fmt.Sprintf("INSERT INTO %s (session_id, contents, last_active, expiration) VALUES (?,?,?,?)", tableName)
 	db.sqlRegenerate = fmt.Sprintf("UPDATE %s SET session_id=?,last_active=?,expiration=? WHERE session_id=?", tableName)
 
 	return db, err
@@ -66,6 +66,8 @@ func (db *Dao) getSessionBySessionID(sessionID []byte) (*DBRow, error) {
 	if err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
+
+	data.expiration *= time.Second
 
 	return data, nil
 }
@@ -88,7 +90,7 @@ func (db *Dao) countSessions() int {
 
 // update session by sessionID
 func (db *Dao) updateBySessionID(sessionID, contents []byte, lastActiveTime int64, expiration time.Duration) (int64, error) {
-	return db.Exec(db.sqlUpdateBySessionID, gotils.B2S(contents), lastActiveTime, expiration, gotils.B2S(sessionID))
+	return db.Exec(db.sqlUpdateBySessionID, gotils.B2S(contents), lastActiveTime, expiration/time.Second, gotils.B2S(sessionID))
 }
 
 // delete session by sessionID
@@ -103,10 +105,10 @@ func (db *Dao) deleteExpiredSessions() (int64, error) {
 
 // insert new session
 func (db *Dao) insert(sessionID, contents []byte, lastActiveTime int64, expiration time.Duration) (int64, error) {
-	return db.Exec(db.sqlInsert, gotils.B2S(sessionID), gotils.B2S(contents), lastActiveTime, expiration)
+	return db.Exec(db.sqlInsert, gotils.B2S(sessionID), gotils.B2S(contents), lastActiveTime, expiration/time.Second)
 }
 
 // insert new session
 func (db *Dao) regenerate(oldID, newID []byte, lastActiveTime int64, expiration time.Duration) (int64, error) {
-	return db.Exec(db.sqlRegenerate, gotils.B2S(newID), lastActiveTime, gotils.B2S(oldID))
+	return db.Exec(db.sqlRegenerate, gotils.B2S(newID), lastActiveTime, expiration/time.Second, gotils.B2S(oldID))
 }

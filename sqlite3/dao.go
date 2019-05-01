@@ -67,6 +67,8 @@ func (db *Dao) getSessionBySessionID(sessionID []byte) (*DBRow, error) {
 		return nil, err
 	}
 
+	data.expiration *= time.Second
+
 	return data, nil
 }
 
@@ -88,7 +90,7 @@ func (db *Dao) countSessions() int {
 
 // update session by sessionID
 func (db *Dao) updateBySessionID(sessionID, contents []byte, lastActiveTime int64, expiration time.Duration) (int64, error) {
-	return db.Exec(db.sqlUpdateBySessionID, gotils.B2S(contents), lastActiveTime, expiration, gotils.B2S(sessionID))
+	return db.Exec(db.sqlUpdateBySessionID, gotils.B2S(contents), lastActiveTime, expiration/time.Second, gotils.B2S(sessionID))
 }
 
 // delete session by sessionID
@@ -103,10 +105,10 @@ func (db *Dao) deleteExpiredSessions() (int64, error) {
 
 // insert new session
 func (db *Dao) insert(sessionID, contents []byte, lastActiveTime int64, expiration time.Duration) (int64, error) {
-	return db.Exec(db.sqlInsert, gotils.B2S(sessionID), gotils.B2S(contents), lastActiveTime, expiration)
+	return db.Exec(db.sqlInsert, gotils.B2S(sessionID), gotils.B2S(contents), lastActiveTime, expiration/time.Second)
 }
 
 // insert new session
 func (db *Dao) regenerate(oldID, newID []byte, lastActiveTime int64, expiration time.Duration) (int64, error) {
-	return db.Exec(db.sqlRegenerate, gotils.B2S(newID), lastActiveTime, expiration, gotils.B2S(oldID))
+	return db.Exec(db.sqlRegenerate, gotils.B2S(newID), lastActiveTime, expiration/time.Second, gotils.B2S(oldID))
 }

@@ -43,6 +43,4 @@ type Provider struct {
 // Store store struct
 type Store struct {
 	session.Store
-
-	newExpiration time.Duration
 }
