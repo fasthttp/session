@@ -38,6 +38,7 @@ func (c *Cookie) Set(ctx *fasthttp.RequestCtx, name string, value []byte, domain
 		cookie.SetSecure(true)
 	}
 
+	ctx.Request.Header.SetCookieBytesKV(cookie.Key(), cookie.Value())
 	ctx.Response.Header.SetCookie(cookie)
 
 	fasthttp.ReleaseCookie(cookie)
