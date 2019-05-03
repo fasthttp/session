@@ -110,7 +110,7 @@ func (mcp *Provider) getMemCacheSessionKey(sessionID []byte) string {
 
 // Get read session store by session id
 func (mcp *Provider) Get(sessionID []byte) (session.Storer, error) {
-	var store *Store
+	store := mcp.acquireStore(sessionID, mcp.expiration)
 	key := mcp.getMemCacheSessionKey(sessionID)
 
 	item, err := mcp.db.Get(key)
@@ -119,14 +119,10 @@ func (mcp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	}
 
 	if item != nil { // Exist
-		store = mcp.acquireStore(sessionID, time.Duration(item.Expiration)*time.Second)
-
 		err := mcp.config.UnSerializeFunc(store.DataPointer(), item.Value)
 		if err != nil {
 			return nil, err
 		}
-	} else {
-		store = mcp.acquireStore(sessionID, mcp.expiration)
 	}
 
 	releaseItem(item)

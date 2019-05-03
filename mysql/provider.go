@@ -75,7 +75,7 @@ func (mp *Provider) Init(expiration time.Duration, cfg session.ProviderConfig) e
 
 // Get read session store by session id
 func (mp *Provider) Get(sessionID []byte) (session.Storer, error) {
-	var store *Store
+	store := mp.acquireStore(sessionID, mp.expiration)
 
 	row, err := mp.db.getSessionBySessionID(sessionID)
 	if err != nil {
@@ -83,16 +83,12 @@ func (mp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	}
 
 	if row.sessionID != "" { // Exist
-		store = mp.acquireStore(sessionID, row.expiration)
-
 		err = mp.config.UnSerializeFunc(store.DataPointer(), gotils.S2B(row.contents))
 		if err != nil {
 			return nil, err
 		}
 
 	} else { // Not exist
-		store = mp.acquireStore(sessionID, mp.expiration)
-
 		_, err = mp.db.insert(sessionID, nil, time.Now().Unix(), mp.expiration)
 		if err != nil {
 			return nil, err
