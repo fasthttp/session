@@ -2,8 +2,6 @@ package session
 
 import "time"
 
-const expirationAttributeKey = "__fasthttp_session_expiration__"
-
 // Init init store data and sessionID
 func (s *Store) Init(sessionID []byte, defaultExpiration time.Duration) {
 	s.sessionID = sessionID
@@ -78,7 +76,9 @@ func (s *Store) SetSessionID(id []byte) {
 
 // SetExpiration set expiration for the session
 func (s *Store) SetExpiration(expiration time.Duration) error {
+	s.lock.Lock()
 	s.expirationChanged = true
+	s.lock.Unlock()
 	s.Set(expirationAttributeKey, int64(expiration.Seconds()))
 	return nil
 }
@@ -94,7 +94,10 @@ func (s *Store) GetExpiration() time.Duration {
 
 // HasExpirationChanged check wether the expiration has been changed
 func (s *Store) HasExpirationChanged() bool {
-	return s.expirationChanged
+	s.lock.RLock()
+	expirationChanged := s.expirationChanged
+	s.lock.RUnlock()
+	return expirationChanged
 }
 
 // Reset reset store

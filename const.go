@@ -10,3 +10,5 @@ const defaultSecure = true
 const defaultSessionIDInURLQuery = false
 const defaultSessionIDInHTTPHeader = false
 const defaultCookieLen uint32 = 32
+
+const expirationAttributeKey = "__fasthttp_session_expiration__"
