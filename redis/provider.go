@@ -108,23 +108,13 @@ func (rp *Provider) getRedisSessionKey(sessionID []byte) string {
 
 // Get read session store by session id
 func (rp *Provider) Get(sessionID []byte) (session.Storer, error) {
+	store := rp.acquireStore(sessionID, rp.expiration)
 	key := rp.getRedisSessionKey(sessionID)
 
 	reply, err := rp.db.Get(key).Bytes()
 	if err != nil && err != redis.Nil {
 		return nil, err
 	}
-
-	expiration, err := rp.db.TTL(key).Result()
-	if err != nil {
-		return nil, err
-	}
-
-	if expiration < 0 {
-		expiration = rp.expiration
-	}
-
-	store := rp.acquireStore(sessionID, expiration)
 
 	if len(reply) > 0 { // Exist
 		err = rp.config.UnSerializeFunc(store.DataPointer(), reply)

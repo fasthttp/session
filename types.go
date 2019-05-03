@@ -74,11 +74,11 @@ type Dao struct {
 
 // Store store
 type Store struct {
-	sessionID     []byte
-	data          *Dict
-	expiration    time.Duration
-	newExpiration time.Duration
-	lock          sync.RWMutex
+	sessionID         []byte
+	data              *Dict
+	defaultExpiration time.Duration
+	expirationChanged bool
+	lock              sync.RWMutex
 }
 
 // Encrypt encrypt struct

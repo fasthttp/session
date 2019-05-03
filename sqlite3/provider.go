@@ -72,7 +72,7 @@ func (sp *Provider) Init(expiration time.Duration, cfg session.ProviderConfig) e
 
 // Get read session store by session id
 func (sp *Provider) Get(sessionID []byte) (session.Storer, error) {
-	var store *Store
+	store := sp.acquireStore(sessionID, sp.expiration)
 
 	row, err := sp.db.getSessionBySessionID(sessionID)
 	if err != nil {
@@ -80,16 +80,12 @@ func (sp *Provider) Get(sessionID []byte) (session.Storer, error) {
 	}
 
 	if row.sessionID != "" { // Exist
-		store = sp.acquireStore(sessionID, row.expiration)
-
 		err := sp.config.UnSerializeFunc(store.DataPointer(), gotils.S2B(row.contents))
 		if err != nil {
 			return nil, err
 		}
 
 	} else { // Not exist
-		store = sp.acquireStore(sessionID, sp.expiration)
-
 		_, err := sp.db.insert(sessionID, nil, time.Now().Unix(), sp.expiration)
 		if err != nil {
 			return nil, err
