@@ -151,24 +151,17 @@ func (s *Session) Get(ctx *fasthttp.RequestCtx) (Storer, error) {
 		return nil, errNotSetProvider
 	}
 
-	var newSessionGenerated bool
 	sessionID := s.getSessionID(ctx)
 	if len(sessionID) == 0 {
 		sessionID = s.config.SessionIDGeneratorFunc()
 		if len(sessionID) == 0 {
 			return nil, errEmptySessionID
 		}
-
-		newSessionGenerated = true
 	}
 
 	store, err := s.provider.Get(sessionID)
 	if err != nil {
 		return nil, err
-	}
-
-	if newSessionGenerated {
-		s.setHTTPValues(ctx, sessionID, store.GetExpiration())
 	}
 
 	return store, nil
@@ -188,9 +181,7 @@ func (s *Session) Save(ctx *fasthttp.RequestCtx, store Storer) {
 		return
 	}
 
-	if store.HasExpirationChanged() {
-		s.setHTTPValues(ctx, store.GetSessionID(), store.GetExpiration())
-	}
+	s.setHTTPValues(ctx, store.GetSessionID(), store.GetExpiration())
 
 	s.provider.Put(store)
 }
