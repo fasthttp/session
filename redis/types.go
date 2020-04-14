@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/fasthttp/session"
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v7"
 )
 
 // Config session redis config
