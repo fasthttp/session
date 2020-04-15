@@ -3,15 +3,16 @@ package main
 import (
 	"flag"
 	"log"
+	"time"
 
 	"github.com/fasthttp/router"
 	"github.com/fasthttp/session"
-	"github.com/fasthttp/session/memcache"
-	"github.com/fasthttp/session/memory"
-	"github.com/fasthttp/session/mysql"
-	"github.com/fasthttp/session/postgres"
-	"github.com/fasthttp/session/redis"
-	"github.com/fasthttp/session/sqlite3"
+	"github.com/fasthttp/session/providers/memcache"
+	"github.com/fasthttp/session/providers/memory"
+	"github.com/fasthttp/session/providers/mysql"
+	"github.com/fasthttp/session/providers/postgre"
+	"github.com/fasthttp/session/providers/redis"
+	"github.com/fasthttp/session/providers/sqlite3"
 	"github.com/valyala/fasthttp"
 )
 
@@ -23,38 +24,46 @@ func init() {
 	providerName := flag.String("provider", defaultProvider, "Name of provider")
 	flag.Parse()
 
-	var config session.ProviderConfig
+	var provider session.Provider
+	var err error
+
 	switch *providerName {
 	case "memory":
-		config = &memory.Config{}
+		provider, err = memory.New(memory.Config{})
 	case "memcache":
-		config = &memcache.Config{
+		provider, err = memcache.New(memcache.Config{
 			ServerList: []string{
 				"0.0.0.0:11211",
 			},
 			MaxIdleConns: 8,
 			KeyPrefix:    "session",
-		}
+		})
 	case "mysql":
-		config = mysql.NewConfigWith("127.0.0.1", 3306, "root", "session", "test", "session")
-	case "postgres":
-		config = postgres.NewConfigWith("127.0.0.1", 5432, "root", "session", "test", "session")
+		cfg := mysql.NewConfigWith("127.0.0.1", 3306, "root", "session", "test", "session")
+		provider, err = mysql.New(cfg)
+	case "postgre":
+		cfg := postgre.NewConfigWith("127.0.0.1", 5432, "postgres", "session", "test", "session")
+		provider, err = postgre.New(cfg)
 	case "redis":
-		config = &redis.Config{
+		provider, err = redis.New(redis.Config{
 			Host:        "127.0.0.1",
 			Port:        6379,
 			PoolSize:    8,
-			IdleTimeout: 300,
+			IdleTimeout: 30 * time.Second,
 			KeyPrefix:   "session",
-		}
+		})
 	case "sqlite3":
-		config = sqlite3.NewConfigWith("test.db", "session")
+		cfg := sqlite3.NewConfigWith("test.db", "session")
+		provider, err = sqlite3.New(cfg)
 	default:
 		panic("Invalid provider")
 	}
 
-	err := serverSession.SetProvider(*providerName, config)
 	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err = serverSession.SetProvider(provider); err != nil {
 		log.Fatal(err)
 	}
 

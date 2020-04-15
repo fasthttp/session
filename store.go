@@ -1,14 +1,17 @@
 package session
 
-import "time"
+import (
+	"fmt"
+	"time"
 
-// Init init store data and sessionID
-func (s *Store) Init(sessionID []byte, defaultExpiration time.Duration) {
-	s.sessionID = sessionID
-	s.defaultExpiration = defaultExpiration
+	"github.com/savsgio/gotils"
+)
 
-	if s.data == nil { // Ensure the store always has a valid pointer of Dict
-		s.data = new(Dict)
+var expirationAttributeKey = fmt.Sprintf("__store:expiration:%s__", gotils.RandBytes(make([]byte, 5)))
+
+func NewStore() *Store {
+	return &Store{
+		data: new(Dict),
 	}
 }
 
@@ -76,10 +79,8 @@ func (s *Store) SetSessionID(id []byte) {
 
 // SetExpiration set expiration for the session
 func (s *Store) SetExpiration(expiration time.Duration) error {
-	s.lock.Lock()
-	s.expirationChanged = true
-	s.lock.Unlock()
-	s.Set(expirationAttributeKey, int64(expiration.Seconds()))
+	s.Set(expirationAttributeKey, expiration)
+
 	return nil
 }
 
@@ -89,19 +90,18 @@ func (s *Store) GetExpiration() time.Duration {
 	if !ok {
 		return s.defaultExpiration
 	}
-	return time.Duration(expiration) * time.Second
+
+	return time.Duration(expiration)
 }
 
 // HasExpirationChanged check wether the expiration has been changed
 func (s *Store) HasExpirationChanged() bool {
-	s.lock.RLock()
-	expirationChanged := s.expirationChanged
-	s.lock.RUnlock()
-	return expirationChanged
+	return s.data.Has(expirationAttributeKey)
 }
 
 // Reset reset store
 func (s *Store) Reset() {
-	s.sessionID = s.sessionID[:0]
 	s.data.Reset()
+	s.sessionID = s.sessionID[:0]
+	s.defaultExpiration = 0
 }

@@ -1,27 +1,12 @@
 package session
 
 import (
-	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/valyala/fasthttp"
 )
-
-var providers Dict
-
-// Register register session provider
-func Register(providerName string, provider Provider) error {
-	if provider == nil {
-		return errRegisterNilProvider(providerName)
-	} else if providers.Has(providerName) {
-		return errProviderAlreadyRegisted(providerName)
-	}
-
-	providers.Set(providerName, provider)
-
-	return nil
-}
 
 // New return new Session
 func New(cfg *Config) *Session {
@@ -51,23 +36,22 @@ func New(cfg *Config) *Session {
 
 	session := &Session{
 		config: cfg,
-		cookie: NewCookie(),
+		cookie: newCookie(),
+		storePool: &sync.Pool{
+			New: func() interface{} {
+				return &Store{
+					data: new(Dict),
+				}
+			},
+		},
 	}
 
 	return session
 }
 
 // SetProvider set session provider and provider config
-func (s *Session) SetProvider(name string, cfg ProviderConfig) error {
-	if !providers.Has(name) {
-		return errors.New("session set provider error, " + name + " not registered!")
-	}
-	s.provider = providers.Get(name).(Provider)
-
-	err := s.provider.Init(s.config.Expires, cfg)
-	if err != nil {
-		return err
-	}
+func (s *Session) SetProvider(provider Provider) error {
+	s.provider = provider
 
 	if s.provider.NeedGC() {
 		s.startGC()
@@ -146,21 +130,24 @@ func (s *Session) getSessionID(ctx *fasthttp.RequestCtx) []byte {
 // 1. get sessionID from fasthttp ctx
 // 2. if sessionID is empty, generator sessionID and set response Set-Cookie
 // 3. return session provider store
-func (s *Session) Get(ctx *fasthttp.RequestCtx) (Storer, error) {
+func (s *Session) Get(ctx *fasthttp.RequestCtx) (*Store, error) {
 	if s.provider == nil {
 		return nil, errNotSetProvider
 	}
 
-	sessionID := s.getSessionID(ctx)
-	if len(sessionID) == 0 {
-		sessionID = s.config.SessionIDGeneratorFunc()
-		if len(sessionID) == 0 {
+	id := s.getSessionID(ctx)
+	if len(id) == 0 {
+		id = s.config.SessionIDGeneratorFunc()
+		if len(id) == 0 {
 			return nil, errEmptySessionID
 		}
 	}
 
-	store, err := s.provider.Get(sessionID)
-	if err != nil {
+	store := s.storePool.Get().(*Store)
+	store.sessionID = id
+	store.defaultExpiration = s.config.Expires
+
+	if err := s.provider.Get(store); err != nil {
 		return nil, err
 	}
 
@@ -174,20 +161,21 @@ func (s *Session) Get(ctx *fasthttp.RequestCtx) (Storer, error) {
 //
 // Warning: Don't use more the store after exec this function, because, you will lose the after data
 // For avoid it, defer this function in your request handler
-func (s *Session) Save(ctx *fasthttp.RequestCtx, store Storer) {
-	err := store.Save()
-	if err != nil {
-		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
-		return
+func (s *Session) Save(ctx *fasthttp.RequestCtx, store *Store) error {
+	if err := s.provider.Save(store); err != nil {
+		return err
 	}
 
 	s.setHTTPValues(ctx, store.GetSessionID(), store.GetExpiration())
 
-	s.provider.Put(store)
+	store.Reset()
+	s.storePool.Put(store)
+
+	return nil
 }
 
 // Regenerate regenerate a session id for this Storer
-func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) (Storer, error) {
+func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) (*Store, error) {
 	if s.provider == nil {
 		return nil, errNotSetProvider
 	}
@@ -196,10 +184,13 @@ func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) (Storer, error) {
 	if len(newID) == 0 {
 		return nil, errEmptySessionID
 	}
-	oldID := s.getSessionID(ctx)
+	id := s.getSessionID(ctx)
 
-	store, err := s.provider.Regenerate(oldID, newID)
-	if err != nil {
+	store := s.storePool.Get().(*Store)
+	store.sessionID = newID
+	store.defaultExpiration = s.config.Expires
+
+	if err := s.provider.Regenerate(id, store); err != nil {
 		return nil, err
 	}
 

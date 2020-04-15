@@ -4,15 +4,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/valyala/fasthttp"
-
 	"github.com/savsgio/dictpool"
-	"github.com/savsgio/gotils/dao"
+	"github.com/valyala/fasthttp"
 )
 
 // Config config struct
 type Config struct {
-
 	// cookie name
 	CookieName string
 
@@ -55,21 +52,18 @@ type Config struct {
 	cookieLen uint32
 }
 
-// Dict memory store
-type Dict struct {
-	dictpool.Dict
-}
-
 // Session session struct
 type Session struct {
 	provider Provider
 	config   *Config
-	cookie   *Cookie
+	cookie   *cookie
+
+	storePool *sync.Pool
 }
 
-// Dao database connection
-type Dao struct {
-	dao.Dao
+// Dict memory store
+type Dict struct {
+	dictpool.Dict
 }
 
 // Store store
@@ -77,46 +71,19 @@ type Store struct {
 	sessionID         []byte
 	data              *Dict
 	defaultExpiration time.Duration
-	expirationChanged bool
 	lock              sync.RWMutex
 }
 
-// Encrypt encrypt struct
-type Encrypt struct{}
-
 // Cookie cookie struct
-type Cookie struct{}
-
-// Storer session store interface
-type Storer interface {
-	Save() error
-	Get(key string) interface{}
-	GetBytes(key []byte) interface{}
-	GetAll() Dict
-	Set(key string, value interface{})
-	SetBytes(key []byte, value interface{})
-	Delete(key string)
-	DeleteBytes(key []byte)
-	Flush()
-	GetSessionID() []byte
-	SetExpiration(expiration time.Duration) error
-	GetExpiration() time.Duration
-	HasExpirationChanged() bool
-}
+type cookie struct{}
 
 // Provider provider interface
 type Provider interface {
-	Init(expiration time.Duration, cfg ProviderConfig) error
-	Get(id []byte) (Storer, error)
-	Put(store Storer)
+	Get(store *Store) error
+	Save(store *Store) error
 	Destroy(id []byte) error
-	Regenerate(oldID, newID []byte) (Storer, error) // the expiration is also reset to original value
+	Regenerate(id []byte, newStore *Store) error // the expiration is also reset to original value
 	Count() int
 	NeedGC() bool
 	GC()
-}
-
-// ProviderConfig provider config interface
-type ProviderConfig interface {
-	Name() string
 }

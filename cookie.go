@@ -6,18 +6,18 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-// NewCookie return new cookie instance
-func NewCookie() *Cookie {
-	return new(Cookie)
+// newCookie return new cookie instance
+func newCookie() *cookie {
+	return new(cookie)
 }
 
 // Get get cookie by name
-func (c *Cookie) Get(ctx *fasthttp.RequestCtx, name string) []byte {
+func (c *cookie) Get(ctx *fasthttp.RequestCtx, name string) []byte {
 	return ctx.Request.Header.Cookie(name)
 }
 
 // Set response set cookie
-func (c *Cookie) Set(ctx *fasthttp.RequestCtx, name string, value []byte, domain string, expires time.Duration, secure bool) {
+func (c *cookie) Set(ctx *fasthttp.RequestCtx, name string, value []byte, domain string, expires time.Duration, secure bool) {
 	cookie := fasthttp.AcquireCookie()
 
 	cookie.SetKey(name)
@@ -45,7 +45,7 @@ func (c *Cookie) Set(ctx *fasthttp.RequestCtx, name string, value []byte, domain
 }
 
 // Delete delete cookie by cookie name
-func (c *Cookie) Delete(ctx *fasthttp.RequestCtx, name string) {
+func (c *cookie) Delete(ctx *fasthttp.RequestCtx, name string) {
 	// delete response cookie
 	ctx.Response.Header.DelCookie(name)
 
