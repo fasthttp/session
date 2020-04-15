@@ -19,7 +19,7 @@ func New(cfg Config) (*Provider, error) {
 		cfg.UnSerializeFunc = session.Base64Decode
 	}
 
-	db, err := NewDao(cfg.DBPath, cfg.TableName)
+	db, err := newDao(cfg.DBPath, cfg.TableName)
 	if err != nil {
 		return nil, err
 	}

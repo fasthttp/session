@@ -32,7 +32,7 @@ func (row *dbRow) reset() {
 	row.lastActive = 0
 }
 
-func NewDao(dsn, tableName string) (*dao, error) {
+func newDao(dsn, tableName string) (*dao, error) {
 	db := &dao{tableName: tableName}
 	db.Driver = "sqlite3"
 	db.Dsn = dsn
