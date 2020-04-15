@@ -82,12 +82,12 @@ func (s *Store) SetExpiration(expiration time.Duration) error {
 
 // GetExpiration returns the expiration for current session
 func (s *Store) GetExpiration() time.Duration {
-	expiration, ok := s.Get(expirationAttrKey).(int64)
+	expiration, ok := s.Get(expirationAttrKey).(time.Duration)
 	if !ok {
 		return s.defaultExpiration
 	}
 
-	return time.Duration(expiration)
+	return expiration
 }
 
 // HasExpirationChanged checks wether the expiration has been changed
