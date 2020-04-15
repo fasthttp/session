@@ -7,7 +7,7 @@ import (
 	"github.com/savsgio/gotils"
 )
 
-var expirationAttributeKey = fmt.Sprintf("__store:expiration:%s__", gotils.RandBytes(make([]byte, 5)))
+var expirationAttrKey = fmt.Sprintf("__store:expiration:%s__", gotils.RandBytes(make([]byte, 5)))
 
 func NewStore() *Store {
 	return &Store{
@@ -74,14 +74,14 @@ func (s *Store) SetSessionID(id []byte) {
 
 // SetExpiration sets the expiration for current session
 func (s *Store) SetExpiration(expiration time.Duration) error {
-	s.Set(expirationAttributeKey, expiration)
+	s.Set(expirationAttrKey, expiration)
 
 	return nil
 }
 
 // GetExpiration returns the expiration for current session
 func (s *Store) GetExpiration() time.Duration {
-	expiration, ok := s.Get(expirationAttributeKey).(int64)
+	expiration, ok := s.Get(expirationAttrKey).(int64)
 	if !ok {
 		return s.defaultExpiration
 	}
@@ -91,7 +91,7 @@ func (s *Store) GetExpiration() time.Duration {
 
 // HasExpirationChanged checks wether the expiration has been changed
 func (s *Store) HasExpirationChanged() bool {
-	return s.data.Has(expirationAttributeKey)
+	return s.data.Has(expirationAttrKey)
 }
 
 // Reset resets the store
