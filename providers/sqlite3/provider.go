@@ -110,24 +110,24 @@ func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
 }
 
 // Destroy destroy session by sessionID
-func (mp *Provider) Destroy(id []byte) error {
-	_, err := mp.db.deleteBySessionID(id)
+func (p *Provider) Destroy(id []byte) error {
+	_, err := p.db.deleteBySessionID(id)
 	return err
 }
 
 // Count session values count
-func (sp *Provider) Count() int {
-	return sp.db.countSessions()
+func (p *Provider) Count() int {
+	return p.db.countSessions()
 }
 
 // NeedGC need gc
-func (sp *Provider) NeedGC() bool {
+func (p *Provider) NeedGC() bool {
 	return true
 }
 
 // GC session garbage collection
-func (sp *Provider) GC() {
-	_, err := sp.db.deleteExpiredSessions()
+func (p *Provider) GC() {
+	_, err := p.db.deleteExpiredSessions()
 	if err != nil {
 		panic(err)
 	}

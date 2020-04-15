@@ -53,19 +53,19 @@ func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
 }
 
 // Destroy destroy session by sessionID
-func (mp *Provider) Destroy(id []byte) error {
-	mp.db.DelBytes(id)
+func (p *Provider) Destroy(id []byte) error {
+	p.db.DelBytes(id)
 
 	return nil
 }
 
 // Count session values count
-func (mp *Provider) Count() int {
-	return len(mp.db.D)
+func (p *Provider) Count() int {
+	return len(p.db.D)
 }
 
 // NeedGC need gc
-func (mp *Provider) NeedGC() bool {
+func (p *Provider) NeedGC() bool {
 	return true
 }
 

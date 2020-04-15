@@ -71,16 +71,16 @@ func (p *Provider) getRedisSessionKey(sessionID []byte) string {
 }
 
 // Get read session store by session id
-func (rp *Provider) Get(store *session.Store) error {
-	key := rp.getRedisSessionKey(store.GetSessionID())
+func (p *Provider) Get(store *session.Store) error {
+	key := p.getRedisSessionKey(store.GetSessionID())
 
-	reply, err := rp.db.Get(key).Bytes()
+	reply, err := p.db.Get(key).Bytes()
 	if err != nil && err != redis.Nil {
 		return err
 	}
 
 	if len(reply) > 0 { // Exist
-		err = rp.config.UnSerializeFunc(store.DataPointer(), reply)
+		err = p.config.UnSerializeFunc(store.DataPointer(), reply)
 		if err != nil {
 			return err
 		}
@@ -125,14 +125,14 @@ func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
 }
 
 // Destroy destroy session by sessionID
-func (rp *Provider) Destroy(id []byte) error {
-	key := rp.getRedisSessionKey(id)
-	return rp.db.Del(key).Err()
+func (p *Provider) Destroy(id []byte) error {
+	key := p.getRedisSessionKey(id)
+	return p.db.Del(key).Err()
 }
 
 // Count session values count
-func (rp *Provider) Count() int {
-	reply, err := rp.db.Keys(rp.getRedisSessionKey(all)).Result()
+func (p *Provider) Count() int {
+	reply, err := p.db.Keys(p.getRedisSessionKey(all)).Result()
 	if err != nil {
 		return 0
 	}
@@ -141,9 +141,9 @@ func (rp *Provider) Count() int {
 }
 
 // NeedGC not need gc
-func (rp *Provider) NeedGC() bool {
+func (p *Provider) NeedGC() bool {
 	return false
 }
 
 // GC session redis provider not need garbage collection
-func (rp *Provider) GC() {}
+func (p *Provider) GC() {}

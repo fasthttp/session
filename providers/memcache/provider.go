@@ -113,7 +113,7 @@ func (p *Provider) Save(store *session.Store) error {
 
 	releaseItem(item)
 
-	return nil
+	return err
 }
 
 // Regenerate regenerate session
