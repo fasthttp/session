@@ -5,7 +5,7 @@ import (
 	"github.com/fasthttp/session"
 )
 
-// Config session memcache configuration
+// Config configuration of provider
 type Config struct {
 	// ServerList memcache server list
 	ServerList []string
@@ -28,7 +28,7 @@ type Config struct {
 	UnSerializeFunc func(dst *session.Dict, src []byte) error
 }
 
-// Provider provider struct
+// Provider backend manager
 type Provider struct {
 	config Config
 	db     *memcache.Client

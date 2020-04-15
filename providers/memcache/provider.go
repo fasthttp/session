@@ -29,9 +29,8 @@ func releaseItem(item *memcache.Item) {
 	}
 }
 
-// New new memcache provider
+// New returns a new memcache provider configured
 func New(cfg Config) (*Provider, error) {
-	// config check
 	if len(cfg.ServerList) == 0 {
 		return nil, errConfigServerListEmpty
 	}
@@ -39,7 +38,6 @@ func New(cfg Config) (*Provider, error) {
 		return nil, errConfigMaxIdleConnsZero
 	}
 
-	// init config serialize func
 	if cfg.SerializeFunc == nil {
 		cfg.SerializeFunc = session.MSGPEncode
 	}
@@ -71,7 +69,7 @@ func (p *Provider) getMemCacheSessionKey(sessionID []byte) string {
 	return keyStr
 }
 
-// Get read session store by session id
+// Get sets the user session to the given store
 func (p *Provider) Get(store *session.Store) error {
 	key := p.getMemCacheSessionKey(store.GetSessionID())
 
@@ -81,7 +79,7 @@ func (p *Provider) Get(store *session.Store) error {
 	}
 
 	if item != nil { // Exist
-		err := p.config.UnSerializeFunc(store.DataPointer(), item.Value)
+		err := p.config.UnSerializeFunc(store.Ptr(), item.Value)
 		if err != nil {
 			return err
 		}
@@ -92,6 +90,7 @@ func (p *Provider) Get(store *session.Store) error {
 	return nil
 }
 
+// Save saves the user session from the given store
 func (p *Provider) Save(store *session.Store) error {
 	expiration := int32(store.GetExpiration().Seconds())
 	if expiration > math.MaxInt32 {
@@ -116,7 +115,8 @@ func (p *Provider) Save(store *session.Store) error {
 	return err
 }
 
-// Regenerate regenerate session
+// Regenerate updates a user session with the new session id
+// and sets the user session to the store
 func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
 	key := p.getMemCacheSessionKey(id)
 	newKey := p.getMemCacheSessionKey(newStore.GetSessionID())
@@ -140,7 +140,7 @@ func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
 			return err
 		}
 
-		if err := p.config.UnSerializeFunc(newStore.DataPointer(), newItem.Value); err != nil {
+		if err := p.config.UnSerializeFunc(newStore.Ptr(), newItem.Value); err != nil {
 			return err
 		}
 
@@ -152,21 +152,21 @@ func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
 	return nil
 }
 
-// Destroy destroy session by sessionID
+// Destroy destroys the user session from the given id
 func (p *Provider) Destroy(id []byte) error {
 	key := p.getMemCacheSessionKey(id)
 	return p.db.Delete(key)
 }
 
-// Count session values count
+// Count returns the total of users sessions stored
 func (p *Provider) Count() int {
 	return 0
 }
 
-// NeedGC not need gc
+// NeedGC indicates if the GC needs to be run
 func (p *Provider) NeedGC() bool {
 	return false
 }
 
-// GC session memcache provider not need garbage collection
+// GC destroys the expired user sessions
 func (p *Provider) GC() {}

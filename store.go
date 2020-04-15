@@ -15,76 +15,71 @@ func NewStore() *Store {
 	}
 }
 
-// Save save store
-func (s *Store) Save() error {
-	return nil
-}
-
-// Get get data by key
+// Get returns a value from the given key
 func (s *Store) Get(key string) interface{} {
 	return s.data.Get(key)
 }
 
-// GetBytes get data by key
+// GetBytes returns a value from the given key
 func (s *Store) GetBytes(key []byte) interface{} {
 	return s.data.GetBytes(key)
 }
 
-// GetAll get all data
+// GetAll returns all stored values
 func (s *Store) GetAll() Dict {
 	return *s.data
 }
 
-// DataPointer get pointer of data
-func (s *Store) DataPointer() *Dict {
+// Ptr returns the internal store pointer
+func (s *Store) Ptr() *Dict {
 	return s.data
 }
 
-// Set set data
+// Set saves a value for the given key
 func (s *Store) Set(key string, value interface{}) {
 	s.data.Set(key, value)
 }
 
-// SetBytes set data
+// SetBytes saves a value for the given key
 func (s *Store) SetBytes(key []byte, value interface{}) {
 	s.data.SetBytes(key, value)
 }
 
-// Delete delete data by key
+// Delete deletes a value from the given key
 func (s *Store) Delete(key string) {
 	s.data.Del(key)
 }
 
-// DeleteBytes delete data by key
+// DeleteBytes deletes a value from the given key
 func (s *Store) DeleteBytes(key []byte) {
 	s.data.DelBytes(key)
 }
 
-// Flush flush all data
+// Flush removes all stored values
 func (s *Store) Flush() {
 	s.data.Reset()
 }
 
-// GetSessionID get session id
+// GetSessionID returns the session id
 func (s *Store) GetSessionID() []byte {
 	return s.sessionID
 }
 
-// SetSessionID set session id
+// SetSessionID sets the session id
 func (s *Store) SetSessionID(id []byte) {
 	s.lock.Lock()
 	s.sessionID = id
 	s.lock.Unlock()
 }
 
-// SetExpiration set expiration for the session
+// SetExpiration sets the expiration for current session
 func (s *Store) SetExpiration(expiration time.Duration) error {
 	s.Set(expirationAttributeKey, expiration)
 
 	return nil
 }
 
-// GetExpiration get expiration for the session
+// GetExpiration returns the expiration for current session
 func (s *Store) GetExpiration() time.Duration {
 	expiration, ok := s.Get(expirationAttributeKey).(int64)
 	if !ok {
@@ -94,12 +89,12 @@ func (s *Store) GetExpiration() time.Duration {
 	return time.Duration(expiration)
 }
 
-// HasExpirationChanged check wether the expiration has been changed
+// HasExpirationChanged checks wether the expiration has been changed
 func (s *Store) HasExpirationChanged() bool {
 	return s.data.Has(expirationAttributeKey)
 }
 
-// Reset reset store
+// Reset resets the store
 func (s *Store) Reset() {
 	s.data.Reset()
 	s.sessionID = s.sessionID[:0]

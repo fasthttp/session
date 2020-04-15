@@ -5,17 +5,17 @@ import (
 	"net/url"
 )
 
-func (pc *Config) getPostgresDSN() string {
+func (c *Config) getPostgresDSN() string {
 	return fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?connect_timeout=%d&sslmode=disable",
-		url.QueryEscape(pc.Username),
-		pc.Password,
-		url.QueryEscape(pc.Host),
-		pc.Port,
-		url.QueryEscape(pc.Database),
-		pc.ConnTimeout)
+		url.QueryEscape(c.Username),
+		c.Password,
+		url.QueryEscape(c.Host),
+		c.Port,
+		url.QueryEscape(c.Database),
+		c.ConnTimeout)
 }
 
-// NewConfigWith instance new configuration with especific paremters
+// NewConfigWith returns a new configuration with especific paremters
 func NewConfigWith(host string, port int64, username string, password string, dbName string, tableName string) Config {
 	cf := NewDefaultConfig()
 	cf.Host = host
@@ -28,7 +28,7 @@ func NewConfigWith(host string, port int64, username string, password string, db
 	return cf
 }
 
-// NewDefaultConfig return default configuration
+// NewDefaultConfig returns a default configuration
 func NewDefaultConfig() Config {
 	return Config{
 		Host:           "127.0.0.1",

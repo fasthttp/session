@@ -13,29 +13,27 @@ import (
 
 var dbRowPool = &sync.Pool{
 	New: func() interface{} {
-		return new(DBRow)
+		return new(dbRow)
 	},
 }
 
-func acquireDBRow() *DBRow {
-	return dbRowPool.Get().(*DBRow)
+func acquireDBRow() *dbRow {
+	return dbRowPool.Get().(*dbRow)
 }
 
-func releaseDBRow(row *DBRow) {
-	row.Reset()
+func releaseDBRow(row *dbRow) {
+	row.reset()
 	dbRowPool.Put(row)
 }
 
-// Reset reset database row memory
-func (row *DBRow) Reset() {
+func (row *dbRow) reset() {
 	row.sessionID = ""
 	row.contents = ""
 	row.lastActive = 0
 }
 
-// NewDao create new database access object
-func NewDao(dsn, tableName string) (*Dao, error) {
-	db := &Dao{tableName: tableName}
+func newDao(dsn, tableName string) (*dao, error) {
+	db := &dao{tableName: tableName}
 	db.Driver = "mysql"
 	db.Dsn = dsn
 
@@ -53,8 +51,7 @@ func NewDao(dsn, tableName string) (*Dao, error) {
 	return db, err
 }
 
-// get session by sessionID
-func (db *Dao) getSessionBySessionID(sessionID []byte) (*DBRow, error) {
+func (db *dao) getSessionBySessionID(sessionID []byte) (*dbRow, error) {
 	data := acquireDBRow()
 
 	row, err := db.QueryRow(db.sqlGetSessionBySessionID, gotils.B2S(sessionID))
@@ -72,8 +69,7 @@ func (db *Dao) getSessionBySessionID(sessionID []byte) (*DBRow, error) {
 	return data, nil
 }
 
-// count sessions
-func (db *Dao) countSessions() int {
+func (db *dao) countSessions() int {
 	row, err := db.QueryRow(db.sqlCountSessions)
 	if err != nil {
 		return 0
@@ -88,27 +84,22 @@ func (db *Dao) countSessions() int {
 	return total
 }
 
-// update session by sessionID
-func (db *Dao) updateBySessionID(sessionID, contents []byte, lastActiveTime int64, expiration time.Duration) (int64, error) {
+func (db *dao) updateBySessionID(sessionID, contents []byte, lastActiveTime int64, expiration time.Duration) (int64, error) {
 	return db.Exec(db.sqlUpdateBySessionID, gotils.B2S(contents), lastActiveTime, expiration.Seconds(), gotils.B2S(sessionID))
 }
 
-// delete session by sessionID
-func (db *Dao) deleteBySessionID(sessionID []byte) (int64, error) {
+func (db *dao) deleteBySessionID(sessionID []byte) (int64, error) {
 	return db.Exec(db.sqlDeleteBySessionID, gotils.B2S(sessionID))
 }
 
-// delete session by expiration
-func (db *Dao) deleteExpiredSessions() (int64, error) {
+func (db *dao) deleteExpiredSessions() (int64, error) {
 	return db.Exec(db.sqlDeleteExpiredSessions, time.Now().Unix())
 }
 
-// insert new session
-func (db *Dao) insert(sessionID, contents []byte, lastActiveTime int64, expiration time.Duration) (int64, error) {
+func (db *dao) insert(sessionID, contents []byte, lastActiveTime int64, expiration time.Duration) (int64, error) {
 	return db.Exec(db.sqlInsert, gotils.B2S(sessionID), gotils.B2S(contents), lastActiveTime, expiration.Seconds())
 }
 
-// insert new session
-func (db *Dao) regenerate(oldID, newID []byte, lastActiveTime int64, expiration time.Duration) (int64, error) {
+func (db *dao) regenerate(oldID, newID []byte, lastActiveTime int64, expiration time.Duration) (int64, error) {
 	return db.Exec(db.sqlRegenerate, gotils.B2S(newID), lastActiveTime, expiration.Seconds(), gotils.B2S(oldID))
 }

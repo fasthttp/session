@@ -5,7 +5,7 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-// NewDefaultConfig return new default configuration
+// NewDefaultConfig returns a new default configuration
 func NewDefaultConfig() *Config {
 	config := &Config{
 		CookieName:              defaultSessionKeyName,
@@ -30,11 +30,7 @@ func NewDefaultConfig() *Config {
 }
 
 func (c *Config) defaultSessionIDGenerator() []byte {
-	b := make([]byte, c.cookieLen)
-
-	gotils.RandBytes(b)
-
-	return b
+	return gotils.RandBytes(make([]byte, c.cookieLen))
 }
 
 func (c *Config) defaultIsSecureFunc(ctx *fasthttp.RequestCtx) bool {

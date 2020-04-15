@@ -7,7 +7,7 @@ import (
 	"github.com/go-redis/redis/v7"
 )
 
-// Config session redis config
+// Config configuration of provider
 type Config struct {
 	// Redis server host
 	Host string
@@ -40,7 +40,7 @@ type Config struct {
 	UnSerializeFunc func(dst *session.Dict, src []byte) error
 }
 
-// Provider provider struct
+// Provider backend manager
 type Provider struct {
 	config Config
 	db     *redis.Client

@@ -8,7 +8,7 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-// New return new Session
+// New returns a configured provider
 func New(cfg *Config) *Session {
 	cfg.cookieLen = defaultCookieLen
 
@@ -49,7 +49,7 @@ func New(cfg *Config) *Session {
 	return session
 }
 
-// SetProvider set session provider and provider config
+// SetProvider sets the session provider used by the sessions manager
 func (s *Session) SetProvider(provider Provider) error {
 	s.provider = provider
 
@@ -60,7 +60,6 @@ func (s *Session) SetProvider(provider Provider) error {
 	return nil
 }
 
-// startGC start session gc process.
 func (s *Session) startGC() {
 	go func() {
 		defer func() {
@@ -81,7 +80,7 @@ func (s *Session) startGC() {
 
 func (s *Session) setHTTPValues(ctx *fasthttp.RequestCtx, sessionID []byte, expires time.Duration) {
 	secure := s.config.Secure && s.config.IsSecureFunc(ctx)
-	s.cookie.Set(ctx, s.config.CookieName, sessionID, s.config.Domain, expires, secure)
+	s.cookie.set(ctx, s.config.CookieName, sessionID, s.config.Domain, expires, secure)
 
 	if s.config.SessionIDInHTTPHeader {
 		ctx.Request.Header.SetBytesV(s.config.SessionNameInHTTPHeader, sessionID)
@@ -90,7 +89,7 @@ func (s *Session) setHTTPValues(ctx *fasthttp.RequestCtx, sessionID []byte, expi
 }
 
 func (s *Session) delHTTPValues(ctx *fasthttp.RequestCtx) {
-	s.cookie.Delete(ctx, s.config.CookieName)
+	s.cookie.delete(ctx, s.config.CookieName)
 
 	if s.config.SessionIDInHTTPHeader {
 		ctx.Request.Header.Del(s.config.SessionNameInHTTPHeader)
@@ -98,10 +97,10 @@ func (s *Session) delHTTPValues(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// get session id
-// 1. get session id from cookie
-// 2. get session id from http headers
-// 3. get session id from query string
+// Returns the session id from:
+// 1. cookie
+// 2. http headers
+// 3. query string
 func (s *Session) getSessionID(ctx *fasthttp.RequestCtx) []byte {
 	val := ctx.Request.Header.Cookie(s.config.CookieName)
 	if len(val) > 0 {
@@ -120,16 +119,13 @@ func (s *Session) getSessionID(ctx *fasthttp.RequestCtx) []byte {
 		if len(val) > 0 {
 			return val
 		}
-
 	}
 
 	return nil
 }
 
-// Get get user session from provider
-// 1. get sessionID from fasthttp ctx
-// 2. if sessionID is empty, generator sessionID and set response Set-Cookie
-// 3. return session provider store
+// Get returns the user session
+// if it does not exist, it will be generated
 func (s *Session) Get(ctx *fasthttp.RequestCtx) (*Store, error) {
 	if s.provider == nil {
 		return nil, errNotSetProvider
@@ -154,12 +150,9 @@ func (s *Session) Get(ctx *fasthttp.RequestCtx) (*Store, error) {
 	return store, nil
 }
 
-// Save save the user session with current store
+// Save saves the user session
 //
-// Use this function if you want to avoid some extra-allocations
-// This will save the store into provider and will return it to the pool
-//
-// Warning: Don't use more the store after exec this function, because, you will lose the after data
+// Warning: Don't use the store after exec this function, because, you will lose the after data
 // For avoid it, defer this function in your request handler
 func (s *Session) Save(ctx *fasthttp.RequestCtx, store *Store) error {
 	if err := s.provider.Save(store); err != nil {
@@ -174,7 +167,7 @@ func (s *Session) Save(ctx *fasthttp.RequestCtx, store *Store) error {
 	return nil
 }
 
-// Regenerate regenerate a session id for this Storer
+// Regenerate generates a new session id to the current user
 func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) (*Store, error) {
 	if s.provider == nil {
 		return nil, errNotSetProvider
@@ -199,7 +192,7 @@ func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) (*Store, error) {
 	return store, nil
 }
 
-// Destroy destroy session in fasthttp ctx
+// Destroy destroys the session of the current user
 func (s *Session) Destroy(ctx *fasthttp.RequestCtx) error {
 	sessionID := s.getSessionID(ctx)
 	if len(sessionID) == 0 {

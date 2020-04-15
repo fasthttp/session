@@ -6,18 +6,15 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-// newCookie return new cookie instance
 func newCookie() *cookie {
 	return new(cookie)
 }
 
-// Get get cookie by name
-func (c *cookie) Get(ctx *fasthttp.RequestCtx, name string) []byte {
+func (c *cookie) get(ctx *fasthttp.RequestCtx, name string) []byte {
 	return ctx.Request.Header.Cookie(name)
 }
 
-// Set response set cookie
-func (c *cookie) Set(ctx *fasthttp.RequestCtx, name string, value []byte, domain string, expires time.Duration, secure bool) {
+func (c *cookie) set(ctx *fasthttp.RequestCtx, name string, value []byte, domain string, expires time.Duration, secure bool) {
 	cookie := fasthttp.AcquireCookie()
 
 	cookie.SetKey(name)
@@ -44,14 +41,11 @@ func (c *cookie) Set(ctx *fasthttp.RequestCtx, name string, value []byte, domain
 	fasthttp.ReleaseCookie(cookie)
 }
 
-// Delete delete cookie by cookie name
-func (c *cookie) Delete(ctx *fasthttp.RequestCtx, name string) {
-	// delete response cookie
+func (c *cookie) delete(ctx *fasthttp.RequestCtx, name string) {
+	ctx.Request.Header.DelCookie(name)
 	ctx.Response.Header.DelCookie(name)
 
-	// reset response cookie
 	cookie := fasthttp.AcquireCookie()
-
 	cookie.SetKey(name)
 	cookie.SetValue("")
 	cookie.SetPath("/")
@@ -60,9 +54,6 @@ func (c *cookie) Delete(ctx *fasthttp.RequestCtx, name string) {
 	exp := time.Now().Add(-time.Duration(1) * time.Minute)
 	cookie.SetExpire(exp)
 	ctx.Response.Header.SetCookie(cookie)
-
-	// delete request's cookie also
-	ctx.Request.Header.DelCookie(name)
 
 	fasthttp.ReleaseCookie(cookie)
 }

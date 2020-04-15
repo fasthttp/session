@@ -4,10 +4,10 @@ import (
 	"github.com/fasthttp/session"
 )
 
-// Config session memory configuration
+// Config configuration of provider
 type Config struct{}
 
-// Provider provider struct
+// Provider backend manager
 type Provider struct {
 	config Config
 	db     *session.Dict

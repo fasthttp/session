@@ -10,9 +10,8 @@ import (
 
 var all = []byte("*")
 
-// New new redis provider
+// New returns a new redis provider configured
 func New(cfg Config) (*Provider, error) {
-	// config check
 	if cfg.Host == "" {
 		return nil, errConfigHostEmpty
 	}
@@ -26,7 +25,6 @@ func New(cfg Config) (*Provider, error) {
 		return nil, errConfigIdleTimeoutZero
 	}
 
-	// init config serialize func
 	if cfg.SerializeFunc == nil {
 		cfg.SerializeFunc = session.MSGPEncode
 	}
@@ -34,7 +32,6 @@ func New(cfg Config) (*Provider, error) {
 		cfg.UnSerializeFunc = session.MSGPDecode
 	}
 
-	// create redis conn pool
 	db := redis.NewClient(&redis.Options{
 		Addr:        fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
 		Password:    cfg.Password,
@@ -43,7 +40,6 @@ func New(cfg Config) (*Provider, error) {
 		IdleTimeout: cfg.IdleTimeout,
 	})
 
-	// check redis conn
 	if err := db.Ping().Err(); err != nil {
 		return nil, errRedisConnection(err)
 	}
@@ -56,7 +52,6 @@ func New(cfg Config) (*Provider, error) {
 	return p, nil
 }
 
-// get redis session key, prefix:sessionID
 func (p *Provider) getRedisSessionKey(sessionID []byte) string {
 	key := bytebufferpool.Get()
 	key.SetString(p.config.KeyPrefix)
@@ -80,7 +75,7 @@ func (p *Provider) Get(store *session.Store) error {
 	}
 
 	if len(reply) > 0 { // Exist
-		err = p.config.UnSerializeFunc(store.DataPointer(), reply)
+		err = p.config.UnSerializeFunc(store.Ptr(), reply)
 		if err != nil {
 			return err
 		}
@@ -90,7 +85,7 @@ func (p *Provider) Get(store *session.Store) error {
 
 }
 
-// Put put store into the pool.
+// Save saves the user session from the given store
 func (p *Provider) Save(store *session.Store) error {
 	data := store.GetAll()
 	b, err := p.config.SerializeFunc(data)
@@ -101,7 +96,8 @@ func (p *Provider) Save(store *session.Store) error {
 	return p.db.Set(p.getRedisSessionKey(store.GetSessionID()), b, store.GetExpiration()).Err()
 }
 
-// Regenerate regenerate session
+// Regenerate updates a user session with the new session id
+// and sets the user session to the store
 func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
 	key := p.getRedisSessionKey(id)
 	newKey := p.getRedisSessionKey(newStore.GetSessionID())
@@ -124,13 +120,13 @@ func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
 	return p.Get(newStore)
 }
 
-// Destroy destroy session by sessionID
+// Destroy destroys the user session from the given id
 func (p *Provider) Destroy(id []byte) error {
 	key := p.getRedisSessionKey(id)
 	return p.db.Del(key).Err()
 }
 
-// Count session values count
+// Count returns the total of users sessions stored
 func (p *Provider) Count() int {
 	reply, err := p.db.Keys(p.getRedisSessionKey(all)).Result()
 	if err != nil {
@@ -140,10 +136,10 @@ func (p *Provider) Count() int {
 	return len(reply)
 }
 
-// NeedGC not need gc
+// NeedGC indicates if the GC needs to be run
 func (p *Provider) NeedGC() bool {
 	return false
 }
 
-// GC session redis provider not need garbage collection
+// GC destroys the expired user sessions
 func (p *Provider) GC() {}

@@ -5,22 +5,21 @@ import (
 	"net/url"
 )
 
-// get mysql dsn
-func (mc *Config) getMysqlDSN() string {
+func (c *Config) getMysqlDSN() string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?timeout=%dms&readTimeout=%dms&writeTimeout=%dms&charset=%s&collation=%s",
-		url.QueryEscape(mc.Username),
-		mc.Password,
-		url.QueryEscape(mc.Host),
-		mc.Port,
-		url.QueryEscape(mc.Database),
-		mc.Timeout,
-		mc.ReadTimeout,
-		mc.WriteTimeout,
-		url.QueryEscape(mc.Charset),
-		url.QueryEscape(mc.Collate))
+		url.QueryEscape(c.Username),
+		c.Password,
+		url.QueryEscape(c.Host),
+		c.Port,
+		url.QueryEscape(c.Database),
+		c.Timeout,
+		c.ReadTimeout,
+		c.WriteTimeout,
+		url.QueryEscape(c.Charset),
+		url.QueryEscape(c.Collate))
 }
 
-// NewConfigWith return new configuration with especific paremters
+// NewConfigWith returns a new configuration with especific paremters
 func NewConfigWith(host string, port int, user, pass, dbName, tableName string) Config {
 	cf := NewDefaultConfig()
 	cf.Host = host
@@ -33,7 +32,7 @@ func NewConfigWith(host string, port int, user, pass, dbName, tableName string) 
 	return cf
 }
 
-// NewDefaultConfig return default configuration
+// NewDefaultConfig returns a default configuration
 func NewDefaultConfig() Config {
 	return Config{
 		Charset:        "utf8",

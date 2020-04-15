@@ -1,6 +1,6 @@
 package sqlite3
 
-// NewConfigWith instance new configuration with especific paremters
+// NewConfigWith returns a new configuration with especific paremters
 func NewConfigWith(dbPath, tableName string) Config {
 	cf := NewDefaultConfig()
 	cf.DBPath = dbPath
@@ -9,7 +9,7 @@ func NewConfigWith(dbPath, tableName string) Config {
 	return cf
 }
 
-// NewDefaultConfig return default configuration
+// NewDefaultConfig returns a default configuration
 func NewDefaultConfig() Config {
 	return Config{
 		DBPath:         "./",

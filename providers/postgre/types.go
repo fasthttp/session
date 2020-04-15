@@ -4,10 +4,10 @@ import (
 	"time"
 
 	"github.com/fasthttp/session"
-	"github.com/savsgio/gotils/dao"
+	gotilsDao "github.com/savsgio/gotils/dao"
 )
 
-// Config session postgres configuration
+// Config configuration of provider
 type Config struct {
 	// The host to connect to. Values that start with / are for unix domain sockets. (default is localhost)
 	Host string
@@ -44,15 +44,14 @@ type Config struct {
 	UnSerializeFunc func(dst *session.Dict, src []byte) error
 }
 
-// Provider provider struct
+// Provider backend manager
 type Provider struct {
 	config Config
-	db     *Dao
+	db     *dao
 }
 
-// Dao database access object
-type Dao struct {
-	dao.Dao
+type dao struct {
+	gotilsDao.Dao
 
 	tableName string
 
@@ -65,8 +64,7 @@ type Dao struct {
 	sqlRegenerate            string
 }
 
-// DBRow database row definition
-type DBRow struct {
+type dbRow struct {
 	sessionID  string
 	contents   string
 	lastActive int64

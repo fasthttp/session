@@ -7,7 +7,7 @@ import (
 	"github.com/savsgio/gotils"
 )
 
-// New new postgres provider
+// New returns a new postgre provider configured
 func New(cfg Config) (*Provider, error) {
 	if cfg.Host == "" {
 		return nil, errConfigHostEmpty
@@ -23,7 +23,7 @@ func New(cfg Config) (*Provider, error) {
 		cfg.UnSerializeFunc = session.Base64Decode
 	}
 
-	db, err := NewDao(cfg.getPostgresDSN(), cfg.TableName)
+	db, err := newDao(cfg.getPostgresDSN(), cfg.TableName)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func New(cfg Config) (*Provider, error) {
 	return p, nil
 }
 
-// Get read session store by session id
+// Get sets the user session to the given store
 func (p *Provider) Get(store *session.Store) error {
 	row, err := p.db.getSessionBySessionID(store.GetSessionID())
 	if err != nil {
@@ -51,7 +51,7 @@ func (p *Provider) Get(store *session.Store) error {
 	}
 
 	if row.sessionID != "" { // Exist
-		err = p.config.UnSerializeFunc(store.DataPointer(), gotils.S2B(row.contents))
+		err = p.config.UnSerializeFunc(store.Ptr(), gotils.S2B(row.contents))
 		if err != nil {
 			return err
 		}
@@ -68,7 +68,7 @@ func (p *Provider) Get(store *session.Store) error {
 	return nil
 }
 
-// Put put store into the pool.
+// Save saves the user session from the given store
 func (p *Provider) Save(store *session.Store) error {
 	data := store.GetAll()
 	value, err := p.config.SerializeFunc(data)
@@ -81,7 +81,8 @@ func (p *Provider) Save(store *session.Store) error {
 	return err
 }
 
-// Regenerate regenerate session
+// Regenerate updates a user session with the new session id
+// and sets the user session to the store
 func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
 	row, err := p.db.getSessionBySessionID(id)
 	if err != nil {
@@ -96,7 +97,7 @@ func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
 			return err
 		}
 
-		err = p.config.UnSerializeFunc(newStore.DataPointer(), gotils.S2B(row.contents))
+		err = p.config.UnSerializeFunc(newStore.Ptr(), gotils.S2B(row.contents))
 		if err != nil {
 			return err
 		}
@@ -113,23 +114,23 @@ func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
 	return nil
 }
 
-// Destroy destroy session by sessionID
+// Destroy destroys the user session from the given id
 func (p *Provider) Destroy(id []byte) error {
 	_, err := p.db.deleteBySessionID(id)
 	return err
 }
 
-// Count session values count
+// Count returns the total of users sessions stored
 func (p *Provider) Count() int {
 	return p.db.countSessions()
 }
 
-// NeedGC need gc
+// NeedGC indicates if the GC needs to be run
 func (p *Provider) NeedGC() bool {
 	return true
 }
 
-// GC session garbage collection
+// GC destroys the expired user sessions
 func (p *Provider) GC() {
 	_, err := p.db.deleteExpiredSessions()
 	if err != nil {

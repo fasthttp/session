@@ -8,7 +8,7 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-// Config config struct
+// Config configuration of session manager
 type Config struct {
 	// cookie name
 	CookieName string
@@ -52,7 +52,7 @@ type Config struct {
 	cookieLen uint32
 }
 
-// Session session struct
+// Session manages the users sessions
 type Session struct {
 	provider Provider
 	config   *Config
@@ -66,7 +66,7 @@ type Dict struct {
 	dictpool.Dict
 }
 
-// Store store
+// Store represents the user session
 type Store struct {
 	sessionID         []byte
 	data              *Dict
@@ -74,10 +74,9 @@ type Store struct {
 	lock              sync.RWMutex
 }
 
-// Cookie cookie struct
 type cookie struct{}
 
-// Provider provider interface
+// Provider interface implemented by providers
 type Provider interface {
 	Get(store *Store) error
 	Save(store *Store) error
