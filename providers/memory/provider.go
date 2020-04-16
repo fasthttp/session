@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fasthttp/session"
+	"github.com/fasthttp/session/v2"
 	"github.com/savsgio/gotils"
 )
 

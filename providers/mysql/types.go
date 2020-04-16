@@ -3,7 +3,7 @@ package mysql
 import (
 	"time"
 
-	"github.com/fasthttp/session"
+	"github.com/fasthttp/session/v2"
 	gotilsDao "github.com/savsgio/gotils/dao"
 )
 

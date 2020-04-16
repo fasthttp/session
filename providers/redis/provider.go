@@ -3,7 +3,7 @@ package redis
 import (
 	"fmt"
 
-	"github.com/fasthttp/session"
+	"github.com/fasthttp/session/v2"
 	"github.com/go-redis/redis/v7"
 	"github.com/valyala/bytebufferpool"
 )

@@ -6,13 +6,13 @@ import (
 	"time"
 
 	"github.com/fasthttp/router"
-	"github.com/fasthttp/session"
-	"github.com/fasthttp/session/providers/memcache"
-	"github.com/fasthttp/session/providers/memory"
-	"github.com/fasthttp/session/providers/mysql"
-	"github.com/fasthttp/session/providers/postgre"
-	"github.com/fasthttp/session/providers/redis"
-	"github.com/fasthttp/session/providers/sqlite3"
+	"github.com/fasthttp/session/v2"
+	"github.com/fasthttp/session/v2/providers/memcache"
+	"github.com/fasthttp/session/v2/providers/memory"
+	"github.com/fasthttp/session/v2/providers/mysql"
+	"github.com/fasthttp/session/v2/providers/postgre"
+	"github.com/fasthttp/session/v2/providers/redis"
+	"github.com/fasthttp/session/v2/providers/sqlite3"
 	"github.com/valyala/fasthttp"
 )
 

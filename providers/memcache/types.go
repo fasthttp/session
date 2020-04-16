@@ -2,7 +2,7 @@ package memcache
 
 import (
 	"github.com/bradfitz/gomemcache/memcache"
-	"github.com/fasthttp/session"
+	"github.com/fasthttp/session/v2"
 )
 
 // Config configuration of provider

@@ -3,7 +3,7 @@ package redis
 import (
 	"time"
 
-	"github.com/fasthttp/session"
+	"github.com/fasthttp/session/v2"
 	"github.com/go-redis/redis/v7"
 )
 

@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/bradfitz/gomemcache/memcache"
-	"github.com/fasthttp/session"
+	"github.com/fasthttp/session/v2"
 	"github.com/valyala/bytebufferpool"
 )
 
