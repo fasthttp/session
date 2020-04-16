@@ -148,7 +148,7 @@ func TestSession_stopGC(t *testing.T) {
 	select {
 	case <-s.stopGCChan:
 	case <-time.After(200 * time.Millisecond):
-		t.Error("Signal for stop GC does not send")
+		t.Error("Signal for stop GC is not sent")
 	}
 }
 
