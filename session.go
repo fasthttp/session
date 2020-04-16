@@ -15,15 +15,17 @@ func New(cfg Config) *Session {
 	if cfg.CookieName == "" {
 		cfg.CookieName = defaultSessionKeyName
 	}
-	if cfg.SessionIDInHTTPHeader && cfg.SessionNameInHTTPHeader == "" {
-		cfg.SessionNameInHTTPHeader = defaultSessionKeyName
+
+	if cfg.GCLifetime == 0 {
+		cfg.GCLifetime = defaultGCLifetime
 	}
+
 	if cfg.SessionIDInURLQuery && cfg.SessionNameInURLQuery == "" {
 		cfg.SessionNameInURLQuery = defaultSessionKeyName
 	}
 
-	if cfg.GCLifetime == 0 {
-		cfg.GCLifetime = defaultGCLifetime
+	if cfg.SessionIDInHTTPHeader && cfg.SessionNameInHTTPHeader == "" {
+		cfg.SessionNameInHTTPHeader = defaultSessionKeyName
 	}
 
 	if cfg.SessionIDGeneratorFunc == nil {
@@ -52,28 +54,27 @@ func (s *Session) SetProvider(provider Provider) error {
 	s.provider = provider
 
 	if s.provider.NeedGC() {
-		s.startGC()
+		go s.startGC()
 	}
 
 	return nil
 }
 
 func (s *Session) startGC() {
-	go func() {
-		defer func() {
-			e := recover()
-			if e != nil {
-				panic(fmt.Errorf("session gc crash, %v", e))
-			}
-		}()
-
-		for {
-			select {
-			case <-time.After(s.config.GCLifetime):
-				s.provider.GC()
-			}
+	defer func() {
+		e := recover()
+		if e != nil {
+			panic(fmt.Errorf("session GC crash: %v", e))
 		}
 	}()
+
+	for {
+		select {
+		case <-time.After(s.config.GCLifetime):
+			s.provider.GC()
+		}
+	}
+
 }
 
 func (s *Session) setHTTPValues(ctx *fasthttp.RequestCtx, sessionID []byte, expires time.Duration) {
@@ -192,6 +193,10 @@ func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) (*Store, error) {
 
 // Destroy destroys the session of the current user
 func (s *Session) Destroy(ctx *fasthttp.RequestCtx) error {
+	if s.provider == nil {
+		return errNotSetProvider
+	}
+
 	sessionID := s.getSessionID(ctx)
 	if len(sessionID) == 0 {
 		return nil
