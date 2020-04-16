@@ -11,5 +11,5 @@ require (
 	github.com/savsgio/dictpool v0.0.0-20200414074025-215dfcb77c2c
 	github.com/savsgio/gotils v0.0.0-20200413113635-8c468ce75cca
 	github.com/valyala/bytebufferpool v1.0.0
-	github.com/valyala/fasthttp v1.9.0
+	github.com/valyala/fasthttp v1.10.0
 )
