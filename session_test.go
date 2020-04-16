@@ -104,12 +104,12 @@ func TestSession_SetProvider(t *testing.T) {
 	provider := &mockProvider{needGCValue: true}
 
 	s.SetProvider(provider)
+	time.Sleep(s.config.GCLifetime + 100*time.Millisecond)
+	s.stopGC()
 
 	if s.provider != provider {
 		t.Errorf("Session.SetProvider() provider == %p, want %p", s.provider, provider)
 	}
-
-	time.Sleep(s.config.GCLifetime + 100*time.Millisecond)
 
 	if !provider.gcExecuted {
 		t.Error("GC is not executed")
@@ -136,6 +136,20 @@ func TestSession_startGC(t *testing.T) {
 	s.startGC()
 
 	time.Sleep(s.config.GCLifetime + 100*time.Millisecond)
+}
+
+func TestSession_stopGC(t *testing.T) {
+	s := New(Config{
+		GCLifetime: 100 * time.Millisecond,
+	})
+
+	go s.stopGC()
+
+	select {
+	case <-s.stopGCChan:
+	case <-time.After(200 * time.Millisecond):
+		t.Error("Signal for stop GC does not send")
+	}
 }
 
 func TestSession_setHTTPValues(t *testing.T) {

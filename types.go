@@ -58,7 +58,8 @@ type Session struct {
 	config   Config
 	cookie   *cookie
 
-	storePool *sync.Pool
+	storePool  *sync.Pool
+	stopGCChan chan struct{}
 }
 
 // Dict memory store

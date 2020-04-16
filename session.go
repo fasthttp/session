@@ -44,6 +44,7 @@ func New(cfg Config) *Session {
 				return NewStore()
 			},
 		},
+		stopGCChan: make(chan struct{}),
 	}
 
 	return session
@@ -72,9 +73,14 @@ func (s *Session) startGC() {
 		select {
 		case <-time.After(s.config.GCLifetime):
 			s.provider.GC()
+		case <-s.stopGCChan:
+			return
 		}
 	}
+}
 
+func (s *Session) stopGC() {
+	s.stopGCChan <- struct{}{}
 }
 
 func (s *Session) setHTTPValues(ctx *fasthttp.RequestCtx, sessionID []byte, expires time.Duration) {
