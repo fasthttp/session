@@ -51,7 +51,7 @@ func (c *cookie) delete(ctx *fasthttp.RequestCtx, name string) {
 	cookie.SetPath("/")
 	cookie.SetHTTPOnly(true)
 	//RFC says 1 second, but let's do it 1 minute to make sure is working...
-	exp := time.Now().Add(-time.Duration(1) * time.Minute)
+	exp := time.Now().Add(-1 * time.Minute)
 	cookie.SetExpire(exp)
 	ctx.Response.Header.SetCookie(cookie)
 

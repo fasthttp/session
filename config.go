@@ -6,8 +6,8 @@ import (
 )
 
 // NewDefaultConfig returns a new default configuration
-func NewDefaultConfig() *Config {
-	config := &Config{
+func NewDefaultConfig() Config {
+	config := Config{
 		CookieName:              defaultSessionKeyName,
 		Domain:                  defaultDomain,
 		Expires:                 defaultExpires,

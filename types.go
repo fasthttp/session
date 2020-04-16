@@ -55,7 +55,7 @@ type Config struct {
 // Session manages the users sessions
 type Session struct {
 	provider Provider
-	config   *Config
+	config   Config
 	cookie   *cookie
 
 	storePool *sync.Pool

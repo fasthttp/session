@@ -8,8 +8,8 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-// New returns a configured provider
-func New(cfg *Config) *Session {
+// New returns a configured manager
+func New(cfg Config) *Session {
 	cfg.cookieLen = defaultCookieLen
 
 	if cfg.CookieName == "" {
@@ -39,9 +39,7 @@ func New(cfg *Config) *Session {
 		cookie: newCookie(),
 		storePool: &sync.Pool{
 			New: func() interface{} {
-				return &Store{
-					data: new(Dict),
-				}
+				return NewStore()
 			},
 		},
 	}

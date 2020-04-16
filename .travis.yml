@@ -13,7 +13,7 @@ os:
   - osx
 
 script:
-    # build test for supported platforms
+  # build test for supported platforms
   - GOOS=linux go build
   - GOOS=darwin go build
   - GOOS=freebsd go build
@@ -28,8 +28,8 @@ script:
         GOARCH=386 go build
     fi
 
-   # run tests on a standard platform
-  - go test -v ./...
+  # run tests on a standard platform
+  - go test -v -cover ./...
 
   # run tests with the race detector as well
-  - go test -race -v ./...
+  - go test -v -cover -race ./...
