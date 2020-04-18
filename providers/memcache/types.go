@@ -2,7 +2,6 @@ package memcache
 
 import (
 	"github.com/bradfitz/gomemcache/memcache"
-	"github.com/fasthttp/session/v2"
 )
 
 // Config configuration of provider
@@ -20,12 +19,6 @@ type Config struct {
 
 	// KeyPrefix sessionID as memcache key prefix
 	KeyPrefix string
-
-	// SerializeFunc session value serialize func
-	SerializeFunc func(src session.Dict) ([]byte, error)
-
-	// UnSerializeFunc session value unSerialize func
-	UnSerializeFunc func(dst *session.Dict, src []byte) error
 }
 
 // Provider backend manager

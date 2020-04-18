@@ -3,8 +3,7 @@ package mysql
 import (
 	"time"
 
-	"github.com/fasthttp/session/v2"
-	gotilsDao "github.com/savsgio/gotils/dao"
+	"github.com/fasthttp/session/v2/internal/sql"
 )
 
 // Config configuration of provider
@@ -33,51 +32,28 @@ type Config struct {
 	// session table name
 	TableName string
 
-	// mysql conn timeout(s)
-	Timeout int
+	// mysql conn timeout
+	Timeout time.Duration
 
-	// mysql read timeout(s)
-	ReadTimeout int
+	// mysql read timeout
+	ReadTimeout time.Duration
 
-	// mysql write timeout(s)
-	WriteTimeout int
+	// mysql write timeout
+	WriteTimeout time.Duration
 
 	// mysql max free idle
-	SetMaxIdleConn int
+	MaxIdleConn int
 
 	// mysql max open idle
-	SetMaxOpenConn int
+	MaxOpenConn int
 
-	// session value serialize func
-	SerializeFunc func(src session.Dict) ([]byte, error)
-
-	// session value unSerialize func
-	UnSerializeFunc func(dst *session.Dict, src []byte) error
+	// mysql conn max open idle
+	ConnMaxLifetime time.Duration
 }
 
 // Provider backend manager
 type Provider struct {
 	config Config
-	db     *dao
-}
 
-type dao struct {
-	gotilsDao.Dao
-
-	tableName string
-
-	sqlGetSessionBySessionID string
-	sqlCountSessions         string
-	sqlUpdateBySessionID     string
-	sqlDeleteBySessionID     string
-	sqlDeleteExpiredSessions string
-	sqlInsert                string
-	sqlRegenerate            string
-}
-
-type dbRow struct {
-	sessionID  string
-	contents   string
-	lastActive int64
-	expiration time.Duration
+	*sql.Provider
 }

@@ -36,6 +36,13 @@ func New(cfg Config) *Session {
 		cfg.IsSecureFunc = cfg.defaultIsSecureFunc
 	}
 
+	if cfg.EncodeFunc == nil {
+		cfg.EncodeFunc = Base64Encode
+	}
+	if cfg.DecodeFunc == nil {
+		cfg.DecodeFunc = Base64Decode
+	}
+
 	session := &Session{
 		config: cfg,
 		cookie: newCookie(),
@@ -83,9 +90,9 @@ func (s *Session) stopGC() {
 	s.stopGCChan <- struct{}{}
 }
 
-func (s *Session) setHTTPValues(ctx *fasthttp.RequestCtx, sessionID []byte, expires time.Duration) {
+func (s *Session) setHTTPValues(ctx *fasthttp.RequestCtx, sessionID []byte, expiration time.Duration) {
 	secure := s.config.Secure && s.config.IsSecureFunc(ctx)
-	s.cookie.set(ctx, s.config.CookieName, sessionID, s.config.Domain, expires, secure)
+	s.cookie.set(ctx, s.config.CookieName, sessionID, s.config.Domain, expiration, secure)
 
 	if s.config.SessionIDInHTTPHeader {
 		ctx.Request.Header.SetBytesV(s.config.SessionNameInHTTPHeader, sessionID)
@@ -136,20 +143,31 @@ func (s *Session) Get(ctx *fasthttp.RequestCtx) (*Store, error) {
 		return nil, errNotSetProvider
 	}
 
+	newUser := false
+
 	id := s.getSessionID(ctx)
 	if len(id) == 0 {
 		id = s.config.SessionIDGeneratorFunc()
 		if len(id) == 0 {
 			return nil, errEmptySessionID
 		}
+
+		newUser = true
 	}
 
 	store := s.storePool.Get().(*Store)
 	store.sessionID = id
-	store.defaultExpiration = s.config.Expires
+	store.defaultExpiration = s.config.Expiration
 
-	if err := s.provider.Get(store); err != nil {
-		return nil, err
+	if !newUser {
+		data, err := s.provider.Get(id)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := s.config.DecodeFunc(store.data, data); err != nil {
+			return store, nil
+		}
 	}
 
 	return store, nil
@@ -160,11 +178,22 @@ func (s *Session) Get(ctx *fasthttp.RequestCtx) (*Store, error) {
 // Warning: Don't use the store after exec this function, because, you will lose the after data
 // For avoid it, defer this function in your request handler
 func (s *Session) Save(ctx *fasthttp.RequestCtx, store *Store) error {
-	if err := s.provider.Save(store); err != nil {
+	if s.provider == nil {
+		return errNotSetProvider
+	}
+
+	id := store.GetSessionID()
+
+	data, err := s.config.EncodeFunc(store.GetAll())
+	if err != nil {
+		return nil
+	}
+
+	if err := s.provider.Save(id, data, store.GetExpiration()); err != nil {
 		return err
 	}
 
-	s.setHTTPValues(ctx, store.GetSessionID(), store.GetExpiration())
+	s.setHTTPValues(ctx, id, store.GetExpiration())
 
 	store.Reset()
 	s.storePool.Put(store)
@@ -173,28 +202,28 @@ func (s *Session) Save(ctx *fasthttp.RequestCtx, store *Store) error {
 }
 
 // Regenerate generates a new session id to the current user
-func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) (*Store, error) {
+func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) error {
 	if s.provider == nil {
-		return nil, errNotSetProvider
+		return errNotSetProvider
 	}
+
+	id := s.getSessionID(ctx)
+	// if len(id) == 0 {
+	// 	return nil
+	// }
 
 	newID := s.config.SessionIDGeneratorFunc()
 	if len(newID) == 0 {
-		return nil, errEmptySessionID
-	}
-	id := s.getSessionID(ctx)
-
-	store := s.storePool.Get().(*Store)
-	store.sessionID = newID
-	store.defaultExpiration = s.config.Expires
-
-	if err := s.provider.Regenerate(id, store); err != nil {
-		return nil, err
+		return errEmptySessionID
 	}
 
-	s.setHTTPValues(ctx, newID, store.GetExpiration())
+	if err := s.provider.Regenerate(id, newID, s.config.Expiration); err != nil {
+		return err
+	}
 
-	return store, nil
+	s.setHTTPValues(ctx, newID, s.config.Expiration)
+
+	return nil
 }
 
 // Destroy destroys the session of the current user

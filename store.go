@@ -73,11 +73,9 @@ func (s *Store) SetSessionID(id []byte) {
 	s.lock.Unlock()
 }
 
-// SetExpiration sets the expiration for current session
-func (s *Store) SetExpiration(expiration time.Duration) error {
-	s.Set(expirationAttrKey, expiration)
-
-	return nil
+// HasExpirationChanged checks wether the expiration has been changed
+func (s *Store) HasExpirationChanged() bool {
+	return s.data.Has(expirationAttrKey)
 }
 
 // GetExpiration returns the expiration for current session
@@ -90,9 +88,11 @@ func (s *Store) GetExpiration() time.Duration {
 	return expiration
 }
 
-// HasExpirationChanged checks wether the expiration has been changed
-func (s *Store) HasExpirationChanged() bool {
-	return s.data.Has(expirationAttrKey)
+// SetExpiration sets the expiration for current session
+func (s *Store) SetExpiration(expiration time.Duration) error {
+	s.Set(expirationAttrKey, expiration)
+
+	return nil
 }
 
 // Reset resets the store

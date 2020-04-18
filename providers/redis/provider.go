@@ -2,6 +2,7 @@ package redis
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/fasthttp/session/v2"
 	"github.com/go-redis/redis/v7"
@@ -66,41 +67,30 @@ func (p *Provider) getRedisSessionKey(sessionID []byte) string {
 }
 
 // Get read session store by session id
-func (p *Provider) Get(store *session.Store) error {
-	key := p.getRedisSessionKey(store.GetSessionID())
+func (p *Provider) Get(id []byte) ([]byte, error) {
+	key := p.getRedisSessionKey(id)
 
 	reply, err := p.db.Get(key).Bytes()
 	if err != nil && err != redis.Nil {
-		return err
+		return nil, err
 	}
 
-	if len(reply) > 0 { // Exist
-		err = p.config.UnSerializeFunc(store.Ptr(), reply)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return reply, nil
 
 }
 
 // Save saves the user session from the given store
-func (p *Provider) Save(store *session.Store) error {
-	data := store.GetAll()
-	b, err := p.config.SerializeFunc(data)
-	if err != nil {
-		return err
-	}
+func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
+	key := p.getRedisSessionKey(id)
 
-	return p.db.Set(p.getRedisSessionKey(store.GetSessionID()), b, store.GetExpiration()).Err()
+	return p.db.Set(key, data, expiration).Err()
 }
 
 // Regenerate updates a user session with the new session id
 // and sets the user session to the store
-func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
+func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error {
 	key := p.getRedisSessionKey(id)
-	newKey := p.getRedisSessionKey(newStore.GetSessionID())
+	newKey := p.getRedisSessionKey(newID)
 
 	exists, err := p.db.Exists(key).Result()
 	if err != nil {
@@ -112,17 +102,18 @@ func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
 			return err
 		}
 
-		if err = p.db.Expire(newKey, newStore.GetExpiration()).Err(); err != nil {
+		if err = p.db.Expire(newKey, expiration).Err(); err != nil {
 			return err
 		}
 	}
 
-	return p.Get(newStore)
+	return nil
 }
 
 // Destroy destroys the user session from the given id
 func (p *Provider) Destroy(id []byte) error {
 	key := p.getRedisSessionKey(id)
+
 	return p.db.Del(key).Err()
 }
 

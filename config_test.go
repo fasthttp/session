@@ -18,8 +18,8 @@ func Test_NewDefaultConfig(t *testing.T) {
 		t.Errorf("NewDefaultConfig().Domain == %s, want %s", cfg.Domain, defaultDomain)
 	}
 
-	if cfg.Expires != defaultExpires {
-		t.Errorf("NewDefaultConfig().Expires == %d, want %d", cfg.Expires, defaultExpires)
+	if cfg.Expiration != defaultExpiration {
+		t.Errorf("NewDefaultConfig().Expiration == %d, want %d", cfg.Expiration, defaultExpiration)
 	}
 
 	if cfg.GCLifetime != defaultGCLifetime {

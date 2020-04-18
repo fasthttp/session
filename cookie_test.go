@@ -37,11 +37,11 @@ func TestCookie_set(t *testing.T) {
 	value := []byte("value")
 	path := "/"
 	domain := "domain"
-	expires := 10 * time.Second
+	expiration := 10 * time.Second
 	secure := true
 
 	now := time.Now()
-	cookie.set(ctx, key, value, domain, expires, secure)
+	cookie.set(ctx, key, value, domain, expiration, secure)
 
 	resultCookie := new(fasthttp.Cookie)
 	resultCookie.SetKey(key)
@@ -63,8 +63,8 @@ func TestCookie_set(t *testing.T) {
 		t.Errorf("cookie.set() Value == %s, want %s", resultCookie.Value(), value)
 	}
 
-	if resultCookie.Expire().Unix() != now.Add(expires).Unix() {
-		t.Errorf("cookie.set() Expire == %v, want %v", resultCookie.Expire(), expires)
+	if resultCookie.Expire().Unix() != now.Add(expiration).Unix() {
+		t.Errorf("cookie.set() Expire == %v, want %v", resultCookie.Expire(), expiration)
 	}
 
 	if resultCookie.Secure() != secure {
@@ -83,7 +83,7 @@ func TestCookie_delete(t *testing.T) {
 	key := "key"
 	value := []byte("")
 	path := "/"
-	expires := -1 * time.Minute
+	expiration := -1 * time.Minute
 
 	now := time.Now()
 	cookie.delete(ctx, key)
@@ -104,8 +104,8 @@ func TestCookie_delete(t *testing.T) {
 		t.Errorf("cookie.set() Value == %s, want %s", resultCookie.Value(), value)
 	}
 
-	if resultCookie.Expire().Unix() != now.Add(expires).Unix() {
-		t.Errorf("cookie.set() Expire == %v, want %v", resultCookie.Expire(), expires)
+	if resultCookie.Expire().Unix() != now.Add(expiration).Unix() {
+		t.Errorf("cookie.set() Expire == %v, want %v", resultCookie.Expire(), expiration)
 	}
 
 	if v := ctx.Request.Header.Cookie(key); string(v) != string(value) {

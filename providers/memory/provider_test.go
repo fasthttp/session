@@ -1,69 +1,69 @@
 package memory
 
-import (
-	"testing"
+// import (
+// 	"testing"
 
-	"github.com/fasthttp/session/v2"
-	"github.com/valyala/fasthttp"
-)
+// 	"github.com/fasthttp/session/v2"
+// 	"github.com/valyala/fasthttp"
+// )
 
-func getServerSession() *session.Session {
-	cfg := session.NewDefaultConfig()
-	cfg.SessionIDInHTTPHeader = true // Setted true for simulate the same client in this benchmark
-	serverSession := session.New(cfg)
+// func getServerSession() *session.Session {
+// 	cfg := session.NewDefaultConfig()
+// 	cfg.SessionIDInHTTPHeader = true // Setted true for simulate the same client in this benchmark
+// 	serverSession := session.New(cfg)
 
-	p, err := New(Config{})
-	if err != nil {
-		panic("Unexpected error: " + err.Error())
-	}
+// 	p, err := New(Config{})
+// 	if err != nil {
+// 		panic("Unexpected error: " + err.Error())
+// 	}
 
-	serverSession.SetProvider(p)
+// 	serverSession.SetProvider(p)
 
-	return serverSession
-}
+// 	return serverSession
+// }
 
-func Benchmark_Get(b *testing.B) {
-	testCtx := new(fasthttp.RequestCtx)
-	serverSession := getServerSession()
+// func Benchmark_Get(b *testing.B) {
+// 	testCtx := new(fasthttp.RequestCtx)
+// 	serverSession := getServerSession()
 
-	handler := func(ctx *fasthttp.RequestCtx) {
-		store, _ := serverSession.Get(ctx)
-		store.Set("k1", 1)
-		serverSession.Save(ctx, store)
-	}
+// 	handler := func(ctx *fasthttp.RequestCtx) {
+// 		store, _ := serverSession.Get(ctx)
+// 		store.Set("k1", 1)
+// 		serverSession.Save(ctx, store)
+// 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler(testCtx)
-	}
-}
+// 	b.ResetTimer()
+// 	for i := 0; i < b.N; i++ {
+// 		handler(testCtx)
+// 	}
+// }
 
-func Benchmark_Regenerate(b *testing.B) {
-	testCtx := new(fasthttp.RequestCtx)
-	serverSession := getServerSession()
+// func Benchmark_Regenerate(b *testing.B) {
+// 	testCtx := new(fasthttp.RequestCtx)
+// 	serverSession := getServerSession()
 
-	handler := func(ctx *fasthttp.RequestCtx) {
-		store, _ := serverSession.Regenerate(ctx)
-		store.Set("k1", 1)
-		serverSession.Save(ctx, store)
-	}
+// 	handler := func(ctx *fasthttp.RequestCtx) {
+// 		store, _ := serverSession.Regenerate(ctx)
+// 		store.Set("k1", 1)
+// 		serverSession.Save(ctx, store)
+// 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler(testCtx)
-	}
-}
+// 	b.ResetTimer()
+// 	for i := 0; i < b.N; i++ {
+// 		handler(testCtx)
+// 	}
+// }
 
-func Benchmark_Destroy(b *testing.B) {
-	testCtx := new(fasthttp.RequestCtx)
-	serverSession := getServerSession()
+// func Benchmark_Destroy(b *testing.B) {
+// 	testCtx := new(fasthttp.RequestCtx)
+// 	serverSession := getServerSession()
 
-	handler := func(ctx *fasthttp.RequestCtx) {
-		serverSession.Destroy(ctx)
-	}
+// 	handler := func(ctx *fasthttp.RequestCtx) {
+// 		serverSession.Destroy(ctx)
+// 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		handler(testCtx)
-	}
-}
+// 	b.ResetTimer()
+// 	for i := 0; i < b.N; i++ {
+// 		handler(testCtx)
+// 	}
+// }

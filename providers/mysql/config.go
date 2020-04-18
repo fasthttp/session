@@ -3,20 +3,27 @@ package mysql
 import (
 	"fmt"
 	"net/url"
+	"time"
 )
 
-func (c *Config) getMysqlDSN() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?timeout=%dms&readTimeout=%dms&writeTimeout=%dms&charset=%s&collation=%s",
-		url.QueryEscape(c.Username),
-		c.Password,
-		url.QueryEscape(c.Host),
-		c.Port,
-		url.QueryEscape(c.Database),
-		c.Timeout,
-		c.ReadTimeout,
-		c.WriteTimeout,
-		url.QueryEscape(c.Charset),
-		url.QueryEscape(c.Collate))
+// NewDefaultConfig returns a default configuration
+func NewDefaultConfig() Config {
+	return Config{
+		Host:            "127.0.0.1",
+		Port:            3306,
+		Username:        "root",
+		Password:        "",
+		Charset:         "utf8",
+		Collate:         "utf8_general_ci",
+		Database:        "session",
+		TableName:       "session",
+		Timeout:         30 * time.Second,
+		ReadTimeout:     30 * time.Second,
+		WriteTimeout:    30 * time.Second,
+		MaxOpenConn:     100,
+		MaxIdleConn:     100,
+		ConnMaxLifetime: 1 * time.Second,
+	}
 }
 
 // NewConfigWith returns a new configuration with especific paremters
@@ -32,21 +39,16 @@ func NewConfigWith(host string, port int, user, pass, dbName, tableName string) 
 	return cf
 }
 
-// NewDefaultConfig returns a default configuration
-func NewDefaultConfig() Config {
-	return Config{
-		Charset:        "utf8",
-		Collate:        "utf8_general_ci",
-		Database:       "session",
-		TableName:      "session",
-		Host:           "127.0.0.1",
-		Port:           3306,
-		Username:       "root",
-		Password:       "",
-		Timeout:        3000,
-		ReadTimeout:    5000,
-		WriteTimeout:   5000,
-		SetMaxOpenConn: 500,
-		SetMaxIdleConn: 50,
-	}
+func (c *Config) dsn() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?timeout=%ds&readTimeout=%ds&writeTimeout=%ds&charset=%s&collation=%s",
+		url.QueryEscape(c.Username),
+		c.Password,
+		url.QueryEscape(c.Host),
+		c.Port,
+		url.QueryEscape(c.Database),
+		int64(c.Timeout.Seconds()),
+		int64(c.ReadTimeout.Seconds()),
+		int64(c.WriteTimeout.Seconds()),
+		url.QueryEscape(c.Charset),
+		url.QueryEscape(c.Collate))
 }

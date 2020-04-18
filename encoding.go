@@ -22,11 +22,12 @@ func MSGPEncode(src Dict) ([]byte, error) {
 
 // MSGPDecode MessagePack decode
 func MSGPDecode(dst *Dict, src []byte) error {
+	dst.Reset()
+
 	if len(src) == 0 {
 		return nil
 	}
 
-	dst.Reset()
 	_, err := dst.UnmarshalMsg(src)
 
 	return err

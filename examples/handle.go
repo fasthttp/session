@@ -142,17 +142,19 @@ func sessionIDHandler(ctx *fasthttp.RequestCtx) {
 
 // regenerate handler
 func regenerateHandler(ctx *fasthttp.RequestCtx) {
-	store, err := serverSession.Regenerate(ctx)
+	if err := serverSession.Regenerate(ctx); err != nil {
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
+		return
+	}
+
+	store, err := serverSession.Get(ctx)
 	if err != nil {
 		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 		return
 	}
-	defer serverSession.Save(ctx, store)
-
-	sessionID := store.GetSessionID()
 
 	ctx.SetBodyString("Session REGENERATE: New session id: ")
-	ctx.Write(sessionID)
+	ctx.Write(store.GetSessionID())
 }
 
 // get expiration handler

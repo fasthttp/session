@@ -3,8 +3,7 @@ package postgre
 import (
 	"time"
 
-	"github.com/fasthttp/session/v2"
-	gotilsDao "github.com/savsgio/gotils/dao"
+	"github.com/fasthttp/session/v2/internal/sql"
 )
 
 // Config configuration of provider
@@ -21,52 +20,29 @@ type Config struct {
 	// postgres user's password
 	Password string
 
-	// Maximum wait for connection, in seconds. Zero or
-	// not specified means wait indefinitely.
-	ConnTimeout int64
-
 	// name of the database to connect to
 	Database string
 
 	// session table name
 	TableName string
 
-	// postgres max free idle
-	SetMaxIdleConn int
+	// Maximum wait for connection, in seconds. Zero or
+	// not specified means wait indefinitely.
+	Timeout time.Duration
 
-	// postgres max open idle
-	SetMaxOpenConn int
+	// postgre max free idle
+	MaxIdleConn int
 
-	// session value serialize func
-	SerializeFunc func(src session.Dict) ([]byte, error)
+	// postgre max open idle
+	MaxOpenConn int
 
-	// session value unSerialize func
-	UnSerializeFunc func(dst *session.Dict, src []byte) error
+	// postgre conn max open idle
+	ConnMaxLifetime time.Duration
 }
 
 // Provider backend manager
 type Provider struct {
 	config Config
-	db     *dao
-}
 
-type dao struct {
-	gotilsDao.Dao
-
-	tableName string
-
-	sqlGetSessionBySessionID string
-	sqlCountSessions         string
-	sqlUpdateBySessionID     string
-	sqlDeleteBySessionID     string
-	sqlDeleteExpiredSessions string
-	sqlInsert                string
-	sqlRegenerate            string
-}
-
-type dbRow struct {
-	sessionID  string
-	contents   string
-	lastActive int64
-	expiration time.Duration
+	*sql.Provider
 }

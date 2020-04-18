@@ -21,11 +21,11 @@ type mockProvider struct {
 	gcExecuted    bool
 }
 
-func (p *mockProvider) Get(store *Store) error {
-	return p.errGet
+func (p *mockProvider) Get(id []byte) ([]byte, error) {
+	return nil, p.errGet
 }
 
-func (p *mockProvider) Save(store *Store) error {
+func (p *mockProvider) Save(id, data []byte, expiration time.Duration) error {
 	return p.errSave
 }
 
@@ -33,7 +33,7 @@ func (p *mockProvider) Destroy(id []byte) error {
 	return p.errDestroy
 }
 
-func (p *mockProvider) Regenerate(id []byte, newStore *Store) error {
+func (p *mockProvider) Regenerate(id, newID []byte, expiration time.Duration) error {
 	return p.errRegenerate
 }
 
@@ -285,6 +285,7 @@ func TestSession_GetProviderError(t *testing.T) {
 	s.SetProvider(provider)
 
 	ctx := new(fasthttp.RequestCtx)
+	ctx.Request.Header.SetCookie(s.config.CookieName, "aiasdiasd")
 
 	store, err := s.Get(ctx)
 
@@ -319,8 +320,8 @@ func TestSession_Get(t *testing.T) {
 		t.Error("Store.sessionID is nil")
 	}
 
-	if store.defaultExpiration != s.config.Expires {
-		t.Errorf("Store.defaultExpiration == %d, want %d", store.defaultExpiration, s.config.Expires)
+	if store.defaultExpiration != s.config.Expiration {
+		t.Errorf("Store.defaultExpiration == %d, want %d", store.defaultExpiration, s.config.Expiration)
 	}
 }
 
@@ -368,14 +369,8 @@ func TestSession_RegenerateErrNotProvider(t *testing.T) {
 	s := New(Config{})
 	ctx := new(fasthttp.RequestCtx)
 
-	store, err := s.Regenerate(ctx)
-
-	if err != errNotSetProvider {
+	if err := s.Regenerate(ctx); err != errNotSetProvider {
 		t.Errorf("Expected error: %v", errNotSetProvider)
-	}
-
-	if store != nil {
-		t.Error("The store is not nil")
 	}
 }
 
@@ -388,15 +383,10 @@ func TestSession_RegenerateErrEmptySessionID(t *testing.T) {
 	s.SetProvider(new(mockProvider))
 
 	ctx := new(fasthttp.RequestCtx)
+	ctx.Request.Header.SetCookie(s.config.CookieName, "d32r2f2ecev")
 
-	store, err := s.Regenerate(ctx)
-
-	if err != errEmptySessionID {
+	if err := s.Regenerate(ctx); err != errEmptySessionID {
 		t.Errorf("Expected error: %v", errEmptySessionID)
-	}
-
-	if store != nil {
-		t.Error("The store is not nil")
 	}
 }
 
@@ -406,15 +396,10 @@ func TestSession_RegenerateProviderError(t *testing.T) {
 	s.SetProvider(provider)
 
 	ctx := new(fasthttp.RequestCtx)
+	ctx.Request.Header.SetCookie(s.config.CookieName, "d32r2f2ecev")
 
-	store, err := s.Regenerate(ctx)
-
-	if err != provider.errRegenerate {
+	if err := s.Regenerate(ctx); err != provider.errRegenerate {
 		t.Errorf("Expected error: %v", provider.errRegenerate)
-	}
-
-	if store != nil {
-		t.Error("The store is not nil")
 	}
 }
 
@@ -423,26 +408,15 @@ func TestSession_Regenerate(t *testing.T) {
 	provider := &mockProvider{}
 	s.SetProvider(provider)
 
+	id := "d32r2f2ecev"
 	ctx := new(fasthttp.RequestCtx)
+	ctx.Request.Header.SetCookie(s.config.CookieName, id)
 
-	store, err := s.Get(ctx)
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
+	if err := s.Regenerate(ctx); err != nil {
+		t.Errorf("Unexpected error: %v", err)
 	}
 
-	oldSessionID := string(store.GetSessionID())
-
-	store, err = s.Regenerate(ctx)
-
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
-
-	if string(store.sessionID) == oldSessionID {
-		t.Error("The session id is not chaged")
-	}
-
-	if string(ctx.Response.Header.PeekCookie(s.config.CookieName)) == oldSessionID {
+	if string(ctx.Response.Header.PeekCookie(s.config.CookieName)) == id {
 		t.Error("HTTP values are not regenerated")
 	}
 }

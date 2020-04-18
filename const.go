@@ -4,7 +4,7 @@ import "time"
 
 const defaultSessionKeyName = "sessionid"
 const defaultDomain = ""
-const defaultExpires = 2 * time.Hour
+const defaultExpiration = 2 * time.Hour
 const defaultGCLifetime = 1 * time.Minute
 const defaultSecure = true
 const defaultSessionIDInURLQuery = false

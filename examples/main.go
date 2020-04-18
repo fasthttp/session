@@ -18,18 +18,24 @@ import (
 
 const defaultProvider = "memory"
 
-var serverSession = session.New(session.NewDefaultConfig())
+var serverSession *session.Session
 
 func init() {
 	providerName := flag.String("provider", defaultProvider, "Name of provider")
 	flag.Parse()
+
+	encoder := session.Base64Encode
+	decoder := session.Base64Decode
 
 	var provider session.Provider
 	var err error
 
 	switch *providerName {
 	case "memory":
+		encoder = session.MSGPEncode
+		decoder = session.MSGPDecode
 		provider, err = memory.New(memory.Config{})
+
 	case "memcache":
 		provider, err = memcache.New(memcache.Config{
 			ServerList: []string{
@@ -45,6 +51,8 @@ func init() {
 		cfg := postgre.NewConfigWith("127.0.0.1", 5432, "postgres", "session", "test", "session")
 		provider, err = postgre.New(cfg)
 	case "redis":
+		encoder = session.MSGPEncode
+		decoder = session.MSGPDecode
 		provider, err = redis.New(redis.Config{
 			Host:        "127.0.0.1",
 			Port:        6379,
@@ -62,6 +70,11 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	cfg := session.NewDefaultConfig()
+	cfg.EncodeFunc = encoder
+	cfg.DecodeFunc = decoder
+	serverSession = session.New(cfg)
 
 	if err = serverSession.SetProvider(provider); err != nil {
 		log.Fatal(err)

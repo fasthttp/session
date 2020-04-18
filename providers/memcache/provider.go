@@ -3,9 +3,9 @@ package memcache
 import (
 	"math"
 	"sync"
+	"time"
 
 	"github.com/bradfitz/gomemcache/memcache"
-	"github.com/fasthttp/session/v2"
 	"github.com/valyala/bytebufferpool"
 )
 
@@ -38,13 +38,6 @@ func New(cfg Config) (*Provider, error) {
 		return nil, errConfigMaxIdleConnsZero
 	}
 
-	if cfg.SerializeFunc == nil {
-		cfg.SerializeFunc = session.MSGPEncode
-	}
-	if cfg.UnSerializeFunc == nil {
-		cfg.UnSerializeFunc = session.MSGPDecode
-	}
-
 	db := memcache.New(cfg.ServerList...)
 	db.MaxIdleConns = cfg.MaxIdleConns
 
@@ -70,45 +63,32 @@ func (p *Provider) getMemCacheSessionKey(sessionID []byte) string {
 }
 
 // Get sets the user session to the given store
-func (p *Provider) Get(store *session.Store) error {
-	key := p.getMemCacheSessionKey(store.GetSessionID())
+func (p *Provider) Get(id []byte) ([]byte, error) {
+	key := p.getMemCacheSessionKey(id)
 
 	item, err := p.db.Get(key)
-	if err != nil && err != memcache.ErrCacheMiss {
-		return err
+	if err == memcache.ErrCacheMiss {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
 	}
 
-	if item != nil { // Exist
-		err := p.config.UnSerializeFunc(store.Ptr(), item.Value)
-		if err != nil {
-			return err
-		}
-	}
-
-	releaseItem(item)
-
-	return nil
+	return item.Value, nil
 }
 
 // Save saves the user session from the given store
-func (p *Provider) Save(store *session.Store) error {
-	expiration := int32(store.GetExpiration().Seconds())
-	if expiration > math.MaxInt32 {
+func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
+	mcExpiration := int32(expiration.Seconds())
+	if mcExpiration > math.MaxInt32 {
 		return errExpirationIsTooBig
 	}
 
-	data := store.GetAll()
-	value, err := p.config.SerializeFunc(data)
-	if err != nil {
-		return err
-	}
-
 	item := acquireItem()
-	item.Key = p.getMemCacheSessionKey(store.GetSessionID())
-	item.Value = value
-	item.Expiration = expiration
+	item.Key = p.getMemCacheSessionKey(id)
+	item.Value = data
+	item.Expiration = mcExpiration
 
-	err = p.db.Set(item)
+	err := p.db.Set(item)
 
 	releaseItem(item)
 
@@ -117,9 +97,9 @@ func (p *Provider) Save(store *session.Store) error {
 
 // Regenerate updates a user session with the new session id
 // and sets the user session to the store
-func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
+func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error {
 	key := p.getMemCacheSessionKey(id)
-	newKey := p.getMemCacheSessionKey(newStore.GetSessionID())
+	newKey := p.getMemCacheSessionKey(newID)
 
 	item, err := p.db.Get(key)
 	if err != nil && err != memcache.ErrCacheMiss {
@@ -127,10 +107,15 @@ func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
 	}
 
 	if item != nil { // Exist
+		mcExpiration := int32(expiration.Seconds())
+		if mcExpiration > math.MaxInt32 {
+			return errExpirationIsTooBig
+		}
+
 		newItem := acquireItem()
 		newItem.Key = newKey
 		newItem.Value = item.Value
-		newItem.Expiration = item.Expiration
+		newItem.Expiration = mcExpiration
 
 		if err = p.db.Set(newItem); err != nil {
 			return err
@@ -140,14 +125,8 @@ func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
 			return err
 		}
 
-		if err := p.config.UnSerializeFunc(newStore.Ptr(), newItem.Value); err != nil {
-			return err
-		}
-
 		releaseItem(newItem)
 	}
-
-	releaseItem(item)
 
 	return nil
 }

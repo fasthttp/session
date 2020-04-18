@@ -1,14 +1,29 @@
 package memory
 
 import (
-	"fmt"
+	"sync"
 	"time"
 
 	"github.com/fasthttp/session/v2"
-	"github.com/savsgio/gotils"
 )
 
-var lastActiveTimeAttrKey = fmt.Sprintf("__session:lastActiveTime:%s__", gotils.RandBytes(make([]byte, 5)))
+var itemPool = &sync.Pool{
+	New: func() interface{} {
+		return new(item)
+	},
+}
+
+func acquireItem() *item {
+	return itemPool.Get().(*item)
+}
+
+func releaseItem(item *item) {
+	item.data = item.data[:0]
+	item.lastActiveTime = 0
+	item.expiration = 0
+
+	itemPool.Put(item)
+}
 
 // New returns a new memory provider configured
 func New(cfg Config) (*Provider, error) {
@@ -21,33 +36,39 @@ func New(cfg Config) (*Provider, error) {
 }
 
 // Get sets the user session to the given store
-func (p *Provider) Get(store *session.Store) error {
-	data := p.db.GetBytes(store.GetSessionID())
-	if data == nil {
-		return nil
+func (p *Provider) Get(id []byte) ([]byte, error) {
+	val := p.db.GetBytes(id)
+	if val == nil { // Not exist
+		return nil, nil
 	}
 
-	ptr := store.Ptr()
-	ptr.D = append(ptr.D[:0], data.(session.Dict).D...)
+	item := val.(*item)
 
-	return nil
+	return item.data, nil
 }
 
 // Save saves the user session from the given store
-func (p *Provider) Save(store *session.Store) error {
-	store.Set(lastActiveTimeAttrKey, time.Now().Unix())
-	p.db.SetBytes(store.GetSessionID(), store.GetAll())
+func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
+	item := acquireItem()
+	item.data = data
+	item.lastActiveTime = time.Now().Unix()
+	item.expiration = expiration
+
+	p.db.SetBytes(id, item)
 
 	return nil
 }
 
 // Regenerate updates a user session with the new session id
 // and sets the user session to the store
-func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
+func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error {
 	data := p.db.GetBytes(id)
 	if data != nil {
-		newStore.Ptr().D = data.(session.Dict).D
-		p.Save(newStore)
+		item := data.(*item)
+		item.lastActiveTime = time.Now().Unix()
+		item.expiration = expiration
+
+		p.db.SetBytes(newID, item)
 		p.db.DelBytes(id)
 	}
 
@@ -56,7 +77,13 @@ func (p *Provider) Regenerate(id []byte, newStore *session.Store) error {
 
 // Destroy destroys the user session from the given id
 func (p *Provider) Destroy(id []byte) error {
+	val := p.db.GetBytes(id)
+	if val == nil {
+		return nil
+	}
+
 	p.db.DelBytes(id)
+	releaseItem(val.(*item))
 
 	return nil
 }
@@ -73,22 +100,16 @@ func (p *Provider) NeedGC() bool {
 
 // GC destroys the expired user sessions
 func (p *Provider) GC() {
-	store := session.NewStore() // TODO: Get from pool
-	ptr := store.Ptr()
 	now := time.Now().Unix()
 
 	for _, kv := range p.db.D {
-		ptr.D = append(ptr.D[:0], kv.Value.(session.Dict).D...)
+		item := kv.Value.(*item)
 
-		expiration := store.GetExpiration()
-		// Do not expire the session if expiration is set to 0
-		if expiration == 0 {
+		if item.expiration == 0 {
 			continue
 		}
 
-		lastActiveTime := store.Get(lastActiveTimeAttrKey).(int64)
-
-		if now >= (lastActiveTime + int64(expiration)) {
+		if now >= (item.lastActiveTime + int64(item.expiration.Seconds())) {
 			p.Destroy(kv.Key)
 		}
 	}

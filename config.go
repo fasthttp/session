@@ -10,7 +10,7 @@ func NewDefaultConfig() Config {
 	config := Config{
 		CookieName:              defaultSessionKeyName,
 		Domain:                  defaultDomain,
-		Expires:                 defaultExpires,
+		Expiration:              defaultExpiration,
 		GCLifetime:              defaultGCLifetime,
 		Secure:                  defaultSecure,
 		SessionIDInURLQuery:     defaultSessionIDInURLQuery,

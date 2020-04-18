@@ -21,7 +21,7 @@ type Config struct {
 	//  0 means no expire, (24 years)
 	// -1 means when browser closes
 	// >0 is the time.Duration which the session cookies should expire.
-	Expires time.Duration
+	Expiration time.Duration
 
 	// gc life time to execute it
 	GCLifetime time.Duration
@@ -47,6 +47,12 @@ type Config struct {
 	// IsSecureFunc should return whether the communication channel is secure
 	// in order to set the secure flag to true according to Secure flag.
 	IsSecureFunc func(*fasthttp.RequestCtx) bool
+
+	// EncodeFunc session value serialize func
+	EncodeFunc func(src Dict) ([]byte, error)
+
+	// DecodeFunc session value unSerialize func
+	DecodeFunc func(dst *Dict, src []byte) error
 
 	// value cookie length
 	cookieLen uint32
@@ -79,10 +85,10 @@ type cookie struct{}
 
 // Provider interface implemented by providers
 type Provider interface {
-	Get(store *Store) error
-	Save(store *Store) error
+	Get(id []byte) ([]byte, error)
+	Save(id, data []byte, expiration time.Duration) error
 	Destroy(id []byte) error
-	Regenerate(id []byte, newStore *Store) error // the expiration is also reset to original value
+	Regenerate(id, newID []byte, expiration time.Duration) error
 	Count() int
 	NeedGC() bool
 	GC()
