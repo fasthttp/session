@@ -21,7 +21,7 @@ var initQueries = []string{
 	"CREATE INDEX expiration ON %s (expiration);",
 }
 
-// New returns a new mysql provider configured
+// New returns a new configured postgres provider
 func New(cfg Config) (*Provider, error) {
 	if cfg.Host == "" {
 		return nil, errConfigHostEmpty
@@ -33,8 +33,8 @@ func New(cfg Config) (*Provider, error) {
 	providerCfg := sql.ProviderConfig{
 		Driver:          "postgres",
 		DSN:             cfg.dsn(),
-		MaxIdleConn:     cfg.MaxIdleConn,
-		MaxOpenConn:     cfg.MaxOpenConn,
+		MaxIdleConns:    cfg.MaxIdleConns,
+		MaxOpenConns:    cfg.MaxOpenConns,
 		ConnMaxLifetime: cfg.ConnMaxLifetime,
 		SQLGet:          fmt.Sprintf("SELECT data FROM %s WHERE id=$1", cfg.TableName),
 		SQLSave:         fmt.Sprintf("UPDATE %s SET data=$1,last_active=$2,expiration=$3 WHERE id=$4", cfg.TableName),

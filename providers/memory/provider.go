@@ -35,7 +35,7 @@ func New(cfg Config) (*Provider, error) {
 	return p, nil
 }
 
-// Get sets the user session to the given store
+// Get returns the data of the given session id
 func (p *Provider) Get(id []byte) ([]byte, error) {
 	val := p.db.GetBytes(id)
 	if val == nil { // Not exist
@@ -47,7 +47,7 @@ func (p *Provider) Get(id []byte) ([]byte, error) {
 	return item.data, nil
 }
 
-// Save saves the user session from the given store
+// Save saves the session data and expiration from the given session id
 func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
 	item := acquireItem()
 	item.data = data
@@ -59,8 +59,8 @@ func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
 	return nil
 }
 
-// Regenerate updates a user session with the new session id
-// and sets the user session to the store
+// Regenerate updates the session id and expiration with the new session id
+// of the the given current session id
 func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error {
 	data := p.db.GetBytes(id)
 	if data != nil {
@@ -75,7 +75,7 @@ func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error 
 	return nil
 }
 
-// Destroy destroys the user session from the given id
+// Destroy destroys the session from the given id
 func (p *Provider) Destroy(id []byte) error {
 	val := p.db.GetBytes(id)
 	if val == nil {
@@ -88,7 +88,7 @@ func (p *Provider) Destroy(id []byte) error {
 	return nil
 }
 
-// Count returns the total of users sessions stored
+// Count returns the total of stored sessions
 func (p *Provider) Count() int {
 	return len(p.db.D)
 }
@@ -98,7 +98,7 @@ func (p *Provider) NeedGC() bool {
 	return true
 }
 
-// GC destroys the expired user sessions
+// GC destroys the expired sessions
 func (p *Provider) GC() {
 	now := time.Now().Unix()
 

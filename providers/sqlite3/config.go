@@ -7,8 +7,8 @@ func NewDefaultConfig() Config {
 	return Config{
 		DBPath:          "./",
 		TableName:       "session",
-		MaxOpenConn:     100,
-		MaxIdleConn:     100,
+		MaxOpenConns:    100,
+		MaxIdleConns:    100,
 		ConnMaxLifetime: 1 * time.Second,
 	}
 }

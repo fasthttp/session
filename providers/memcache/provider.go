@@ -39,6 +39,7 @@ func New(cfg Config) (*Provider, error) {
 	}
 
 	db := memcache.New(cfg.ServerList...)
+	db.Timeout = cfg.Timeout
 	db.MaxIdleConns = cfg.MaxIdleConns
 
 	p := &Provider{
@@ -62,7 +63,7 @@ func (p *Provider) getMemCacheSessionKey(sessionID []byte) string {
 	return keyStr
 }
 
-// Get sets the user session to the given store
+// Get returns the data of the given session id
 func (p *Provider) Get(id []byte) ([]byte, error) {
 	key := p.getMemCacheSessionKey(id)
 
@@ -76,7 +77,7 @@ func (p *Provider) Get(id []byte) ([]byte, error) {
 	return item.Value, nil
 }
 
-// Save saves the user session from the given store
+// Save saves the session data and expiration from the given session id
 func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
 	mcExpiration := int32(expiration.Seconds())
 	if mcExpiration > math.MaxInt32 {
@@ -95,8 +96,8 @@ func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
 	return err
 }
 
-// Regenerate updates a user session with the new session id
-// and sets the user session to the store
+// Regenerate updates the session id and expiration with the new session id
+// of the the given current session id
 func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error {
 	key := p.getMemCacheSessionKey(id)
 	newKey := p.getMemCacheSessionKey(newID)
@@ -131,13 +132,13 @@ func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error 
 	return nil
 }
 
-// Destroy destroys the user session from the given id
+// Destroy destroys the session from the given id
 func (p *Provider) Destroy(id []byte) error {
 	key := p.getMemCacheSessionKey(id)
 	return p.db.Delete(key)
 }
 
-// Count returns the total of users sessions stored
+// Count returns the total of stored sessions
 func (p *Provider) Count() int {
 	return 0
 }
@@ -147,5 +148,5 @@ func (p *Provider) NeedGC() bool {
 	return false
 }
 
-// GC destroys the expired user sessions
+// GC destroys the expired sessions
 func (p *Provider) GC() {}

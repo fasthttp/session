@@ -13,15 +13,15 @@ func NewDefaultConfig() Config {
 		Port:            3306,
 		Username:        "root",
 		Password:        "",
-		Charset:         "utf8",
-		Collate:         "utf8_general_ci",
 		Database:        "session",
 		TableName:       "session",
+		Charset:         "utf8",
+		Collation:       "utf8_general_ci",
 		Timeout:         30 * time.Second,
 		ReadTimeout:     30 * time.Second,
 		WriteTimeout:    30 * time.Second,
-		MaxOpenConn:     100,
-		MaxIdleConn:     100,
+		MaxOpenConns:    100,
+		MaxIdleConns:    100,
 		ConnMaxLifetime: 1 * time.Second,
 	}
 }
@@ -50,5 +50,5 @@ func (c *Config) dsn() string {
 		int64(c.ReadTimeout.Seconds()),
 		int64(c.WriteTimeout.Seconds()),
 		url.QueryEscape(c.Charset),
-		url.QueryEscape(c.Collate))
+		url.QueryEscape(c.Collation))
 }

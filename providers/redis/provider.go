@@ -1,44 +1,39 @@
 package redis
 
 import (
-	"fmt"
 	"time"
 
-	"github.com/fasthttp/session/v2"
 	"github.com/go-redis/redis/v7"
 	"github.com/valyala/bytebufferpool"
 )
 
 var all = []byte("*")
 
-// New returns a new redis provider configured
+// New returns a new configured redis provider
 func New(cfg Config) (*Provider, error) {
-	if cfg.Host == "" {
-		return nil, errConfigHostEmpty
-	}
-	if cfg.Port == 0 {
-		return nil, errConfigPortZero
-	}
-	if cfg.PoolSize <= 0 {
-		return nil, errConfigPoolSizeZero
-	}
-	if cfg.IdleTimeout <= 0 {
-		return nil, errConfigIdleTimeoutZero
-	}
-
-	if cfg.SerializeFunc == nil {
-		cfg.SerializeFunc = session.MSGPEncode
-	}
-	if cfg.UnSerializeFunc == nil {
-		cfg.UnSerializeFunc = session.MSGPDecode
+	if cfg.Addr == "" {
+		return nil, errConfigAddrEmpty
 	}
 
 	db := redis.NewClient(&redis.Options{
-		Addr:        fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
-		Password:    cfg.Password,
-		DB:          cfg.DbNumber,
-		PoolSize:    cfg.PoolSize,
-		IdleTimeout: cfg.IdleTimeout,
+		Network:            cfg.Network,
+		Addr:               cfg.Addr,
+		Password:           cfg.Password,
+		DB:                 cfg.DB,
+		MaxRetries:         cfg.MaxRetries,
+		MinRetryBackoff:    cfg.MinRetryBackoff,
+		MaxRetryBackoff:    cfg.MaxRetryBackoff,
+		DialTimeout:        cfg.DialTimeout,
+		ReadTimeout:        cfg.ReadTimeout,
+		WriteTimeout:       cfg.WriteTimeout,
+		PoolSize:           cfg.PoolSize,
+		MinIdleConns:       cfg.MinIdleConns,
+		MaxConnAge:         cfg.MaxConnAge,
+		PoolTimeout:        cfg.PoolTimeout,
+		IdleTimeout:        cfg.IdleTimeout,
+		IdleCheckFrequency: cfg.IdleCheckFrequency,
+		TLSConfig:          cfg.TLSConfig,
+		Limiter:            cfg.Limiter,
 	})
 
 	if err := db.Ping().Err(); err != nil {
@@ -66,7 +61,7 @@ func (p *Provider) getRedisSessionKey(sessionID []byte) string {
 	return keyStr
 }
 
-// Get read session store by session id
+// Get returns the data of the given session id
 func (p *Provider) Get(id []byte) ([]byte, error) {
 	key := p.getRedisSessionKey(id)
 
@@ -79,15 +74,15 @@ func (p *Provider) Get(id []byte) ([]byte, error) {
 
 }
 
-// Save saves the user session from the given store
+// Save saves the session data and expiration from the given session id
 func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
 	key := p.getRedisSessionKey(id)
 
 	return p.db.Set(key, data, expiration).Err()
 }
 
-// Regenerate updates a user session with the new session id
-// and sets the user session to the store
+// Regenerate updates the session id and expiration with the new session id
+// of the the given current session id
 func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error {
 	key := p.getRedisSessionKey(id)
 	newKey := p.getRedisSessionKey(newID)
@@ -110,14 +105,14 @@ func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error 
 	return nil
 }
 
-// Destroy destroys the user session from the given id
+// Destroy destroys the session from the given id
 func (p *Provider) Destroy(id []byte) error {
 	key := p.getRedisSessionKey(id)
 
 	return p.db.Del(key).Err()
 }
 
-// Count returns the total of users sessions stored
+// Count returns the total of stored sessions
 func (p *Provider) Count() int {
 	reply, err := p.db.Keys(p.getRedisSessionKey(all)).Result()
 	if err != nil {
@@ -132,5 +127,5 @@ func (p *Provider) NeedGC() bool {
 	return false
 }
 
-// GC destroys the expired user sessions
+// GC destroys the expired sessions
 func (p *Provider) GC() {}

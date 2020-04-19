@@ -22,7 +22,7 @@ var initQueries = []string{
 	 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='session table';`,
 }
 
-// New returns a new mysql provider configured
+// New returns a new configured mysql provider
 func New(cfg Config) (*Provider, error) {
 	if cfg.Host == "" {
 		return nil, errConfigHostEmpty
@@ -34,8 +34,8 @@ func New(cfg Config) (*Provider, error) {
 	providerCfg := sql.ProviderConfig{
 		Driver:          "mysql",
 		DSN:             cfg.dsn(),
-		MaxIdleConn:     cfg.MaxIdleConn,
-		MaxOpenConn:     cfg.MaxOpenConn,
+		MaxIdleConns:    cfg.MaxIdleConns,
+		MaxOpenConns:    cfg.MaxOpenConns,
 		ConnMaxLifetime: cfg.ConnMaxLifetime,
 		SQLGet:          fmt.Sprintf("SELECT data FROM %s WHERE id=?", cfg.TableName),
 		SQLSave:         fmt.Sprintf("UPDATE %s SET data=?,last_active=?,expiration=? WHERE id=?", cfg.TableName),

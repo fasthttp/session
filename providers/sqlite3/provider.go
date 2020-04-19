@@ -21,7 +21,7 @@ var initQueries = []string{
 	"CREATE INDEX expiration ON %s (expiration);",
 }
 
-// New returns a new mysql provider configured
+// New returns a new configured sqlite3 provider
 func New(cfg Config) (*Provider, error) {
 	if cfg.DBPath == "" {
 		return nil, errConfigDBPathEmpty
@@ -30,8 +30,8 @@ func New(cfg Config) (*Provider, error) {
 	providerCfg := sql.ProviderConfig{
 		Driver:          "sqlite3",
 		DSN:             cfg.DBPath,
-		MaxIdleConn:     cfg.MaxIdleConn,
-		MaxOpenConn:     cfg.MaxOpenConn,
+		MaxIdleConns:    cfg.MaxIdleConns,
+		MaxOpenConns:    cfg.MaxOpenConns,
 		ConnMaxLifetime: cfg.ConnMaxLifetime,
 		SQLGet:          fmt.Sprintf("SELECT data FROM %s WHERE id=?", cfg.TableName),
 		SQLSave:         fmt.Sprintf("UPDATE %s SET data=?,last_active=?,expiration=? WHERE id=?", cfg.TableName),

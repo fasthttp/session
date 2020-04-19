@@ -7,15 +7,15 @@ import (
 	"github.com/savsgio/gotils"
 )
 
-// New returns a new mysql provider configured
+// New returns a new configured sql provider
 func NewProvider(cfg ProviderConfig) (*Provider, error) {
 	db, err := sql.Open(cfg.Driver, cfg.DSN)
 	if err != nil {
 		return nil, err
 	}
 
-	db.SetMaxOpenConns(cfg.MaxOpenConn)
-	db.SetMaxIdleConns(cfg.MaxIdleConn)
+	db.SetMaxOpenConns(cfg.MaxOpenConns)
+	db.SetMaxIdleConns(cfg.MaxIdleConns)
 	db.SetConnMaxLifetime(cfg.ConnMaxLifetime)
 
 	if err := db.Ping(); err != nil {
@@ -24,14 +24,19 @@ func NewProvider(cfg ProviderConfig) (*Provider, error) {
 
 	p := &Provider{
 		config: cfg,
-		DB:     db,
+		db:     db,
 	}
 
 	return p, nil
 }
 
+// Exec executes a query without returning any rows.
+// The args are for any placeholder parameters in the query.
+//
+// Returns the number of rows affected by an update, insert, or delete.
+// Not every database or database driver may support this.
 func (p *Provider) Exec(query string, args ...interface{}) (int64, error) {
-	result, err := p.DB.Exec(query, args...)
+	result, err := p.db.Exec(query, args...)
 	if err != nil {
 		return 0, err
 	}
@@ -39,9 +44,13 @@ func (p *Provider) Exec(query string, args ...interface{}) (int64, error) {
 	return result.RowsAffected()
 }
 
-// Get sets the user session to the given store
+func (p *Provider) Close() error {
+	return p.db.Close()
+}
+
+// Get returns the data of the given session id
 func (p *Provider) Get(id []byte) ([]byte, error) {
-	result := p.QueryRow(p.config.SQLGet, gotils.B2S(id))
+	result := p.db.QueryRow(p.config.SQLGet, gotils.B2S(id))
 
 	data := []byte("")
 
@@ -53,7 +62,7 @@ func (p *Provider) Get(id []byte) ([]byte, error) {
 	return data, nil
 }
 
-// Save saves the user session from the given store
+// Save saves the session data and expiration from the given session id
 func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
 	now := time.Now().Unix()
 
@@ -72,8 +81,8 @@ func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
 	return nil
 }
 
-// Regenerate updates a user session with the new session id
-// and sets the user session to the store
+// Regenerate updates the session id and expiration with the new session id
+// of the the given current session id
 func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error {
 	now := time.Now().Unix()
 
@@ -92,15 +101,15 @@ func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error 
 	return nil
 }
 
-// Destroy destroys the user session from the given id
+// Destroy destroys the session from the given id
 func (p *Provider) Destroy(id []byte) error {
 	_, err := p.Exec(p.config.SQLDestroy, id)
 	return err
 }
 
-// Count returns the total of users sessions stored
+// Count returns the total of stored sessions
 func (p *Provider) Count() int {
-	row := p.QueryRow(p.config.SQLCount)
+	row := p.db.QueryRow(p.config.SQLCount)
 
 	total := 0
 	if err := row.Scan(&total); err != nil {
@@ -115,7 +124,7 @@ func (p *Provider) NeedGC() bool {
 	return true
 }
 
-// GC destroys the expired user sessions
+// GC destroys the expired sessions
 func (p *Provider) GC() {
 	_, err := p.Exec(p.config.SQLGC, time.Now().Unix())
 	if err != nil {

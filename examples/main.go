@@ -38,11 +38,11 @@ func init() {
 
 	case "memcache":
 		provider, err = memcache.New(memcache.Config{
+			KeyPrefix: "session",
 			ServerList: []string{
 				"0.0.0.0:11211",
 			},
 			MaxIdleConns: 8,
-			KeyPrefix:    "session",
 		})
 	case "mysql":
 		cfg := mysql.NewConfigWith("127.0.0.1", 3306, "root", "session", "test", "session")
@@ -54,11 +54,10 @@ func init() {
 		encoder = session.MSGPEncode
 		decoder = session.MSGPDecode
 		provider, err = redis.New(redis.Config{
-			Host:        "127.0.0.1",
-			Port:        6379,
+			KeyPrefix:   "session",
+			Addr:        "127.0.0.1:6379",
 			PoolSize:    8,
 			IdleTimeout: 30 * time.Second,
-			KeyPrefix:   "session",
 		})
 	case "sqlite3":
 		cfg := sqlite3.NewConfigWith("test.db", "session")

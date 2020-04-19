@@ -16,8 +16,8 @@ func NewDefaultConfig() Config {
 		Database:        "session",
 		TableName:       "session",
 		Timeout:         30 * time.Second,
-		MaxOpenConn:     100,
-		MaxIdleConn:     100,
+		MaxOpenConns:    100,
+		MaxIdleConns:    100,
 		ConnMaxLifetime: 1 * time.Second,
 	}
 }
