@@ -6,7 +6,7 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 )
 
-// Config configuration of provider
+// Config provider settings
 type Config struct {
 	// Prefix key
 	KeyPrefix string

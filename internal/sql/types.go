@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Config configuration of provider
+// ProviderConfig provider settings
 type ProviderConfig struct {
 	// SQL driver
 	Driver string

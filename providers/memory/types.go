@@ -6,7 +6,7 @@ import (
 	"github.com/fasthttp/session/v2"
 )
 
-// Config configuration of provider
+// Config provider settings
 type Config struct{}
 
 // Provider backend manager

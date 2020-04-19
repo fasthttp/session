@@ -7,7 +7,7 @@ import (
 	"github.com/go-redis/redis/v7"
 )
 
-// Config configuration of provider
+// Config provider settings
 type Config struct {
 	// Key prefix
 	KeyPrefix string

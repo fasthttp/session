@@ -6,7 +6,7 @@ import (
 	"github.com/fasthttp/session/v2/internal/sql"
 )
 
-// Config configuration of provider
+// Config provider settings
 type Config struct {
 	// DB host
 	Host string
