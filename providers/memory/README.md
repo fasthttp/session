@@ -9,4 +9,4 @@ Better encoder:
 
 **_WARNING_**
 
-Not use in production, just for testing!
+Don't use in production. Only for testing!
