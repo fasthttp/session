@@ -36,8 +36,21 @@ func NewProvider(cfg ProviderConfig) (*Provider, error) {
 // Returns the number of rows affected by an update, insert, or delete.
 // Not every database or database driver may support this.
 func (p *Provider) Exec(query string, args ...interface{}) (int64, error) {
-	result, err := p.db.Exec(query, args...)
+	tx, err := p.db.Begin()
 	if err != nil {
+		return 0, err
+	}
+
+	result, err := tx.Exec(query, args...)
+	if err != nil {
+		tx.Rollback()
+
+		return 0, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+
 		return 0, err
 	}
 

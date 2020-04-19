@@ -35,8 +35,18 @@ func init() {
 		encoder = session.MSGPEncode
 		decoder = session.MSGPDecode
 		provider, err = memory.New(memory.Config{})
-
+	case "redis":
+		encoder = session.MSGPEncode
+		decoder = session.MSGPDecode
+		provider, err = redis.New(redis.Config{
+			KeyPrefix:   "session",
+			Addr:        "127.0.0.1:6379",
+			PoolSize:    8,
+			IdleTimeout: 30 * time.Second,
+		})
 	case "memcache":
+		encoder = session.MSGPEncode
+		decoder = session.MSGPDecode
 		provider, err = memcache.New(memcache.Config{
 			KeyPrefix: "session",
 			ServerList: []string{
@@ -50,15 +60,6 @@ func init() {
 	case "postgre":
 		cfg := postgre.NewConfigWith("127.0.0.1", 5432, "postgres", "session", "test", "session")
 		provider, err = postgre.New(cfg)
-	case "redis":
-		encoder = session.MSGPEncode
-		decoder = session.MSGPDecode
-		provider, err = redis.New(redis.Config{
-			KeyPrefix:   "session",
-			Addr:        "127.0.0.1:6379",
-			PoolSize:    8,
-			IdleTimeout: 30 * time.Second,
-		})
 	case "sqlite3":
 		cfg := sqlite3.NewConfigWith("test.db", "session")
 		provider, err = sqlite3.New(cfg)

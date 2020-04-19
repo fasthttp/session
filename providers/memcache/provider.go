@@ -42,6 +42,10 @@ func New(cfg Config) (*Provider, error) {
 	db.Timeout = cfg.Timeout
 	db.MaxIdleConns = cfg.MaxIdleConns
 
+	if err := db.Ping(); err != nil {
+		return nil, err
+	}
+
 	p := &Provider{
 		config: cfg,
 		db:     db,
