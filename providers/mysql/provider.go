@@ -12,10 +12,10 @@ import (
 var initQueries = []string{
 	"DROP TABLE IF EXISTS %s;",
 	`CREATE TABLE IF NOT EXISTS %s (
-		id varchar(64) NOT NULL DEFAULT '' COMMENT 'Session id',
+		id VARCHAR(64) NOT NULL DEFAULT '' COMMENT 'Session id',
 		data TEXT NOT NULL COMMENT 'Session data',
-		last_active int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Last active time',
-		expiration int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Expiration time',
+		last_active BIGINT SIGNED NOT NULL DEFAULT '0' COMMENT 'Last active time',
+		expiration INT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Expiration time',
 		PRIMARY KEY (id),
 		KEY last_active (last_active),
 		KEY expiration (expiration)

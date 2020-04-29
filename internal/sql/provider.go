@@ -83,7 +83,7 @@ func (p *Provider) Get(id []byte) ([]byte, error) {
 
 // Save saves the session data and expiration from the given session id
 func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
-	now := time.Now().Unix()
+	now := time.Now().UnixNano()
 
 	n, err := p.Exec(p.config.SQLSave, gotils.B2S(data), now, expiration.Seconds(), gotils.B2S(id))
 	if err != nil {
@@ -103,7 +103,7 @@ func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
 // Regenerate updates the session id and expiration with the new session id
 // of the the given current session id
 func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error {
-	now := time.Now().Unix()
+	now := time.Now().UnixNano()
 
 	n, err := p.Exec(p.config.SQLRegenerate, gotils.B2S(newID), now, expiration.Seconds(), gotils.B2S(id))
 	if err != nil {
@@ -145,7 +145,7 @@ func (p *Provider) NeedGC() bool {
 
 // GC destroys the expired sessions
 func (p *Provider) GC() {
-	_, err := p.Exec(p.config.SQLGC, time.Now().Unix())
+	_, err := p.Exec(p.config.SQLGC, time.Now().UnixNano())
 	if err != nil {
 		panic(err)
 	}

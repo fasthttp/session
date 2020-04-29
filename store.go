@@ -80,17 +80,17 @@ func (s *Store) HasExpirationChanged() bool {
 
 // GetExpiration returns the expiration for current session
 func (s *Store) GetExpiration() time.Duration {
-	expiration, ok := s.Get(expirationAttrKey).(time.Duration)
+	expiration, ok := s.Get(expirationAttrKey).(int64)
 	if !ok {
 		return s.defaultExpiration
 	}
 
-	return expiration
+	return time.Duration(expiration)
 }
 
 // SetExpiration sets the expiration for current session
 func (s *Store) SetExpiration(expiration time.Duration) error {
-	s.Set(expirationAttrKey, expiration)
+	s.Set(expirationAttrKey, int64(expiration))
 
 	return nil
 }

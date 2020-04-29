@@ -14,7 +14,7 @@ var initQueries = []string{
 	`CREATE TABLE IF NOT EXISTS %s (
 		id VARCHAR(64) PRIMARY KEY NOT NULL DEFAULT '',
 		data TEXT NOT NULL,
-		last_active INT NOT NULL DEFAULT '0',
+		last_active BIGINT NOT NULL DEFAULT '0',
 		expiration INT NOT NULL DEFAULT '0'
 	);`,
 	"CREATE INDEX last_active ON %s (last_active);",

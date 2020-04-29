@@ -186,7 +186,7 @@ func (s *Session) Save(ctx *fasthttp.RequestCtx, store *Store) error {
 
 	data, err := s.config.EncodeFunc(store.GetAll())
 	if err != nil {
-		return nil
+		return err
 	}
 
 	if err := s.provider.Save(id, data, store.GetExpiration()); err != nil {
@@ -208,10 +208,6 @@ func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) error {
 	}
 
 	id := s.getSessionID(ctx)
-	// if len(id) == 0 {
-	// 	return nil
-	// }
-
 	newID := s.config.SessionIDGeneratorFunc()
 	if len(newID) == 0 {
 		return errEmptySessionID
