@@ -15,7 +15,7 @@ var initQueries = []string{
 		id VARCHAR(64) NOT NULL DEFAULT '' COMMENT 'Session id',
 		data TEXT NOT NULL COMMENT 'Session data',
 		last_active BIGINT SIGNED NOT NULL DEFAULT '0' COMMENT 'Last active time',
-		expiration INT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Expiration time',
+		expiration BIGINT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Expiration time',
 		PRIMARY KEY (id),
 		KEY last_active (last_active),
 		KEY expiration (expiration)

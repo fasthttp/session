@@ -51,7 +51,7 @@ func (p *Provider) Get(id []byte) ([]byte, error) {
 func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
 	item := acquireItem()
 	item.data = data
-	item.lastActiveTime = time.Now().Unix()
+	item.lastActiveTime = time.Now().UnixNano()
 	item.expiration = expiration
 
 	p.db.SetBytes(id, item)
@@ -65,7 +65,7 @@ func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error 
 	data := p.db.GetBytes(id)
 	if data != nil {
 		item := data.(*item)
-		item.lastActiveTime = time.Now().Unix()
+		item.lastActiveTime = time.Now().UnixNano()
 		item.expiration = expiration
 
 		p.db.SetBytes(newID, item)
@@ -100,7 +100,7 @@ func (p *Provider) NeedGC() bool {
 
 // GC destroys the expired sessions
 func (p *Provider) GC() {
-	now := time.Now().Unix()
+	now := time.Now().UnixNano()
 
 	for _, kv := range p.db.D {
 		item := kv.Value.(*item)
@@ -109,7 +109,7 @@ func (p *Provider) GC() {
 			continue
 		}
 
-		if now >= (item.lastActiveTime + int64(item.expiration.Seconds())) {
+		if now >= (item.lastActiveTime + item.expiration.Nanoseconds()) {
 			p.Destroy(kv.Key)
 		}
 	}

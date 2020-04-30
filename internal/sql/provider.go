@@ -85,13 +85,13 @@ func (p *Provider) Get(id []byte) ([]byte, error) {
 func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
 	now := time.Now().UnixNano()
 
-	n, err := p.Exec(p.config.SQLSave, gotils.B2S(data), now, expiration.Seconds(), gotils.B2S(id))
+	n, err := p.Exec(p.config.SQLSave, gotils.B2S(data), now, expiration.Nanoseconds(), gotils.B2S(id))
 	if err != nil {
 		return err
 	}
 
 	if n == 0 { // Not exist
-		_, err = p.Exec(p.config.SQLInsert, gotils.B2S(id), gotils.B2S(data), now, expiration.Seconds())
+		_, err = p.Exec(p.config.SQLInsert, gotils.B2S(id), gotils.B2S(data), now, expiration.Nanoseconds())
 		if err != nil {
 			return err
 		}
@@ -105,13 +105,13 @@ func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
 func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error {
 	now := time.Now().UnixNano()
 
-	n, err := p.Exec(p.config.SQLRegenerate, gotils.B2S(newID), now, expiration.Seconds(), gotils.B2S(id))
+	n, err := p.Exec(p.config.SQLRegenerate, gotils.B2S(newID), now, expiration.Nanoseconds(), gotils.B2S(id))
 	if err != nil {
 		return err
 	}
 
 	if n == 0 { // Not exist
-		_, err = p.Exec(p.config.SQLInsert, gotils.B2S(newID), "", now, expiration.Seconds())
+		_, err = p.Exec(p.config.SQLInsert, gotils.B2S(newID), "", now, expiration.Nanoseconds())
 		if err != nil {
 			return err
 		}

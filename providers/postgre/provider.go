@@ -15,7 +15,7 @@ var initQueries = []string{
 		id VARCHAR(64) PRIMARY KEY NOT NULL DEFAULT '',
 		data TEXT NOT NULL,
 		last_active BIGINT NOT NULL DEFAULT '0',
-		expiration INT NOT NULL DEFAULT '0'
+		expiration BIGINT NOT NULL DEFAULT '0'
 	);`,
 	"CREATE INDEX last_active ON %s (last_active);",
 	"CREATE INDEX expiration ON %s (expiration);",
