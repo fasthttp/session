@@ -12,6 +12,9 @@ os:
   - linux
   - osx
 
+before_install:
+  - go get -v
+
 script:
   # build test for supported platforms
   - GOOS=linux go build
