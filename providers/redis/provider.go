@@ -1,9 +1,10 @@
 package redis
 
 import (
+	"context"
 	"time"
 
-	"github.com/go-redis/redis/v7"
+	"github.com/go-redis/redis/v8"
 	"github.com/valyala/bytebufferpool"
 )
 
@@ -36,7 +37,7 @@ func New(cfg Config) (*Provider, error) {
 		Limiter:            cfg.Limiter,
 	})
 
-	if err := db.Ping().Err(); err != nil {
+	if err := db.Ping(context.Background()).Err(); err != nil {
 		return nil, errRedisConnection(err)
 	}
 
@@ -65,7 +66,7 @@ func (p *Provider) getRedisSessionKey(sessionID []byte) string {
 func (p *Provider) Get(id []byte) ([]byte, error) {
 	key := p.getRedisSessionKey(id)
 
-	reply, err := p.db.Get(key).Bytes()
+	reply, err := p.db.Get(context.Background(), key).Bytes()
 	if err != nil && err != redis.Nil {
 		return nil, err
 	}
@@ -78,7 +79,7 @@ func (p *Provider) Get(id []byte) ([]byte, error) {
 func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
 	key := p.getRedisSessionKey(id)
 
-	return p.db.Set(key, data, expiration).Err()
+	return p.db.Set(context.Background(), key, data, expiration).Err()
 }
 
 // Regenerate updates the session id and expiration with the new session id
@@ -87,17 +88,17 @@ func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error 
 	key := p.getRedisSessionKey(id)
 	newKey := p.getRedisSessionKey(newID)
 
-	exists, err := p.db.Exists(key).Result()
+	exists, err := p.db.Exists(context.Background(), key).Result()
 	if err != nil {
 		return err
 	}
 
 	if exists > 0 { // Exist
-		if err = p.db.Rename(key, newKey).Err(); err != nil {
+		if err = p.db.Rename(context.Background(), key, newKey).Err(); err != nil {
 			return err
 		}
 
-		if err = p.db.Expire(newKey, expiration).Err(); err != nil {
+		if err = p.db.Expire(context.Background(), newKey, expiration).Err(); err != nil {
 			return err
 		}
 	}
@@ -109,12 +110,12 @@ func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error 
 func (p *Provider) Destroy(id []byte) error {
 	key := p.getRedisSessionKey(id)
 
-	return p.db.Del(key).Err()
+	return p.db.Del(context.Background(), key).Err()
 }
 
 // Count returns the total of stored sessions
 func (p *Provider) Count() int {
-	reply, err := p.db.Keys(p.getRedisSessionKey(all)).Result()
+	reply, err := p.db.Keys(context.Background(), p.getRedisSessionKey(all)).Result()
 	if err != nil {
 		return 0
 	}
