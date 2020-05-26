@@ -7,22 +7,6 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-type CookieSameSite int
-
-const (
-	// CookieSameSiteDisabled removes the SameSite flag
-	CookieSameSiteDisabled CookieSameSite = iota
-	// CookieSameSiteDefaultMode sets the SameSite flag
-	CookieSameSiteDefaultMode
-	// CookieSameSiteLaxMode sets the SameSite flag with the "Lax" parameter
-	CookieSameSiteLaxMode
-	// CookieSameSiteStrictMode sets the SameSite flag with the "Strict" parameter
-	CookieSameSiteStrictMode
-	// CookieSameSiteNoneMode sets the SameSite flag with the "None" parameter
-	// see https://tools.ietf.org/html/draft-west-cookie-incrementalism-00
-	CookieSameSiteNoneMode
-)
-
 func newCookie() *cookie {
 	return new(cookie)
 }
