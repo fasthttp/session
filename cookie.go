@@ -14,7 +14,7 @@ func (c *cookie) get(ctx *fasthttp.RequestCtx, name string) []byte {
 	return ctx.Request.Header.Cookie(name)
 }
 
-func (c *cookie) set(ctx *fasthttp.RequestCtx, name string, value []byte, domain string, expiration time.Duration, secure bool, CookieSameSite fasthttp.CookieSameSite) {
+func (c *cookie) set(ctx *fasthttp.RequestCtx, name string, value []byte, domain string, expiration time.Duration, secure bool, sameSite fasthttp.CookieSameSite) {
 	cookie := fasthttp.AcquireCookie()
 
 	cookie.SetKey(name)
@@ -22,7 +22,7 @@ func (c *cookie) set(ctx *fasthttp.RequestCtx, name string, value []byte, domain
 	cookie.SetHTTPOnly(true)
 	cookie.SetDomain(domain)
 	cookie.SetValueBytes(value)
-	cookie.SetSameSite(CookieSameSite)
+	cookie.SetSameSite(sameSite)
 
 	if expiration >= 0 {
 		if expiration == 0 {

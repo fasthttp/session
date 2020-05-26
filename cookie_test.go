@@ -72,6 +72,10 @@ func TestCookie_set(t *testing.T) {
 		t.Errorf("cookie.set() Secure == %v, want %v", resultCookie.Secure(), secure)
 	}
 
+	if resultCookie.SameSite() != fasthttp.CookieSameSiteLaxMode {
+		t.Errorf("cookie.set() SameSite == %v, want %v", resultCookie.SameSite(), samesite)
+	}
+
 	if v := ctx.Request.Header.Cookie(key); string(v) != string(value) {
 		t.Errorf("cookie.set() request value == %s, want %s", v, value)
 	}
