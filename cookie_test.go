@@ -39,7 +39,7 @@ func TestCookie_set(t *testing.T) {
 	domain := "domain"
 	expiration := 10 * time.Second
 	secure := true
-	samesite := "Lax"
+	samesite := fasthttp.CookieSameSiteLaxMode
 
 	now := time.Now()
 	cookie.set(ctx, key, value, domain, expiration, secure, samesite)

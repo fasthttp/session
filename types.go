@@ -31,7 +31,7 @@ type Config struct {
 
 	// allows you to declare if your cookie should be restricted to a first-party or same-site context.
 	// possible values: lax, strict, none
-	SameSite string
+	CookieSameSite fasthttp.CookieSameSite
 
 	// sessionID is in url query
 	SessionIDInURLQuery bool

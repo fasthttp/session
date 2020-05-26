@@ -1,7 +1,6 @@
 package session
 
 import (
-	"strings"
 	"time"
 
 	"github.com/valyala/fasthttp"
@@ -15,7 +14,7 @@ func (c *cookie) get(ctx *fasthttp.RequestCtx, name string) []byte {
 	return ctx.Request.Header.Cookie(name)
 }
 
-func (c *cookie) set(ctx *fasthttp.RequestCtx, name string, value []byte, domain string, expiration time.Duration, secure bool, sameSite string) {
+func (c *cookie) set(ctx *fasthttp.RequestCtx, name string, value []byte, domain string, expiration time.Duration, secure bool, CookieSameSite fasthttp.CookieSameSite) {
 	cookie := fasthttp.AcquireCookie()
 
 	cookie.SetKey(name)
@@ -23,17 +22,7 @@ func (c *cookie) set(ctx *fasthttp.RequestCtx, name string, value []byte, domain
 	cookie.SetHTTPOnly(true)
 	cookie.SetDomain(domain)
 	cookie.SetValueBytes(value)
-
-	switch strings.ToLower(sameSite) {
-	case "lax":
-		cookie.SetSameSite(fasthttp.CookieSameSiteLaxMode)
-	case "strict":
-		cookie.SetSameSite(fasthttp.CookieSameSiteStrictMode)
-	case "none":
-		cookie.SetSameSite(fasthttp.CookieSameSiteNoneMode)
-	default:
-		cookie.SetSameSite(fasthttp.CookieSameSiteDisabled)
-	}
+	cookie.SetSameSite(CookieSameSite)
 
 	if expiration >= 0 {
 		if expiration == 0 {
