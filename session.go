@@ -92,7 +92,7 @@ func (s *Session) stopGC() {
 
 func (s *Session) setHTTPValues(ctx *fasthttp.RequestCtx, sessionID []byte, expiration time.Duration) {
 	secure := s.config.Secure && s.config.IsSecureFunc(ctx)
-	s.cookie.set(ctx, s.config.CookieName, sessionID, s.config.Domain, expiration, secure, s.config.SameSite)
+	s.cookie.set(ctx, s.config.CookieName, sessionID, s.config.Domain, expiration, secure, s.config.CookieSameSite)
 
 	if s.config.SessionIDInHTTPHeader {
 		ctx.Request.Header.SetBytesV(s.config.SessionNameInHTTPHeader, sessionID)
