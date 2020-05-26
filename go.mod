@@ -4,6 +4,7 @@ go 1.11
 
 require (
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b
+	github.com/fasthttp/router v1.1.4
 	github.com/go-redis/redis/v8 v8.0.0-beta.2
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/lib/pq v1.5.2

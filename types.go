@@ -29,6 +29,10 @@ type Config struct {
 	// set whether to pass this bar cookie only through HTTPS
 	Secure bool
 
+	// allows you to declare if your cookie should be restricted to a first-party or same-site context.
+	// possible values: lax, strict, none
+	SameSite string
+
 	// sessionID is in url query
 	SessionIDInURLQuery bool
 
