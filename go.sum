@@ -85,10 +85,10 @@ github.com/philhofer/fwd v1.0.0/go.mod h1:gk3iGcWd9+svBvR0sR+KPcfE+RNWozjowpeBVG
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
-github.com/savsgio/dictpool v0.0.0-20200608103930-183a3465dc11 h1:2410QHOZt5vR/VPP9IbX9N1lIumi8Zv+qRiNJWqkEsI=
-github.com/savsgio/dictpool v0.0.0-20200608103930-183a3465dc11/go.mod h1:/B+on+V676AurJy5EO4m6WZ43mhAlXpE4Ig7OoAayxA=
-github.com/savsgio/gotils v0.0.0-20200608092407-b1456038b6ca h1:fHGQex3/DBt5QH/ZpMCseG2ytKjCiISEkMD4RMT51Dg=
-github.com/savsgio/gotils v0.0.0-20200608092407-b1456038b6ca/go.mod h1:TWNAOTaVzGOXq8RbEvHnhzA/A2sLZzgn0m6URjnukY8=
+github.com/savsgio/dictpool v0.0.0-20200608150529-6a3c1a8f6ab2 h1:V+VG/pzeMdwBlS21mJmNkBnQQmZWyuBgYRoz0SVxaVk=
+github.com/savsgio/dictpool v0.0.0-20200608150529-6a3c1a8f6ab2/go.mod h1:LTEdLD+Y+KR4yx9eRMIgciXZo4Od0doGWP/hjgfOlE0=
+github.com/savsgio/gotils v0.0.0-20200608150037-a5f6f5aef16c h1:2nF5+FZ4/qp7pZVL7fR6DEaSTzuDmNaFTyqp92/hwF8=
+github.com/savsgio/gotils v0.0.0-20200608150037-a5f6f5aef16c/go.mod h1:TWNAOTaVzGOXq8RbEvHnhzA/A2sLZzgn0m6URjnukY8=
 github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72 h1:qLC7fQah7D6K1B0ujays3HV9gkFtllcxhzImRR7ArPQ=
 github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
