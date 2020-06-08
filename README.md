@@ -7,7 +7,7 @@
 
 Session implementation for [fasthttp](https://github.com/valyala/fasthttp).
 
-See [examples](https://github.com/fasthttp/session/tree/master/examples) to see how to use it.
+See [examples](_examples/) to see how to use it.
 
 ## Providers
 
