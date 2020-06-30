@@ -183,17 +183,23 @@ func (s *Session) Save(ctx *fasthttp.RequestCtx, store *Store) error {
 	}
 
 	id := store.GetSessionID()
+	expiration := store.GetExpiration()
+
+	providerExpiration := expiration
+	if expiration == -1 {
+		providerExpiration = keepAliveExpiration
+	}
 
 	data, err := s.config.EncodeFunc(store.GetAll())
 	if err != nil {
 		return err
 	}
 
-	if err := s.provider.Save(id, data, store.GetExpiration()); err != nil {
+	if err := s.provider.Save(id, data, providerExpiration); err != nil {
 		return err
 	}
 
-	s.setHTTPValues(ctx, id, store.GetExpiration())
+	s.setHTTPValues(ctx, id, expiration)
 
 	store.Reset()
 	s.storePool.Put(store)
@@ -208,16 +214,23 @@ func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) error {
 	}
 
 	id := s.getSessionID(ctx)
+	expiration := s.config.Expiration
+
 	newID := s.config.SessionIDGeneratorFunc()
 	if len(newID) == 0 {
 		return errEmptySessionID
 	}
 
-	if err := s.provider.Regenerate(id, newID, s.config.Expiration); err != nil {
+	providerExpiration := expiration
+	if expiration == -1 {
+		providerExpiration = keepAliveExpiration
+	}
+
+	if err := s.provider.Regenerate(id, newID, providerExpiration); err != nil {
 		return err
 	}
 
-	s.setHTTPValues(ctx, newID, s.config.Expiration)
+	s.setHTTPValues(ctx, newID, expiration)
 
 	return nil
 }
