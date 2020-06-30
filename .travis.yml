@@ -23,6 +23,10 @@ jobs:
     - go: tip
 
   include:
+    - name: "Enabling Go modules in 1.11.x"
+      go: 1.11.x
+      env: GO111MODULE=on
+
     - stage: cross compilation
       script:
         - GOOS=linux go build
