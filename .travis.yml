@@ -12,9 +12,6 @@ go:
   - 1.11.x
   - tip
 
-env:
-  - GO111MODULE=on
-
 before_script:
   - go get -t -v ./...
 
@@ -25,6 +22,7 @@ jobs:
   allow_failures:
     - go: tip
 
+  include:
     - stage: cross compilation
       script:
         - GOOS=linux go build
