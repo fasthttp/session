@@ -12,6 +12,9 @@ go:
   - 1.11.x
   - tip
 
+env:
+  - GO111MODULE=on
+
 before_script:
   - go get -t -v ./...
 
@@ -21,11 +24,6 @@ script:
 jobs:
   allow_failures:
     - go: tip
-
-  include:
-    - name: "Enabling Go modules in 1.11.x"
-      go: 1.11.x
-      env: GO111MODULE=on
 
     - stage: cross compilation
       script:
