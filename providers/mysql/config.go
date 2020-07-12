@@ -15,6 +15,7 @@ func NewDefaultConfig() Config {
 		Password:        "",
 		Database:        "session",
 		TableName:       "session",
+		ResetTable:      false,
 		Charset:         "utf8",
 		Collation:       "utf8_general_ci",
 		Timeout:         30 * time.Second,

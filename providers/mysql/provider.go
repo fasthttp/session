@@ -9,9 +9,10 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var initQueries = []string{
-	"DROP TABLE IF EXISTS %s;",
-	`CREATE TABLE IF NOT EXISTS %s (
+var (
+	dropQuery   = "DROP TABLE IF EXISTS %s;"
+	initQueries = []string{
+		`CREATE TABLE IF NOT EXISTS %s (
 		id VARCHAR(64) NOT NULL DEFAULT '' COMMENT 'Session id',
 		data TEXT NOT NULL COMMENT 'Session data',
 		last_active BIGINT SIGNED NOT NULL DEFAULT '0' COMMENT 'Last active time',
@@ -20,7 +21,8 @@ var initQueries = []string{
 		KEY last_active (last_active),
 		KEY expiration (expiration)
 	 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='session table';`,
-}
+	}
+)
 
 // New returns a new configured mysql provider
 func New(cfg Config) (*Provider, error) {
@@ -64,11 +66,17 @@ func New(cfg Config) (*Provider, error) {
 }
 
 func (p *Provider) init() error {
+	if p.config.DropTable {
+		_, err := p.Exec(fmt.Sprintf(dropQuery, p.config.TableName))
+		if err != nil {
+			p.Close()
+			return err
+		}
+	}
 	for _, query := range initQueries {
 		_, err := p.Exec(fmt.Sprintf(query, p.config.TableName))
 		if err != nil {
 			p.Close()
-
 			return err
 		}
 	}

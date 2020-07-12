@@ -14,6 +14,9 @@ type Config struct {
 	// DB table name
 	TableName string
 
+	// When set to true, this will Drop any existing table with the same name
+	DropTable bool
+
 	// The maximum number of connections in the idle connection pool.
 	//
 	// If MaxOpenConns is greater than 0 but less than the new MaxIdleConns,
