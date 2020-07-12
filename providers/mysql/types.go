@@ -26,6 +26,9 @@ type Config struct {
 	// DB table name
 	TableName string
 
+	// When set to true, this will Drop any existing table with the same name
+	DropTable bool
+
 	// Charset used for client-server interaction ("SET NAMES <value>")
 	// If multiple charsets are set (separated by a comma),
 	// the following charset is used if setting the charset failes

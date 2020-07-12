@@ -9,17 +9,19 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var initQueries = []string{
-	"DROP TABLE IF EXISTS %s;",
-	`CREATE TABLE IF NOT EXISTS %s (
+var (
+	dropQuery   = "DROP TABLE IF EXISTS %s;"
+	initQueries = []string{
+		`CREATE TABLE IF NOT EXISTS %s (
 		id VARCHAR(64) PRIMARY KEY NOT NULL DEFAULT '',
 		data TEXT NOT NULL,
 		last_active BIGINT NOT NULL DEFAULT '0',
 		expiration BIGINT NOT NULL DEFAULT '0'
 	);`,
-	"CREATE INDEX last_active ON %s (last_active);",
-	"CREATE INDEX expiration ON %s (expiration);",
-}
+		"CREATE INDEX last_active ON %s (last_active);",
+		"CREATE INDEX expiration ON %s (expiration);",
+	}
+)
 
 // New returns a new configured sqlite3 provider
 func New(cfg Config) (*Provider, error) {
@@ -60,11 +62,17 @@ func New(cfg Config) (*Provider, error) {
 }
 
 func (p *Provider) init() error {
+	if p.config.DropTable {
+		_, err := p.Exec(fmt.Sprintf(dropQuery, p.config.TableName))
+		if err != nil {
+			p.Close()
+			return err
+		}
+	}
 	for _, query := range initQueries {
 		_, err := p.Exec(fmt.Sprintf(query, p.config.TableName))
 		if err != nil {
 			p.Close()
-
 			return err
 		}
 	}

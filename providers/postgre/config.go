@@ -15,6 +15,7 @@ func NewDefaultConfig() Config {
 		Password:        "",
 		Database:        "session",
 		TableName:       "session",
+		ResetTable:      false,
 		Timeout:         30 * time.Second,
 		MaxOpenConns:    100,
 		MaxIdleConns:    100,

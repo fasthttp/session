@@ -26,6 +26,9 @@ type Config struct {
 	// DB table name
 	TableName string
 
+	// When set to true, this will Drop any existing table with the same name
+	DropTable bool
+
 	// Maximum wait for connection, in seconds. Zero or
 	// not specified means wait indefinitely.
 	Timeout time.Duration
