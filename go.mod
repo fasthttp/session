@@ -1,10 +1,10 @@
 module github.com/fasthttp/session/v2
 
-go 1.11
+go 1.12
 
 require (
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b
-	github.com/go-redis/redis/v8 v8.0.0-beta.5
+	github.com/go-redis/redis/v8 v8.0.0-beta.6
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/lib/pq v1.7.0
 	github.com/mattn/go-sqlite3 v1.14.0
