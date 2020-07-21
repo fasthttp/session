@@ -18,8 +18,8 @@ var (
 		last_active BIGINT NOT NULL DEFAULT '0',
 		expiration BIGINT NOT NULL DEFAULT '0'
 	);`,
-		"CREATE INDEX last_active ON %s (last_active);",
-		"CREATE INDEX expiration ON %s (expiration);",
+		"CREATE INDEX IF NOT EXISTS last_active ON %s (last_active);",
+		"CREATE INDEX IF NOT EXISTS expiration ON %s (expiration);",
 	}
 )
 
