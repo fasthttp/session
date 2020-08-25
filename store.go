@@ -63,7 +63,11 @@ func (s *Store) Flush() {
 
 // GetSessionID returns the session id
 func (s *Store) GetSessionID() []byte {
-	return s.sessionID
+	s.lock.RLock()
+	id := s.sessionID
+	s.lock.RUnlock()
+
+	return id
 }
 
 // SetSessionID sets the session id
