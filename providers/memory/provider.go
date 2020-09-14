@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/fasthttp/session/v2"
+	"github.com/savsgio/gotils"
 )
 
 var itemPool = &sync.Pool{
@@ -110,7 +111,7 @@ func (p *Provider) GC() {
 		}
 
 		if now >= (item.lastActiveTime + item.expiration.Nanoseconds()) {
-			p.Destroy(kv.Key)
+			p.Destroy(gotils.S2B(kv.Key))
 		}
 	}
 }
