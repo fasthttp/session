@@ -144,9 +144,8 @@ func (p *Provider) NeedGC() bool {
 }
 
 // GC destroys the expired sessions
-func (p *Provider) GC() {
+func (p *Provider) GC() error {
 	_, err := p.Exec(p.config.SQLGC, time.Now().UnixNano())
-	if err != nil {
-		panic(err)
-	}
+
+	return err
 }

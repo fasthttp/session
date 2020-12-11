@@ -100,7 +100,7 @@ func (p *Provider) NeedGC() bool {
 }
 
 // GC destroys the expired sessions
-func (p *Provider) GC() {
+func (p *Provider) GC() error {
 	now := time.Now().UnixNano()
 
 	for _, kv := range p.db.D {
@@ -114,4 +114,6 @@ func (p *Provider) GC() {
 			p.Destroy(gotils.S2B(kv.Key))
 		}
 	}
+
+	return nil
 }

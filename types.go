@@ -95,5 +95,5 @@ type Provider interface {
 	Regenerate(id, newID []byte, expiration time.Duration) error
 	Count() int
 	NeedGC() bool
-	GC()
+	GC() error
 }

@@ -1,7 +1,7 @@
 package session
 
 import (
-	"fmt"
+	"log"
 	"sync"
 	"time"
 
@@ -69,17 +69,13 @@ func (s *Session) SetProvider(provider Provider) error {
 }
 
 func (s *Session) startGC() {
-	defer func() {
-		e := recover()
-		if e != nil {
-			panic(fmt.Errorf("session GC crash: %v", e))
-		}
-	}()
-
 	for {
 		select {
 		case <-time.After(s.config.GCLifetime):
-			s.provider.GC()
+			err := s.provider.GC()
+			if err != nil {
+				log.Printf("session GC crash: %v", err)
+			}
 		case <-s.stopGCChan:
 			return
 		}

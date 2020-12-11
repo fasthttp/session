@@ -1,8 +1,10 @@
 package session
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"log"
 	"reflect"
 	"testing"
 	"time"
@@ -45,12 +47,10 @@ func (p *mockProvider) NeedGC() bool {
 	return p.needGCValue
 }
 
-func (p *mockProvider) GC() {
+func (p *mockProvider) GC() error {
 	p.gcExecuted = true
 
-	if p.errGC != nil {
-		panic(p.errGC)
-	}
+	return p.errGC
 }
 
 func Test_New(t *testing.T) {
@@ -126,16 +126,17 @@ func TestSession_startGC(t *testing.T) {
 	}
 	s.provider = provider
 
-	defer func() {
-		e := recover()
-		if e == nil {
-			t.Error("Expected panic")
-		}
-	}()
+	output := &bytes.Buffer{}
+	log.SetOutput(output)
 
-	s.startGC()
-
+	go s.startGC()
 	time.Sleep(s.config.GCLifetime + 100*time.Millisecond)
+
+	s.stopGC()
+
+	if output.Len() == 0 {
+		t.Errorf("the error it not write on log")
+	}
 }
 
 func TestSession_stopGC(t *testing.T) {
