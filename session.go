@@ -43,9 +43,14 @@ func New(cfg Config) *Session {
 		cfg.DecodeFunc = Base64Decode
 	}
 
+	if cfg.Logger == nil {
+		cfg.Logger = log.New(log.Writer(), "session-manager", log.Flags())
+	}
+
 	session := &Session{
 		config: cfg,
 		cookie: newCookie(),
+		log:    cfg.Logger,
 		storePool: &sync.Pool{
 			New: func() interface{} {
 				return NewStore()
@@ -74,7 +79,7 @@ func (s *Session) startGC() {
 		case <-time.After(s.config.GCLifetime):
 			err := s.provider.GC()
 			if err != nil {
-				log.Printf("session GC crash: %v", err)
+				s.log.Printf("session GC crash: %v", err)
 			}
 		case <-s.stopGCChan:
 			return

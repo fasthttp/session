@@ -58,6 +58,9 @@ type Config struct {
 	// DecodeFunc session value unSerialize func
 	DecodeFunc func(dst *Dict, src []byte) error
 
+	// Logger
+	Logger Logger
+
 	// value cookie length
 	cookieLen uint32
 }
@@ -67,6 +70,7 @@ type Session struct {
 	provider Provider
 	config   Config
 	cookie   *cookie
+	log      Logger
 
 	storePool  *sync.Pool
 	stopGCChan chan struct{}
@@ -86,6 +90,11 @@ type Store struct {
 }
 
 type cookie struct{}
+
+type Logger interface {
+	Print(v ...interface{})
+	Printf(format string, v ...interface{})
+}
 
 // Provider interface implemented by providers
 type Provider interface {

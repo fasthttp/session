@@ -117,17 +117,18 @@ func TestSession_SetProvider(t *testing.T) {
 }
 
 func TestSession_startGC(t *testing.T) {
+	output := &bytes.Buffer{}
+	logger := log.New(output, "test", log.Flags())
+
 	s := New(Config{
 		GCLifetime: 100 * time.Millisecond,
+		Logger:     logger,
 	})
 	provider := &mockProvider{
 		needGCValue: true,
 		errGC:       errors.New("mock error"),
 	}
 	s.provider = provider
-
-	output := &bytes.Buffer{}
-	log.SetOutput(output)
 
 	go s.startGC()
 	time.Sleep(s.config.GCLifetime + 100*time.Millisecond)
