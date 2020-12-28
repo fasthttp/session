@@ -1,13 +1,8 @@
 package session
 
 import (
-	"fmt"
 	"time"
-
-	"github.com/savsgio/gotils"
 )
-
-var expirationAttrKey = fmt.Sprintf("__store:expiration:%s__", gotils.RandBytes(make([]byte, 5)))
 
 // NewStore returns a new empty store
 func NewStore() *Store {

@@ -3,7 +3,7 @@ package sqlite3
 import (
 	"time"
 
-	"github.com/fasthttp/session/v2/internal/sql"
+	"github.com/authelia/session/v2/internal/sql"
 )
 
 // Config provider settings

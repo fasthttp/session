@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fasthttp/session/v2"
+	"github.com/authelia/session/v2"
 	"github.com/savsgio/gotils"
 )
 
