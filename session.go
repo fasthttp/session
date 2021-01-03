@@ -2,10 +2,15 @@ package session
 
 import (
 	"log"
+	"os"
 	"sync"
 	"time"
 
 	"github.com/valyala/fasthttp"
+)
+
+var (
+	defaultLogger Logger = log.New(os.Stderr, "", log.LstdFlags)
 )
 
 // New returns a configured manager
@@ -44,7 +49,7 @@ func New(cfg Config) *Session {
 	}
 
 	if cfg.Logger == nil {
-		cfg.Logger = log.New(log.Writer(), "session-manager", log.Flags())
+		cfg.Logger = defaultLogger
 	}
 
 	session := &Session{
