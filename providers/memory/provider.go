@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/fasthttp/session/v2"
-	"github.com/savsgio/gotils"
+	"github.com/savsgio/gotils/strconv"
 )
 
 var itemPool = &sync.Pool{
@@ -111,7 +111,7 @@ func (p *Provider) GC() error {
 		}
 
 		if now >= (item.lastActiveTime + item.expiration.Nanoseconds()) {
-			p.Destroy(gotils.S2B(kv.Key))
+			p.Destroy(strconv.S2B(kv.Key))
 		}
 	}
 

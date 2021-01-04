@@ -8,8 +8,8 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/lib/pq v1.9.0
 	github.com/mattn/go-sqlite3 v1.14.6
-	github.com/savsgio/dictpool v0.0.0-20201211144637-d4adfdb24374
-	github.com/savsgio/gotils v0.0.0-20200909101946-939aa3fc74fb
+	github.com/savsgio/dictpool v0.0.0-20210104112344-3a2df09158c0
+	github.com/savsgio/gotils v0.0.0-20210104112019-96a5e1e9898f
 	github.com/valyala/bytebufferpool v1.0.0
-	github.com/valyala/fasthttp v1.18.0
+	github.com/valyala/fasthttp v1.19.0
 )
