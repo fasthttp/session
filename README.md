@@ -1,9 +1,6 @@
 # session
 
-[![Build Status](https://img.shields.io/shippable/5444c5ecb904a4b21567b0ff.svg)](https://travis-ci.org/fasthttp/session)
-[![Go Report Card](https://goreportcard.com/badge/github.com/fasthttp/session)](https://goreportcard.com/report/github.com/fasthttp/session)
-[![GoDev](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/fasthttp/session/v2)
-[![GitHub release](https://img.shields.io/github/release/fasthttp/session.svg)](https://github.com/fasthttp/session/releases)
+Temporary Bugfix Fork of https://github.com/fasthttp/session for use with Authelia. 
 
 Session implementation for [fasthttp](https://github.com/valyala/fasthttp).
 
