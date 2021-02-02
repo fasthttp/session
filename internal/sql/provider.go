@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/savsgio/gotils"
+	"github.com/savsgio/gotils/strconv"
 )
 
 // NewProvider returns a new configured sql provider
@@ -69,7 +69,7 @@ func (p *Provider) Close() error {
 
 // Get returns the data of the given session id
 func (p *Provider) Get(id []byte) ([]byte, error) {
-	result := p.db.QueryRow(p.config.SQLGet, gotils.B2S(id))
+	result := p.db.QueryRow(p.config.SQLGet, strconv.B2S(id))
 
 	data := []byte("")
 
@@ -85,13 +85,13 @@ func (p *Provider) Get(id []byte) ([]byte, error) {
 func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
 	now := time.Now().UnixNano()
 
-	n, err := p.Exec(p.config.SQLSave, gotils.B2S(data), now, expiration.Nanoseconds(), gotils.B2S(id))
+	n, err := p.Exec(p.config.SQLSave, strconv.B2S(data), now, expiration.Nanoseconds(), strconv.B2S(id))
 	if err != nil {
 		return err
 	}
 
 	if n == 0 { // Not exist
-		_, err = p.Exec(p.config.SQLInsert, gotils.B2S(id), gotils.B2S(data), now, expiration.Nanoseconds())
+		_, err = p.Exec(p.config.SQLInsert, strconv.B2S(id), strconv.B2S(data), now, expiration.Nanoseconds())
 		if err != nil {
 			return err
 		}
@@ -105,13 +105,13 @@ func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
 func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error {
 	now := time.Now().UnixNano()
 
-	n, err := p.Exec(p.config.SQLRegenerate, gotils.B2S(newID), now, expiration.Nanoseconds(), gotils.B2S(id))
+	n, err := p.Exec(p.config.SQLRegenerate, strconv.B2S(newID), now, expiration.Nanoseconds(), strconv.B2S(id))
 	if err != nil {
 		return err
 	}
 
 	if n == 0 { // Not exist
-		_, err = p.Exec(p.config.SQLInsert, gotils.B2S(newID), "", now, expiration.Nanoseconds())
+		_, err = p.Exec(p.config.SQLInsert, strconv.B2S(newID), "", now, expiration.Nanoseconds())
 		if err != nil {
 			return err
 		}

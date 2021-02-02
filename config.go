@@ -1,7 +1,7 @@
 package session
 
 import (
-	"github.com/savsgio/gotils"
+	"github.com/savsgio/gotils/bytes"
 	"github.com/valyala/fasthttp"
 )
 
@@ -30,7 +30,7 @@ func NewDefaultConfig() Config {
 }
 
 func (c *Config) defaultSessionIDGenerator() []byte {
-	return gotils.RandBytes(make([]byte, c.cookieLen))
+	return bytes.Rand(make([]byte, c.cookieLen))
 }
 
 func (c *Config) defaultIsSecureFunc(ctx *fasthttp.RequestCtx) bool {
