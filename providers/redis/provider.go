@@ -19,6 +19,7 @@ func New(cfg Config) (*Provider, error) {
 	db := redis.NewClient(&redis.Options{
 		Network:            cfg.Network,
 		Addr:               cfg.Addr,
+		Username:           cfg.Username,
 		Password:           cfg.Password,
 		DB:                 cfg.DB,
 		MaxRetries:         cfg.MaxRetries,
