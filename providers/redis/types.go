@@ -19,6 +19,9 @@ type Config struct {
 	// host:port address.
 	Addr string
 
+	// Optional username.
+	Username string
+
 	// Optional password. Must match the password specified in the
 	// requirepass server configuration option.
 	Password string
