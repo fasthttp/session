@@ -5,7 +5,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/fasthttp/router"
 	"github.com/authelia/session/v2"
 	"github.com/authelia/session/v2/providers/memcache"
 	"github.com/authelia/session/v2/providers/memory"
@@ -13,6 +12,7 @@ import (
 	"github.com/authelia/session/v2/providers/postgre"
 	"github.com/authelia/session/v2/providers/redis"
 	"github.com/authelia/session/v2/providers/sqlite3"
+	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 )
 

@@ -3,6 +3,7 @@ package memory
 import (
 	"sync"
 	"time"
+
 	"github.com/authelia/session/v2"
 	"github.com/savsgio/gotils/strconv"
 )
