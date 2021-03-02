@@ -19,6 +19,7 @@ func New(cfg Config) (*Provider, error) {
 	db := redis.NewFailoverClient(&redis.FailoverOptions{
 		MasterName:         cfg.MasterName,
 		SentinelAddrs:      cfg.SentinelAddrs,
+		SentinelPassword:   cfg.SentinelPassword,
 		RouteByLatency:     cfg.RouteByLatency,
 		RouteRandomly:      cfg.RouteRandomly,
 		SlaveOnly:          cfg.SlaveOnly,
