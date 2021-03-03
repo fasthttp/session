@@ -1,23 +1,16 @@
 package redis
 
 import (
+	"context"
 	"crypto/tls"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 )
 
-// Config provider settings
-type Config struct {
+type CommonConfig struct {
 	// Key prefix
 	KeyPrefix string
-
-	// The network type, either tcp or unix.
-	// Default is tcp.
-	Network string
-
-	// host:port address.
-	Addr string
 
 	// Optional username.
 	Username string
@@ -25,9 +18,6 @@ type Config struct {
 	// Optional password. Must match the password specified in the
 	// requirepass server configuration option.
 	Password string
-
-	// Database to be selected after connecting to the server.
-	DB int
 
 	// Maximum number of retries before giving up.
 	// Default is to not retry failed commands.
@@ -85,13 +75,82 @@ type Config struct {
 
 	// TLS Config to use. When set TLS will be negotiated.
 	TLSConfig *tls.Config
+}
+
+// Config provider settings
+type Config struct {
+	CommonConfig
+
+	// Database to be selected after connecting to the server.
+	DB int
+
+	// The network type, either tcp or unix.
+	// Default is tcp.
+	Network string
+
+	// host:port address.
+	Addr string
 
 	// Limiter interface used to implemented circuit breaker or rate limiter.
 	Limiter redis.Limiter
 }
 
+// FailoverConfig provider settings
+type FailoverConfig struct {
+	CommonConfig
+
+	// Database to be selected after connecting to the server.
+	DB int
+
+	// The sentinel master name.
+	MasterName string
+
+	// The sentinel nodes seed list (host:port).
+	SentinelAddrs []string
+
+	// The password for the sentinel connection if required (different to username/password).
+	SentinelPassword string
+
+	// Routes read-only commands to the closest node.
+	RouteByLatency bool
+
+	// Routes read-only commands in random order.
+	RouteRandomly bool
+
+	// Route read-only commands to slave nodes.
+	SlaveOnly bool
+}
+
+// ClusterConfig provider settings
+type ClusterConfig struct {
+	CommonConfig
+
+	Addrs []string
+
+	// NewClient creates a cluster node client with provided name and options.
+	NewClient func(opt *redis.Options) *redis.Client
+
+	// The maximum number of retries before giving up. Command is retried
+	// on network errors and MOVED/ASK redirects.
+	// Default is 3 retries.
+	MaxRedirects int
+
+	// Routes read-only commands to the closest node.
+	RouteByLatency bool
+
+	// Routes read-only commands in random order.
+	RouteRandomly bool
+
+	// Optional function that returns cluster slots information.
+	// It is useful to manually create cluster of standalone Redis servers
+	// and load-balance read/write operations between master and slaves.
+	// It can use service like ZooKeeper to maintain configuration information
+	// and Cluster.ReloadState to manually trigger state reloading.
+	ClusterSlots func(context.Context) ([]redis.ClusterSlot, error)
+}
+
 // Provider backend manager
 type Provider struct {
-	config Config
-	db     *redis.Client
+	keyprefix string
+	db        redis.Cmdable
 }
