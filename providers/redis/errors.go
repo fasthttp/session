@@ -7,6 +7,8 @@ import (
 
 var errConfigAddrEmpty = errors.New("Config Addr must not be empty")
 
+var errConfigMasterNameEmpty = errors.New("Config MasterName must not be empty")
+
 func errRedisConnection(err error) error {
 	return fmt.Errorf("Redis connection error: %v", err)
 }
