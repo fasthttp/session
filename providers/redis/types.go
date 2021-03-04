@@ -1,7 +1,6 @@
 package redis
 
 import (
-	"context"
 	"crypto/tls"
 	"time"
 
@@ -180,103 +179,6 @@ type FailoverConfig struct {
 
 	// TLS Config to use. When set TLS will be negotiated.
 	TLSConfig *tls.Config
-}
-
-// ClusterConfig provider settings
-type ClusterConfig struct {
-	// Key prefix
-	KeyPrefix string
-
-	// Optional username.
-	Username string
-
-	// Optional password. Must match the password specified in the
-	// requirepass server configuration option.
-	Password string
-
-	// The sentinel nodes seed list (host:port).
-	Addrs []string
-
-	// Routes read-only commands to the closest node.
-	RouteByLatency bool
-
-	// Routes read-only commands in random order.
-	RouteRandomly bool
-
-	// Route read-only commands to slave nodes.
-	SlaveOnly bool
-
-	// The maximum number of retries before giving up. Command is retried
-	// on network errors and MOVED/ASK redirects.
-	// Default is 3 retries.
-	MaxRedirects int
-
-	// Maximum number of retries before giving up.
-	// Default is to not retry failed commands.
-	MaxRetries int
-
-	// Minimum backoff between each retry.
-	// Default is 8 milliseconds; -1 disables backoff.
-	MinRetryBackoff time.Duration
-
-	// Maximum backoff between each retry.
-	// Default is 512 milliseconds; -1 disables backoff.
-	MaxRetryBackoff time.Duration
-
-	// Dial timeout for establishing new connections.
-	// Default is 5 seconds.
-	DialTimeout time.Duration
-
-	// Timeout for socket reads. If reached, commands will fail
-	// with a timeout instead of blocking. Use value -1 for no timeout and 0 for default.
-	// Default is 3 seconds.
-	ReadTimeout time.Duration
-
-	// Timeout for socket writes. If reached, commands will fail
-	// with a timeout instead of blocking.
-	// Default is ReadTimeout.
-	WriteTimeout time.Duration
-
-	// Maximum number of socket connections.
-	// Default is 10 connections per every CPU as reported by runtime.NumCPU.
-	PoolSize int
-
-	// Minimum number of idle connections which is useful when establishing
-	// new connection is slow.
-	MinIdleConns int
-
-	// Connection age at which client retires (closes) the connection.
-	// Default is to not close aged connections.
-	MaxConnAge time.Duration
-
-	// Amount of time client waits for connection if all connections
-	// are busy before returning an error.
-	// Default is ReadTimeout + 1 second.
-	PoolTimeout time.Duration
-
-	// Amount of time after which client closes idle connections.
-	// Should be less than server's timeout.
-	// Default is 5 minutes. -1 disables idle timeout check.
-	IdleTimeout time.Duration
-
-	// Frequency of idle checks made by idle connections reaper.
-	// Default is 1 minute. -1 disables idle connections reaper,
-	// but idle connections are still discarded by the client
-	// if IdleTimeout is set.
-	IdleCheckFrequency time.Duration
-
-	// TLS Config to use. When set TLS will be negotiated.
-	TLSConfig *tls.Config
-
-	// NewClient creates a cluster node client with provided name and options.
-	NewClient func(opt *redis.Options) *redis.Client
-
-	// Optional function that returns cluster slots information.
-	// It is useful to manually create cluster of standalone Redis servers
-	// and load-balance read/write operations between master and slaves.
-	// It can use service like ZooKeeper to maintain configuration information
-	// and Cluster.ReloadState to manually trigger state reloading.
-	ClusterSlots func(context.Context) ([]redis.ClusterSlot, error)
 }
 
 // Provider backend manager

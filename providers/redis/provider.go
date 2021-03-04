@@ -93,44 +93,6 @@ func NewFailover(cfg FailoverConfig) (*Provider, error) {
 	return p, nil
 }
 
-// NewFailover returns a new configured redis cluster provider
-func NewCluster(cfg ClusterConfig) (*Provider, error) {
-	db := redis.NewClusterClient(&redis.ClusterOptions{
-		Addrs:              cfg.Addrs,
-		Username:           cfg.Username,
-		Password:           cfg.Password,
-		NewClient:          cfg.NewClient,
-		ClusterSlots:       cfg.ClusterSlots,
-		RouteByLatency:     cfg.RouteByLatency,
-		RouteRandomly:      cfg.RouteRandomly,
-		MaxRedirects:       cfg.MaxRedirects,
-		MaxRetries:         cfg.MaxRetries,
-		MinRetryBackoff:    cfg.MinRetryBackoff,
-		MaxRetryBackoff:    cfg.MaxRetryBackoff,
-		DialTimeout:        cfg.DialTimeout,
-		ReadTimeout:        cfg.ReadTimeout,
-		WriteTimeout:       cfg.WriteTimeout,
-		PoolSize:           cfg.PoolSize,
-		MinIdleConns:       cfg.MinIdleConns,
-		MaxConnAge:         cfg.MaxConnAge,
-		PoolTimeout:        cfg.PoolTimeout,
-		IdleTimeout:        cfg.IdleTimeout,
-		IdleCheckFrequency: cfg.IdleCheckFrequency,
-		TLSConfig:          cfg.TLSConfig,
-	})
-
-	if err := db.Ping(context.Background()).Err(); err != nil {
-		return nil, errRedisConnection(err)
-	}
-
-	p := &Provider{
-		keyprefix: cfg.KeyPrefix,
-		db:        db,
-	}
-
-	return p, nil
-}
-
 func (p *Provider) getRedisSessionKey(sessionID []byte) string {
 	key := bytebufferpool.Get()
 	key.SetString(p.keyprefix)
