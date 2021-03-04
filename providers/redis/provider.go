@@ -60,8 +60,6 @@ func NewFailover(cfg FailoverConfig) (*Provider, error) {
 		MasterName:         cfg.MasterName,
 		SentinelAddrs:      cfg.SentinelAddrs,
 		SentinelPassword:   cfg.SentinelPassword,
-		RouteByLatency:     cfg.RouteByLatency,
-		RouteRandomly:      cfg.RouteRandomly,
 		SlaveOnly:          cfg.SlaveOnly,
 		Username:           cfg.Username,
 		Password:           cfg.Password,
