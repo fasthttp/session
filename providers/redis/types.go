@@ -114,6 +114,12 @@ type FailoverConfig struct {
 	// The password for the sentinel connection if required (different to username/password).
 	SentinelPassword string
 
+	// Routes read-only commands to the closest node. Only relevant with NewFailoverCluster.
+	RouteByLatency bool
+
+	// Routes read-only commands in random order. Only relevant with NewFailoverCluster.
+	RouteRandomly bool
+
 	// Route read-only commands to slave nodes.
 	SlaveOnly bool
 

@@ -91,6 +91,48 @@ func NewFailover(cfg FailoverConfig) (*Provider, error) {
 	return p, nil
 }
 
+func NewFailoverCluster(cfg FailoverConfig) (*Provider, error) {
+	if cfg.MasterName == "" {
+		return nil, errConfigMasterNameEmpty
+	}
+
+	db := redis.NewFailoverClusterClient(&redis.FailoverOptions{
+		MasterName:         cfg.MasterName,
+		SentinelAddrs:      cfg.SentinelAddrs,
+		SentinelPassword:   cfg.SentinelPassword,
+		RouteByLatency:     cfg.RouteByLatency,
+		RouteRandomly:      cfg.RouteRandomly,
+		SlaveOnly:          cfg.SlaveOnly,
+		Username:           cfg.Username,
+		Password:           cfg.Password,
+		DB:                 cfg.DB,
+		MaxRetries:         cfg.MaxRetries,
+		MinRetryBackoff:    cfg.MinRetryBackoff,
+		MaxRetryBackoff:    cfg.MaxRetryBackoff,
+		DialTimeout:        cfg.DialTimeout,
+		ReadTimeout:        cfg.ReadTimeout,
+		WriteTimeout:       cfg.WriteTimeout,
+		PoolSize:           cfg.PoolSize,
+		MinIdleConns:       cfg.MinIdleConns,
+		MaxConnAge:         cfg.MaxConnAge,
+		PoolTimeout:        cfg.PoolTimeout,
+		IdleTimeout:        cfg.IdleTimeout,
+		IdleCheckFrequency: cfg.IdleCheckFrequency,
+		TLSConfig:          cfg.TLSConfig,
+	})
+
+	if err := db.Ping(context.Background()).Err(); err != nil {
+		return nil, errRedisConnection(err)
+	}
+
+	p := &Provider{
+		keyprefix: cfg.KeyPrefix,
+		db:        db,
+	}
+
+	return p, nil
+}
+
 func (p *Provider) getRedisSessionKey(sessionID []byte) string {
 	key := bytebufferpool.Get()
 	key.SetString(p.keyprefix)
