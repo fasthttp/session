@@ -110,7 +110,7 @@ type FailoverConfig struct {
 	MasterName string
 
 	// The sentinel nodes seed list (host:port).
-	Addrs []string
+	SentinelAddrs []string
 
 	// The password for the sentinel connection if required (different to username/password).
 	SentinelPassword string
