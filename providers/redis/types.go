@@ -183,6 +183,6 @@ type FailoverConfig struct {
 
 // Provider backend manager
 type Provider struct {
-	keyprefix string
+	keyPrefix string
 	db        redis.Cmdable
 }

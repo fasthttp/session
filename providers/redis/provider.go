@@ -43,7 +43,7 @@ func New(cfg Config) (*Provider, error) {
 	}
 
 	p := &Provider{
-		keyprefix: cfg.KeyPrefix,
+		keyPrefix: cfg.KeyPrefix,
 		db:        db,
 	}
 
@@ -84,7 +84,7 @@ func NewFailover(cfg FailoverConfig) (*Provider, error) {
 	}
 
 	p := &Provider{
-		keyprefix: cfg.KeyPrefix,
+		keyPrefix: cfg.KeyPrefix,
 		db:        db,
 	}
 
@@ -127,7 +127,7 @@ func NewFailoverCluster(cfg FailoverConfig) (*Provider, error) {
 	}
 
 	p := &Provider{
-		keyprefix: cfg.KeyPrefix,
+		keyPrefix: cfg.KeyPrefix,
 		db:        db,
 	}
 
@@ -136,7 +136,7 @@ func NewFailoverCluster(cfg FailoverConfig) (*Provider, error) {
 
 func (p *Provider) getRedisSessionKey(sessionID []byte) string {
 	key := bytebufferpool.Get()
-	key.SetString(p.keyprefix)
+	key.SetString(p.keyPrefix)
 	key.WriteString(":")
 	key.Write(sessionID)
 
