@@ -50,7 +50,7 @@ func New(cfg Config) (*Provider, error) {
 	return p, nil
 }
 
-// NewFailover returns a new configured redis failover (sentinel) provider
+// NewFailover returns a new redis provider using sentinel to determine the redis server to connect to.
 func NewFailover(cfg FailoverConfig) (*Provider, error) {
 	if cfg.MasterName == "" {
 		return nil, errConfigMasterNameEmpty
@@ -91,6 +91,7 @@ func NewFailover(cfg FailoverConfig) (*Provider, error) {
 	return p, nil
 }
 
+// NewFailoverCluster returns a new redis provider using a group of sentinels to determine the redis server to connect to.
 func NewFailoverCluster(cfg FailoverConfig) (*Provider, error) {
 	if cfg.MasterName == "" {
 		return nil, errConfigMasterNameEmpty

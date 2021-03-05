@@ -90,7 +90,7 @@ type Config struct {
 	Limiter redis.Limiter
 }
 
-// FailoverConfig provider settings
+// FailoverConfig provider settings.
 type FailoverConfig struct {
 	// Key prefix
 	KeyPrefix string
