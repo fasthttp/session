@@ -16,7 +16,9 @@ func New(cfg Config) (*Provider, error) {
 		return nil, errConfigAddrEmpty
 	}
 
-	redis.SetLogger(cfg.Logger)
+	if cfg.Logger != nil {
+		redis.SetLogger(cfg.Logger)
+	}
 
 	db := redis.NewClient(&redis.Options{
 		Network:            cfg.Network,
@@ -58,7 +60,9 @@ func NewFailover(cfg FailoverConfig) (*Provider, error) {
 		return nil, errConfigMasterNameEmpty
 	}
 
-	redis.SetLogger(cfg.Logger)
+	if cfg.Logger != nil {
+		redis.SetLogger(cfg.Logger)
+	}
 
 	db := redis.NewFailoverClient(&redis.FailoverOptions{
 		MasterName:         cfg.MasterName,
@@ -101,7 +105,9 @@ func NewFailoverCluster(cfg FailoverConfig) (*Provider, error) {
 		return nil, errConfigMasterNameEmpty
 	}
 
-	redis.SetLogger(cfg.Logger)
+	if cfg.Logger != nil {
+		redis.SetLogger(cfg.Logger)
+	}
 
 	db := redis.NewFailoverClusterClient(&redis.FailoverOptions{
 		MasterName:         cfg.MasterName,
