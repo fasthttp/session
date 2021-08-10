@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"context"
 	"crypto/tls"
 	"time"
 
@@ -11,6 +12,9 @@ import (
 type Config struct {
 	// Key prefix
 	KeyPrefix string
+
+	// Pointer to the logger interface.
+	Logger Logger
 
 	// The network type, either tcp or unix.
 	// Default is tcp.
@@ -94,6 +98,9 @@ type Config struct {
 type FailoverConfig struct {
 	// Key prefix
 	KeyPrefix string
+
+	// Pointer to the logger interface.
+	Logger Logger
 
 	// Optional username.
 	Username string
@@ -185,4 +192,9 @@ type FailoverConfig struct {
 type Provider struct {
 	keyPrefix string
 	db        redis.Cmdable
+}
+
+// Logger implements the upstream redis internal Logger interface.
+type Logger interface {
+	Printf(ctx context.Context, format string, v ...interface{})
 }
