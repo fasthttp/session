@@ -118,6 +118,11 @@ type FailoverConfig struct {
 	// The sentinel nodes seed list (host:port).
 	SentinelAddrs []string
 
+	// The username to use for the sentinel connection if required. If specified, the Redis
+	// client will attempt to authenticate via ACL authentication. If not specified, the
+	// client will use requirepass-style authentication.
+	SentinelUsername string
+
 	// The password for the sentinel connection if required (different to username/password).
 	SentinelPassword string
 

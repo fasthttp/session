@@ -67,6 +67,7 @@ func NewFailover(cfg FailoverConfig) (*Provider, error) {
 	db := redis.NewFailoverClient(&redis.FailoverOptions{
 		MasterName:         cfg.MasterName,
 		SentinelAddrs:      cfg.SentinelAddrs,
+		SentinelUsername:   cfg.SentinelUsername,
 		SentinelPassword:   cfg.SentinelPassword,
 		SlaveOnly:          cfg.SlaveOnly,
 		Username:           cfg.Username,
@@ -112,6 +113,7 @@ func NewFailoverCluster(cfg FailoverConfig) (*Provider, error) {
 	db := redis.NewFailoverClusterClient(&redis.FailoverOptions{
 		MasterName:         cfg.MasterName,
 		SentinelAddrs:      cfg.SentinelAddrs,
+		SentinelUsername:   cfg.SentinelUsername,
 		SentinelPassword:   cfg.SentinelPassword,
 		RouteByLatency:     cfg.RouteByLatency,
 		RouteRandomly:      cfg.RouteRandomly,
