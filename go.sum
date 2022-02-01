@@ -54,11 +54,10 @@ github.com/onsi/gomega v1.16.0/go.mod h1:HnhC7FXeEQY45zxNK3PPoIUhzk/80Xly9PcubAl
 github.com/philhofer/fwd v1.1.1 h1:GdGcTjf5RNAxwS4QLsiMzJYj5KEvPJD3Abr261yRQXQ=
 github.com/philhofer/fwd v1.1.1/go.mod h1:gk3iGcWd9+svBvR0sR+KPcfE+RNWozjowpeBVG3ZVNU=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/savsgio/dictpool v0.0.0-20210921080634-84324d0689d7 h1:xpWch10f2FeD/0DhPmyBOAq7bhnz4bWoQA6MpX+WHuA=
-github.com/savsgio/dictpool v0.0.0-20210921080634-84324d0689d7/go.mod h1:Yk5UwqSnptrDwMGAvYa96KVGp34nYCBuLbZNLf/L61o=
-github.com/savsgio/gotils v0.0.0-20210921075833-21a6215cb0e4/go.mod h1:oejLrk1Y/5zOF+c/aHtXqn3TFlzzbAgPWg8zBiAHDas=
-github.com/savsgio/gotils v0.0.0-20211223103454-d0aaa54c5899 h1:Orn7s+r1raRTBKLSc9DmbktTT04sL+vkzsbRD2Q8rOI=
-github.com/savsgio/gotils v0.0.0-20211223103454-d0aaa54c5899/go.mod h1:oejLrk1Y/5zOF+c/aHtXqn3TFlzzbAgPWg8zBiAHDas=
+github.com/savsgio/dictpool v0.0.0-20220201165159-a5d561a1a2c9 h1:evrs9pl9zVh1neELXDBjMtuMPp/nrgjceC0zCccrbfM=
+github.com/savsgio/dictpool v0.0.0-20220201165159-a5d561a1a2c9/go.mod h1:ya+xks/rfSw+VXUsDk0XROTKhzLvogFlforzQTPoqMc=
+github.com/savsgio/gotils v0.0.0-20220201163454-d252f0a44d5b h1:ri8OZKT4xhe+5tOr7f7PWeTEx+iAsFy12vu97c892m4=
+github.com/savsgio/gotils v0.0.0-20220201163454-d252f0a44d5b/go.mod h1:oejLrk1Y/5zOF+c/aHtXqn3TFlzzbAgPWg8zBiAHDas=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/tinylib/msgp v1.1.6 h1:i+SbKraHhnrf9M5MYmvQhFnbLhAXSDWF8WWsuyRdocw=
