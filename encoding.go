@@ -8,7 +8,7 @@ var b64Encoding = base64.StdEncoding
 
 // MSGPEncode MessagePack encode
 func MSGPEncode(src Dict) ([]byte, error) {
-	if len(src.D) == 0 {
+	if len(src.KV) == 0 {
 		return nil, nil
 	}
 
@@ -22,7 +22,9 @@ func MSGPEncode(src Dict) ([]byte, error) {
 
 // MSGPDecode MessagePack decode
 func MSGPDecode(dst *Dict, src []byte) error {
-	dst.Reset()
+	for k := range dst.KV {
+		delete(dst.KV, k)
+	}
 
 	if len(src) == 0 {
 		return nil

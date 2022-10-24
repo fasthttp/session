@@ -2,58 +2,68 @@ package session
 
 import (
 	"time"
+
+	"github.com/savsgio/gotils/strconv"
 )
+
+func newDictValue() Dict {
+	return Dict{
+		KV: make(map[string]interface{}),
+	}
+}
 
 // NewStore returns a new empty store
 func NewStore() *Store {
 	return &Store{
-		data: new(Dict),
+		data: newDictValue(),
 	}
 }
 
 // Get returns a value from the given key
 func (s *Store) Get(key string) interface{} {
-	return s.data.Get(key)
+	return s.data.KV[key]
 }
 
 // GetBytes returns a value from the given key
 func (s *Store) GetBytes(key []byte) interface{} {
-	return s.data.GetBytes(key)
+	return s.Get(strconv.B2S(key))
 }
 
 // GetAll returns all stored values
 func (s *Store) GetAll() Dict {
-	return *s.data
+	return s.data
 }
 
 // Ptr returns the internal store pointer
 func (s *Store) Ptr() *Dict {
-	return s.data
+	return &s.data
 }
 
 // Set saves a value for the given key
 func (s *Store) Set(key string, value interface{}) {
-	s.data.Set(key, value)
+	s.data.KV[key] = value
 }
 
 // SetBytes saves a value for the given key
 func (s *Store) SetBytes(key []byte, value interface{}) {
-	s.data.SetBytes(key, value)
+	s.Set(strconv.B2S(key), value)
 }
 
 // Delete deletes a value from the given key
 func (s *Store) Delete(key string) {
-	s.data.Del(key)
+	delete(s.data.KV, key)
 }
 
 // DeleteBytes deletes a value from the given key
 func (s *Store) DeleteBytes(key []byte) {
-	s.data.DelBytes(key)
+	s.Delete(strconv.B2S(key))
 }
 
 // Flush removes all stored values
 func (s *Store) Flush() {
-	s.data.Reset()
+	for k := range s.data.KV {
+		delete(s.data.KV, k)
+	}
 }
 
 // GetSessionID returns the session id
@@ -74,7 +84,7 @@ func (s *Store) SetSessionID(id []byte) {
 
 // HasExpirationChanged checks wether the expiration has been changed
 func (s *Store) HasExpirationChanged() bool {
-	return s.data.Has(expirationAttrKey)
+	return s.Get(expirationAttrKey) != nil
 }
 
 // GetExpiration returns the expiration for current session
@@ -96,7 +106,7 @@ func (s *Store) SetExpiration(expiration time.Duration) error {
 
 // Reset resets the store
 func (s *Store) Reset() {
-	s.data.Reset()
+	s.Flush()
 	s.sessionID = s.sessionID[:0]
 	s.defaultExpiration = 0
 }

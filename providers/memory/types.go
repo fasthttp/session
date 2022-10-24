@@ -1,9 +1,8 @@
 package memory
 
 import (
+	"sync"
 	"time"
-
-	"github.com/fasthttp/session/v2"
 )
 
 // Config provider settings
@@ -12,7 +11,7 @@ type Config struct{}
 // Provider backend manager
 type Provider struct {
 	config Config
-	db     *session.Dict
+	db     sync.Map
 }
 
 type item struct {

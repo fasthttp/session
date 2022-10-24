@@ -171,7 +171,7 @@ func (s *Session) Get(ctx *fasthttp.RequestCtx) (*Store, error) {
 			return nil, err
 		}
 
-		if err := s.config.DecodeFunc(store.data, data); err != nil {
+		if err := s.config.DecodeFunc(&store.data, data); err != nil {
 			return store, nil
 		}
 	}

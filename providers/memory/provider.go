@@ -4,7 +4,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fasthttp/session/v2"
 	"github.com/savsgio/gotils/strconv"
 )
 
@@ -30,16 +29,21 @@ func releaseItem(item *item) {
 func New(cfg Config) (*Provider, error) {
 	p := &Provider{
 		config: cfg,
-		db:     new(session.Dict),
 	}
 
 	return p, nil
 }
 
+func (p *Provider) getSessionKey(sessionID []byte) string {
+	return strconv.B2S(sessionID)
+}
+
 // Get returns the data of the given session id
 func (p *Provider) Get(id []byte) ([]byte, error) {
-	val := p.db.GetBytes(id)
-	if val == nil { // Not exist
+	key := p.getSessionKey(id)
+
+	val, found := p.db.Load(key)
+	if !found || val == nil { // Not exist
 		return nil, nil
 	}
 
@@ -50,12 +54,14 @@ func (p *Provider) Get(id []byte) ([]byte, error) {
 
 // Save saves the session data and expiration from the given session id
 func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
+	key := p.getSessionKey(id)
+
 	item := acquireItem()
 	item.data = data
 	item.lastActiveTime = time.Now().UnixNano()
 	item.expiration = expiration
 
-	p.db.SetBytes(id, item)
+	p.db.Store(key, item)
 
 	return nil
 }
@@ -63,35 +69,49 @@ func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
 // Regenerate updates the session id and expiration with the new session id
 // of the the given current session id
 func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error {
-	data := p.db.GetBytes(id)
-	if data != nil {
+	key := p.getSessionKey(id)
+
+	data, found := p.db.LoadAndDelete(key)
+	if found && data != nil {
 		item := data.(*item)
 		item.lastActiveTime = time.Now().UnixNano()
 		item.expiration = expiration
 
-		p.db.SetBytes(newID, item)
-		p.db.DelBytes(id)
+		newKey := p.getSessionKey(newID)
+
+		p.db.Store(newKey, item)
 	}
+
+	return nil
+}
+
+func (p *Provider) destroy(key string) error {
+	val, found := p.db.LoadAndDelete(key)
+	if !found || val == nil {
+		return nil
+	}
+
+	releaseItem(val.(*item))
 
 	return nil
 }
 
 // Destroy destroys the session from the given id
 func (p *Provider) Destroy(id []byte) error {
-	val := p.db.GetBytes(id)
-	if val == nil {
-		return nil
-	}
+	key := p.getSessionKey(id)
 
-	p.db.DelBytes(id)
-	releaseItem(val.(*item))
-
-	return nil
+	return p.destroy(key)
 }
 
 // Count returns the total of stored sessions
-func (p *Provider) Count() int {
-	return len(p.db.D)
+func (p *Provider) Count() (count int) {
+	p.db.Range(func(_, _ interface{}) bool {
+		count++
+
+		return true
+	})
+
+	return count
 }
 
 // NeedGC indicates if the GC needs to be run
@@ -103,17 +123,19 @@ func (p *Provider) NeedGC() bool {
 func (p *Provider) GC() error {
 	now := time.Now().UnixNano()
 
-	for _, kv := range p.db.D {
-		item := kv.Value.(*item)
+	p.db.Range(func(key, value interface{}) bool {
+		item := value.(*item)
 
 		if item.expiration == 0 {
-			continue
+			return true
 		}
 
 		if now >= (item.lastActiveTime + item.expiration.Nanoseconds()) {
-			p.Destroy(strconv.S2B(kv.Key))
+			_ = p.destroy(key.(string))
 		}
-	}
+
+		return true
+	})
 
 	return nil
 }
