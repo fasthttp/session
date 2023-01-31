@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	"time"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 )
 
 // Config provider settings
@@ -67,7 +67,12 @@ type Config struct {
 	// new connection is slow.
 	MinIdleConns int
 
+	// Maximum number of idle connections.
+	MaxIdleConns int
+
 	// Connection age at which client retires (closes) the connection.
+	// Expired connections may be closed lazily before reuse.
+	// If <= 0, connections are not closed due to a connection's age.
 	// Default is to not close aged connections.
 	MaxConnAge time.Duration
 
@@ -78,14 +83,8 @@ type Config struct {
 
 	// Amount of time after which client closes idle connections.
 	// Should be less than server's timeout.
-	// Default is 5 minutes. -1 disables idle timeout check.
+	// Default is 30 minutes. -1 disables idle timeout check.
 	IdleTimeout time.Duration
-
-	// Frequency of idle checks made by idle connections reaper.
-	// Default is 1 minute. -1 disables idle connections reaper,
-	// but idle connections are still discarded by the client
-	// if IdleTimeout is set.
-	IdleCheckFrequency time.Duration
 
 	// TLS Config to use. When set TLS will be negotiated.
 	TLSConfig *tls.Config
@@ -169,7 +168,12 @@ type FailoverConfig struct {
 	// new connection is slow.
 	MinIdleConns int
 
+	// Maximum number of idle connections.
+	MaxIdleConns int
+
 	// Connection age at which client retires (closes) the connection.
+	// Expired connections may be closed lazily before reuse.
+	// If <= 0, connections are not closed due to a connection's age.
 	// Default is to not close aged connections.
 	MaxConnAge time.Duration
 
@@ -180,14 +184,8 @@ type FailoverConfig struct {
 
 	// Amount of time after which client closes idle connections.
 	// Should be less than server's timeout.
-	// Default is 5 minutes. -1 disables idle timeout check.
+	// Default is 30 minutes. -1 disables idle timeout check.
 	IdleTimeout time.Duration
-
-	// Frequency of idle checks made by idle connections reaper.
-	// Default is 1 minute. -1 disables idle connections reaper,
-	// but idle connections are still discarded by the client
-	// if IdleTimeout is set.
-	IdleCheckFrequency time.Duration
 
 	// TLS Config to use. When set TLS will be negotiated.
 	TLSConfig *tls.Config
