@@ -8,7 +8,7 @@ require (
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/lib/pq v1.10.7
 	github.com/mattn/go-sqlite3 v1.14.16
-	github.com/redis/go-redis/v9 v9.0.1
+	github.com/redis/go-redis/v9 v9.0.2
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee
 	github.com/tinylib/msgp v1.1.8
 	github.com/valyala/bytebufferpool v1.0.0

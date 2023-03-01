@@ -1,5 +1,5 @@
-//go:build go1.19
-// +build go1.19
+//go:build !go1.19
+// +build !go1.19
 
 package redis
 
@@ -8,7 +8,7 @@ import (
 	"crypto/tls"
 	"time"
 
-	"github.com/redis/go-redis/v9"
+	"github.com/go-redis/redis/v8"
 )
 
 // Config provider settings
@@ -70,26 +70,25 @@ type Config struct {
 	// new connection is slow.
 	MinIdleConns int
 
-	// Maximum number of idle connections.
-	MaxIdleConns int
-
-	// Maximum amount of time a connection may be reused.
-	// Expired connections may be closed lazily before reuse.
-	// If <= 0, connections are not closed due to a connection's age.
-	// Default is to not close idle connections.
-	ConnMaxLifetime time.Duration
+	// Connection age at which client retires (closes) the connection.
+	// Default is to not close aged connections.
+	MaxConnAge time.Duration
 
 	// Amount of time client waits for connection if all connections
 	// are busy before returning an error.
 	// Default is ReadTimeout + 1 second.
 	PoolTimeout time.Duration
 
-	// Maximum amount of time a connection may be idle.
+	// Amount of time after which client closes idle connections.
 	// Should be less than server's timeout.
-	// Expired connections may be closed lazily before reuse.
-	// If d <= 0, connections are not closed due to a connection's idle time.
-	// Default is 30 minutes. -1 disables idle timeout check.
-	ConnMaxIdleTime time.Duration
+	// Default is 5 minutes. -1 disables idle timeout check.
+	IdleTimeout time.Duration
+
+	// Frequency of idle checks made by idle connections reaper.
+	// Default is 1 minute. -1 disables idle connections reaper,
+	// but idle connections are still discarded by the client
+	// if IdleTimeout is set.
+	IdleCheckFrequency time.Duration
 
 	// TLS Config to use. When set TLS will be negotiated.
 	TLSConfig *tls.Config
@@ -136,8 +135,8 @@ type FailoverConfig struct {
 	// Routes read-only commands in random order. Only relevant with NewFailoverCluster.
 	RouteRandomly bool
 
-	// Route all commands to replica read-only nodes.
-	ReplicaOnly bool
+	// Route read-only commands to slave nodes.
+	SlaveOnly bool
 
 	// Maximum number of retries before giving up.
 	// Default is to not retry failed commands.
@@ -173,12 +172,7 @@ type FailoverConfig struct {
 	// new connection is slow.
 	MinIdleConns int
 
-	// Maximum number of idle connections.
-	MaxIdleConns int
-
 	// Connection age at which client retires (closes) the connection.
-	// Expired connections may be closed lazily before reuse.
-	// If <= 0, connections are not closed due to a connection's age.
 	// Default is to not close aged connections.
 	MaxConnAge time.Duration
 
@@ -189,8 +183,14 @@ type FailoverConfig struct {
 
 	// Amount of time after which client closes idle connections.
 	// Should be less than server's timeout.
-	// Default is 30 minutes. -1 disables idle timeout check.
+	// Default is 5 minutes. -1 disables idle timeout check.
 	IdleTimeout time.Duration
+
+	// Frequency of idle checks made by idle connections reaper.
+	// Default is 1 minute. -1 disables idle connections reaper,
+	// but idle connections are still discarded by the client
+	// if IdleTimeout is set.
+	IdleCheckFrequency time.Duration
 
 	// TLS Config to use. When set TLS will be negotiated.
 	TLSConfig *tls.Config
