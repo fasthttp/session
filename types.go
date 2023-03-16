@@ -71,7 +71,7 @@ type Session struct {
 	cookie   *cookie
 	log      Logger
 
-	storePool  *sync.Pool
+	storePool  sync.Pool
 	stopGCChan chan struct{}
 }
 

@@ -97,7 +97,9 @@ func TestStore_SetGetHasExpiration(t *testing.T) {
 
 	expiration := 10 * time.Second
 
-	store.SetExpiration(expiration)
+	if err := store.SetExpiration(expiration); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
 	if v := store.GetExpiration(); v != expiration {
 		t.Errorf("Store.GetExpiration() == %d, want %d", v, expiration)

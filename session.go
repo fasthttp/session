@@ -56,7 +56,7 @@ func New(cfg Config) *Session {
 		config: cfg,
 		cookie: newCookie(),
 		log:    cfg.Logger,
-		storePool: &sync.Pool{
+		storePool: sync.Pool{
 			New: func() interface{} {
 				return NewStore()
 			},
@@ -79,9 +79,12 @@ func (s *Session) SetProvider(provider Provider) error {
 }
 
 func (s *Session) startGC() {
+	ticker := time.NewTicker(s.config.GCLifetime)
+	defer ticker.Stop()
+
 	for {
 		select {
-		case <-time.After(s.config.GCLifetime):
+		case <-ticker.C:
 			err := s.provider.GC()
 			if err != nil {
 				s.log.Printf("session GC crash: %v", err)

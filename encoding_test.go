@@ -27,8 +27,7 @@ func TestMSGPEncodeDecode(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = MSGPDecode(&dst, b1)
-	if err != nil {
+	if err := MSGPDecode(&dst, b1); err != nil {
 		t.Fatal(err)
 	}
 
@@ -46,8 +45,7 @@ func TestBase64EncodeDecode(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = Base64Decode(&dst, b1)
-	if err != nil {
+	if err := Base64Decode(&dst, b1); err != nil {
 		t.Fatal(err)
 	}
 
@@ -60,8 +58,11 @@ func BenchmarkMSGPEncode(b *testing.B) {
 	src := getSRC()
 
 	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
-		MSGPEncode(src)
+		if _, err := MSGPEncode(src); err != nil {
+			b.Fatal(err)
+		}
 	}
 }
 
@@ -72,8 +73,11 @@ func BenchmarkMSGPDecode(b *testing.B) {
 	srcBytes, _ := MSGPEncode(src)
 
 	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
-		MSGPDecode(&dst, srcBytes)
+		if err := MSGPDecode(&dst, srcBytes); err != nil {
+			b.Fatal(err)
+		}
 	}
 }
 
@@ -81,8 +85,11 @@ func BenchmarkBase64Encode(b *testing.B) {
 	src := getSRC()
 
 	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
-		Base64Encode(src)
+		if _, err := Base64Encode(src); err != nil {
+			b.Fatal(err)
+		}
 	}
 }
 
@@ -93,7 +100,10 @@ func BenchmarkBase64Decode(b *testing.B) {
 	srcBytes, _ := Base64Encode(src)
 
 	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
-		Base64Decode(&dst, srcBytes)
+		if err := Base64Decode(&dst, srcBytes); err != nil {
+			b.Fatal(err)
+		}
 	}
 }
