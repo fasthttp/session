@@ -26,7 +26,7 @@ var (
 // New returns a new configured sqlite3 provider
 func New(cfg Config) (*Provider, error) {
 	if cfg.DBPath == "" {
-		return nil, errConfigDBPathEmpty
+		return nil, ErrConfigDBPathEmpty
 	}
 
 	providerCfg := sql.ProviderConfig{

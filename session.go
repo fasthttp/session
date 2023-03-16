@@ -146,7 +146,7 @@ func (s *Session) getSessionID(ctx *fasthttp.RequestCtx) []byte {
 // if it does not exist, it will be generated
 func (s *Session) Get(ctx *fasthttp.RequestCtx) (*Store, error) {
 	if s.provider == nil {
-		return nil, errNotSetProvider
+		return nil, ErrNotSetProvider
 	}
 
 	newUser := false
@@ -155,7 +155,7 @@ func (s *Session) Get(ctx *fasthttp.RequestCtx) (*Store, error) {
 	if len(id) == 0 {
 		id = s.config.SessionIDGeneratorFunc()
 		if len(id) == 0 {
-			return nil, errEmptySessionID
+			return nil, ErrEmptySessionID
 		}
 
 		newUser = true
@@ -185,7 +185,7 @@ func (s *Session) Get(ctx *fasthttp.RequestCtx) (*Store, error) {
 // For avoid it, defer this function in your request handler
 func (s *Session) Save(ctx *fasthttp.RequestCtx, store *Store) error {
 	if s.provider == nil {
-		return errNotSetProvider
+		return ErrNotSetProvider
 	}
 
 	id := store.GetSessionID()
@@ -216,7 +216,7 @@ func (s *Session) Save(ctx *fasthttp.RequestCtx, store *Store) error {
 // Regenerate generates a new session id to the current user
 func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) error {
 	if s.provider == nil {
-		return errNotSetProvider
+		return ErrNotSetProvider
 	}
 
 	id := s.getSessionID(ctx)
@@ -224,7 +224,7 @@ func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) error {
 
 	newID := s.config.SessionIDGeneratorFunc()
 	if len(newID) == 0 {
-		return errEmptySessionID
+		return ErrEmptySessionID
 	}
 
 	providerExpiration := expiration
@@ -244,7 +244,7 @@ func (s *Session) Regenerate(ctx *fasthttp.RequestCtx) error {
 // Destroy destroys the session of the current user
 func (s *Session) Destroy(ctx *fasthttp.RequestCtx) error {
 	if s.provider == nil {
-		return errNotSetProvider
+		return ErrNotSetProvider
 	}
 
 	sessionID := s.getSessionID(ctx)

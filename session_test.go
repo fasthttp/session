@@ -251,8 +251,8 @@ func TestSession_GetErrNotProvider(t *testing.T) {
 
 	store, err := s.Get(ctx)
 
-	if err != errNotSetProvider {
-		t.Errorf("Expected error: %v", errNotSetProvider)
+	if err != ErrNotSetProvider {
+		t.Errorf("Expected error: %v", ErrNotSetProvider)
 	}
 
 	if store != nil {
@@ -272,8 +272,8 @@ func TestSession_GetErrEmptySessionID(t *testing.T) {
 
 	store, err := s.Get(ctx)
 
-	if err != errEmptySessionID {
-		t.Errorf("Expected error: %v", errEmptySessionID)
+	if err != ErrEmptySessionID {
+		t.Errorf("Expected error: %v", ErrEmptySessionID)
 	}
 
 	if store != nil {
@@ -371,8 +371,8 @@ func TestSession_RegenerateErrNotProvider(t *testing.T) {
 	s := New(Config{})
 	ctx := new(fasthttp.RequestCtx)
 
-	if err := s.Regenerate(ctx); err != errNotSetProvider {
-		t.Errorf("Expected error: %v", errNotSetProvider)
+	if err := s.Regenerate(ctx); err != ErrNotSetProvider {
+		t.Errorf("Expected error: %v", ErrNotSetProvider)
 	}
 }
 
@@ -387,8 +387,8 @@ func TestSession_RegenerateErrEmptySessionID(t *testing.T) {
 	ctx := new(fasthttp.RequestCtx)
 	ctx.Request.Header.SetCookie(s.config.CookieName, "d32r2f2ecev")
 
-	if err := s.Regenerate(ctx); err != errEmptySessionID {
-		t.Errorf("Expected error: %v", errEmptySessionID)
+	if err := s.Regenerate(ctx); err != ErrEmptySessionID {
+		t.Errorf("Expected error: %v", ErrEmptySessionID)
 	}
 }
 
@@ -429,8 +429,8 @@ func TestSession_DestroyErrNotProvider(t *testing.T) {
 
 	err := s.Destroy(ctx)
 
-	if err != errNotSetProvider {
-		t.Errorf("Expected error: %v", errNotSetProvider)
+	if err != ErrNotSetProvider {
+		t.Errorf("Expected error: %v", ErrNotSetProvider)
 	}
 }
 

@@ -5,10 +5,11 @@ import (
 	"fmt"
 )
 
-var errConfigAddrEmpty = errors.New("Config Addr must not be empty")
+var (
+	ErrConfigAddrEmpty       = errors.New("Config Addr must not be empty")
+	ErrConfigMasterNameEmpty = errors.New("Config MasterName must not be empty")
+)
 
-var errConfigMasterNameEmpty = errors.New("Config MasterName must not be empty")
-
-func errRedisConnection(err error) error {
-	return fmt.Errorf("Redis connection error: %v", err)
+func newErrRedisConnection(err error) error {
+	return fmt.Errorf("redis connection error: %w", err)
 }

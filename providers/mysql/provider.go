@@ -27,10 +27,10 @@ var (
 // New returns a new configured mysql provider
 func New(cfg Config) (*Provider, error) {
 	if cfg.Host == "" {
-		return nil, errConfigHostEmpty
+		return nil, ErrConfigHostEmpty
 	}
 	if cfg.Port == 0 {
-		return nil, errConfigPortZero
+		return nil, ErrConfigPortZero
 	}
 
 	providerCfg := sql.ProviderConfig{

@@ -32,10 +32,10 @@ func releaseItem(item *memcache.Item) {
 // New returns a new memcache provider configured
 func New(cfg Config) (*Provider, error) {
 	if len(cfg.ServerList) == 0 {
-		return nil, errConfigServerListEmpty
+		return nil, ErrConfigServerListEmpty
 	}
 	if cfg.MaxIdleConns <= 0 {
-		return nil, errConfigMaxIdleConnsZero
+		return nil, ErrConfigMaxIdleConnsZero
 	}
 
 	db := memcache.New(cfg.ServerList...)
@@ -85,7 +85,7 @@ func (p *Provider) Get(id []byte) ([]byte, error) {
 func (p *Provider) Save(id, data []byte, expiration time.Duration) error {
 	mcExpiration := int32(expiration.Seconds())
 	if mcExpiration > math.MaxInt32 {
-		return errExpirationIsTooBig
+		return ErrExpirationIsTooBig
 	}
 
 	item := acquireItem()
@@ -114,7 +114,7 @@ func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error 
 	if item != nil { // Exist
 		mcExpiration := int32(expiration.Seconds())
 		if mcExpiration > math.MaxInt32 {
-			return errExpirationIsTooBig
+			return ErrExpirationIsTooBig
 		}
 
 		newItem := acquireItem()
