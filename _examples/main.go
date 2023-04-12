@@ -9,6 +9,7 @@ import (
 	"github.com/fasthttp/session/v2"
 	"github.com/fasthttp/session/v2/providers/memcache"
 	"github.com/fasthttp/session/v2/providers/memory"
+	"github.com/fasthttp/session/v2/providers/mongodb"
 	"github.com/fasthttp/session/v2/providers/mysql"
 	"github.com/fasthttp/session/v2/providers/postgre"
 	"github.com/fasthttp/session/v2/providers/redis"
@@ -63,6 +64,9 @@ func init() {
 	case "sqlite3":
 		cfg := sqlite3.NewConfigWith("test.db", "session")
 		provider, err = sqlite3.New(cfg)
+	case "mongodb":
+		cfg := mongodb.NewConfigWith("mongodb://root:password@localhost:27017", "test", "session")
+		provider, err = mongodb.New(cfg)
 	default:
 		panic("Invalid provider")
 	}
