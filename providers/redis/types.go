@@ -73,6 +73,9 @@ type Config struct {
 	// Maximum number of idle connections.
 	MaxIdleConns int
 
+	// Deprecated: This field has been renamed to ConnMaxLifetime
+	MaxConnAge time.Duration
+
 	// Maximum amount of time a connection may be reused.
 	// Expired connections may be closed lazily before reuse.
 	// If <= 0, connections are not closed due to a connection's age.
@@ -83,6 +86,12 @@ type Config struct {
 	// are busy before returning an error.
 	// Default is ReadTimeout + 1 second.
 	PoolTimeout time.Duration
+
+	// Deprecated: This field has been renamed to ConnMaxIdleTime
+	IdleTimeout time.Duration
+
+	// Deprecated: This field has been removed in favor of MaxIdleConns
+	IdleCheckFrequency time.Duration
 
 	// Maximum amount of time a connection may be idle.
 	// Should be less than server's timeout.
@@ -136,6 +145,9 @@ type FailoverConfig struct {
 	// Routes read-only commands in random order. Only relevant with NewFailoverCluster.
 	RouteRandomly bool
 
+	// Deprecated: his field has been renamed to ReplicaOnly
+	SlaveOnly bool
+
 	// Route all commands to replica read-only nodes.
 	ReplicaOnly bool
 
@@ -176,21 +188,29 @@ type FailoverConfig struct {
 	// Maximum number of idle connections.
 	MaxIdleConns int
 
-	// Connection age at which client retires (closes) the connection.
+	// Deprecated: This field has been renamed to ConnMaxLifetime
+	MaxConnAge time.Duration
+
+	// Maximum amount of time a connection may be reused.
 	// Expired connections may be closed lazily before reuse.
 	// If <= 0, connections are not closed due to a connection's age.
-	// Default is to not close aged connections.
-	MaxConnAge time.Duration
+	// Default is to not close idle connections.
+	ConnMaxLifetime time.Duration
 
 	// Amount of time client waits for connection if all connections
 	// are busy before returning an error.
 	// Default is ReadTimeout + 1 second.
 	PoolTimeout time.Duration
 
-	// Amount of time after which client closes idle connections.
-	// Should be less than server's timeout.
-	// Default is 30 minutes. -1 disables idle timeout check.
+	// Deprecated: This field has been renamed to ConnMaxIdleTime
 	IdleTimeout time.Duration
+
+	// Maximum amount of time a connection may be idle.
+	// Should be less than server's timeout.
+	// Expired connections may be closed lazily before reuse.
+	// If d <= 0, connections are not closed due to a connection's idle time.
+	// Default is 30 minutes. -1 disables idle timeout check.
+	ConnMaxIdleTime time.Duration
 
 	// TLS Config to use. When set TLS will be negotiated.
 	TLSConfig *tls.Config
