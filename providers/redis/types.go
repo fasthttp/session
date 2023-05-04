@@ -145,7 +145,7 @@ type FailoverConfig struct {
 	// Routes read-only commands in random order. Only relevant with NewFailoverCluster.
 	RouteRandomly bool
 
-	// Deprecated: his field has been renamed to ReplicaOnly
+	// Deprecated: This field has been renamed to ReplicaOnly
 	SlaveOnly bool
 
 	// Route all commands to replica read-only nodes.
