@@ -14,7 +14,7 @@ var all = []byte("*")
 // New returns a new configured redis provider
 func New(cfg Config) (*Provider, error) {
 	if cfg.Addr == "" {
-		return nil, errConfigAddrEmpty
+		return nil, ErrConfigAddrEmpty
 	}
 
 	if cfg.Logger != nil {
@@ -44,7 +44,7 @@ func New(cfg Config) (*Provider, error) {
 	})
 
 	if err := db.Ping(context.Background()).Err(); err != nil {
-		return nil, errRedisConnection(err)
+		return nil, newErrRedisConnection(err)
 	}
 
 	p := &Provider{
@@ -58,7 +58,7 @@ func New(cfg Config) (*Provider, error) {
 // NewFailover returns a new redis provider using sentinel to determine the redis server to connect to.
 func NewFailover(cfg FailoverConfig) (*Provider, error) {
 	if cfg.MasterName == "" {
-		return nil, errConfigMasterNameEmpty
+		return nil, ErrConfigMasterNameEmpty
 	}
 
 	if cfg.Logger != nil {
@@ -90,7 +90,7 @@ func NewFailover(cfg FailoverConfig) (*Provider, error) {
 	})
 
 	if err := db.Ping(context.Background()).Err(); err != nil {
-		return nil, errRedisConnection(err)
+		return nil, newErrRedisConnection(err)
 	}
 
 	p := &Provider{
@@ -104,7 +104,7 @@ func NewFailover(cfg FailoverConfig) (*Provider, error) {
 // NewFailoverCluster returns a new redis provider using a group of sentinels to determine the redis server to connect to.
 func NewFailoverCluster(cfg FailoverConfig) (*Provider, error) {
 	if cfg.MasterName == "" {
-		return nil, errConfigMasterNameEmpty
+		return nil, ErrConfigMasterNameEmpty
 	}
 
 	if cfg.Logger != nil {
@@ -138,7 +138,7 @@ func NewFailoverCluster(cfg FailoverConfig) (*Provider, error) {
 	})
 
 	if err := db.Ping(context.Background()).Err(); err != nil {
-		return nil, errRedisConnection(err)
+		return nil, newErrRedisConnection(err)
 	}
 
 	p := &Provider{
