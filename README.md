@@ -11,8 +11,9 @@ See [examples](_examples/) to see how to use it.
 
 ## Providers
 
-- memory
 - memcache
+- memory
+- mongodb
 - mysql
 - postgres
 - redis
