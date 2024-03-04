@@ -9,7 +9,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/redis/go-redis/v9 v9.5.1
-	github.com/savsgio/gotils v0.0.0-20240303165341-b550f9725c9d
+	github.com/savsgio/gotils v0.0.0-20240303185622-093b76447511
 	github.com/tinylib/msgp v1.1.9
 	github.com/valyala/bytebufferpool v1.0.0
 	github.com/valyala/fasthttp v1.52.0
