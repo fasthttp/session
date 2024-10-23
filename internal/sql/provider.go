@@ -122,7 +122,7 @@ func (p *Provider) Regenerate(id, newID []byte, expiration time.Duration) error 
 
 // Destroy destroys the session from the given id
 func (p *Provider) Destroy(id []byte) error {
-	_, err := p.Exec(p.config.SQLDestroy, id)
+	_, err := p.Exec(p.config.SQLDestroy, strconv.B2S(id))
 	return err
 }
 
